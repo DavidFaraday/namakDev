@@ -78,6 +78,8 @@ class WelcomeViewController: UIViewController {
 
     func loginUser() {
         
+        ProgressHUD.show("Login...")
+        
         FUser.loginUserWith(email: emailTextField.text!, password: passwordTextField.text!) { (error) in
             
             //error handeling
@@ -92,28 +94,18 @@ class WelcomeViewController: UIViewController {
     
     func registerUser() {
         
-        FUser.registerUserWith(email: emailTextField.text!, password: passwordTextField.text!, firstName: "", lastName: "") { (error) in
-            
-            if error != nil {
-                
-                DispatchQueue.main.async {
-                    ProgressHUD.showError(error?.localizedDescription)
-                }
-                
-                return
-            }
-            
-            self.cleanTextFields()
-            self.dismissKeyboard()
-            self.performSegue(withIdentifier: "welcomeToFinishReg", sender: self)
-        }
-        
+        self.performSegue(withIdentifier: "welcomeToFinishReg", sender: self)
+        self.cleanTextFields()
+        self.dismissKeyboard()
     }
     
     
     
     
     func goToApp() {
+        
+        print("welcome go to app")
+        ProgressHUD.dismiss()
         
         cleanTextFields()
         dismissKeyboard()
@@ -128,6 +120,18 @@ class WelcomeViewController: UIViewController {
     }
 
     
+    //MARK: Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "welcomeToFinishReg" {
+            let vc = segue.destination as! FinishRegistrationViewController
+            
+            vc.password = passwordTextField.text!
+            vc.email = emailTextField.text!
+            
+        }
+    }
 
     
 }

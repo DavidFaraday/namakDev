@@ -258,27 +258,27 @@ class FUser {
     
     //MARK: LogOut func
     
-    //    class func logOutCurrentUser(withBlock: @escaping (_ success: Bool) -> Void) {
-    //
-    //        userDefaults.removeObject(forKey: "OneSignalId")
-    //        removeOneSignalId()
-    //
-    //        userDefaults.removeObject(forKey: kCURRENTUSER)
-    //        userDefaults.synchronize()
-    //
-    //        do {
-    //            try Auth.auth().signOut()
-    //
-    //            withBlock(true)
-    //
-    //        } catch let error as NSError {
-    //            withBlock(false)
-    //            print(error.localizedDescription)
-    //
-    //        }
-    //
-    //
-    //    }
+        class func logOutCurrentUser(completion: @escaping (_ success: Bool) -> Void) {
+    
+            userDefaults.removeObject(forKey: kPUSHID)
+            removeOneSignalId()
+    
+            userDefaults.removeObject(forKey: kCURRENTUSER)
+            userDefaults.synchronize()
+    
+            do {
+                try Auth.auth().signOut()
+    
+                completion(true)
+    
+            } catch let error as NSError {
+                completion(false)
+                print(error.localizedDescription)
+    
+            }
+    
+    
+        }
     
     //MARK: Delete user
     
@@ -416,6 +416,55 @@ func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ err
         })
     }
 }
+
+
+//MARK: OneSignal
+
+func updateOneSignalId() {
+    
+    if FUser.currentUser() != nil {
+        
+        if let pushId = UserDefaults.standard.string(forKey: kPUSHID) {
+            
+            setOneSignalId(pushId: pushId)
+            
+        } else {
+            
+            removeOneSignalId()
+        }
+    }
+}
+
+
+func setOneSignalId(pushId: String) {
+    
+    updateCurrentUserOneSignalId(newId: pushId)
+}
+
+
+func removeOneSignalId() {
+    
+    updateCurrentUserOneSignalId(newId: "")
+}
+
+//MARK: Updating Current user funcs
+
+func updateCurrentUserOneSignalId(newId: String) {
+    
+    let user = FUser.currentUser()
+    user!.pushId = newId
+    user!.updatedAt = Date()
+    
+    let updatedDate = dateFormatter().string(from: Date())
+    
+    updateCurrentUser(withValues: [kPUSHID : newId, kUPDATEDAT : updatedDate]) { (success) in
+        
+    }
+    
+    saveUserLocally(fUser: user!)
+    saveUserInBackground(fUser: user!)
+}
+
 
 
 

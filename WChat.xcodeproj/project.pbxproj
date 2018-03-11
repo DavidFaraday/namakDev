@@ -13,6 +13,12 @@
 		632BE1FA2051BA5800131EB6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 632BE1F82051BA5800131EB6 /* LaunchScreen.storyboard */; };
 		6344EE1C20541FC6009415FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6344EE1B20541FC5009415FB /* GoogleService-Info.plist */; };
 		6344EE202054222D009415FB /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE1F2054222D009415FB /* WelcomeViewController.swift */; };
+		6344EE2220544E5C009415FB /* FinishRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */; };
+		6344EE2520545D42009415FB /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE2420545D42009415FB /* SettingsViewController.swift */; };
+		635D8E4B20552B7200297A0F /* UsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4A20552B7200297A0F /* UsersViewController.swift */; };
+		635D8E4D20552D2A00297A0F /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4C20552D2A00297A0F /* UserTableViewCell.swift */; };
+		635D8E4F2055679100297A0F /* ChatsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4E2055679100297A0F /* ChatsViewController.swift */; };
+		635D8E5120557A2800297A0F /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E5020557A2800297A0F /* ProfileViewController.swift */; };
 		63C343532051BBF500C6985B /* FUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343522051BBF500C6985B /* FUser.swift */; };
 		63C343552051BC5500C6985B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343542051BC5500C6985B /* Constants.swift */; };
 		63C343572051BC7E00C6985B /* HelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343562051BC7E00C6985B /* HelperFunctions.swift */; };
@@ -28,6 +34,12 @@
 		632BE1FB2051BA5800131EB6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6344EE1B20541FC5009415FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6344EE1F2054222D009415FB /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishRegistrationViewController.swift; sourceTree = "<group>"; };
+		6344EE2420545D42009415FB /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		635D8E4A20552B7200297A0F /* UsersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersViewController.swift; sourceTree = "<group>"; };
+		635D8E4C20552D2A00297A0F /* UserTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTableViewCell.swift; sourceTree = "<group>"; };
+		635D8E4E2055679100297A0F /* ChatsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsViewController.swift; sourceTree = "<group>"; };
+		635D8E5020557A2800297A0F /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		63C343522051BBF500C6985B /* FUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FUser.swift; sourceTree = "<group>"; };
 		63C343542051BC5500C6985B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		63C343562051BC7E00C6985B /* HelperFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperFunctions.swift; sourceTree = "<group>"; };
@@ -78,7 +90,12 @@
 			isa = PBXGroup;
 			children = (
 				632BE1EF2051BA5800131EB6 /* AppDelegate.swift */,
-				6344EE1F2054222D009415FB /* WelcomeViewController.swift */,
+				6344EE2420545D42009415FB /* SettingsViewController.swift */,
+				635D8E4E2055679100297A0F /* ChatsViewController.swift */,
+				635D8E4A20552B7200297A0F /* UsersViewController.swift */,
+				635D8E5020557A2800297A0F /* ProfileViewController.swift */,
+				635D8E4C20552D2A00297A0F /* UserTableViewCell.swift */,
+				6344EE2320545D30009415FB /* Welcome */,
 				6344EE1E2054221B009415FB /* Classes */,
 				6344EE1D20542211009415FB /* Helpers */,
 				632BE1F32051BA5800131EB6 /* Main.storyboard */,
@@ -105,6 +122,15 @@
 				63C343522051BBF500C6985B /* FUser.swift */,
 			);
 			path = Classes;
+			sourceTree = "<group>";
+		};
+		6344EE2320545D30009415FB /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				6344EE1F2054222D009415FB /* WelcomeViewController.swift */,
+				6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */,
+			);
+			path = Welcome;
 			sourceTree = "<group>";
 		};
 		863C61EE247C705E4B738073 /* Pods */ = {
@@ -274,9 +300,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6344EE2220544E5C009415FB /* FinishRegistrationViewController.swift in Sources */,
+				635D8E4D20552D2A00297A0F /* UserTableViewCell.swift in Sources */,
+				635D8E4F2055679100297A0F /* ChatsViewController.swift in Sources */,
 				63C343572051BC7E00C6985B /* HelperFunctions.swift in Sources */,
+				6344EE2520545D42009415FB /* SettingsViewController.swift in Sources */,
 				6344EE202054222D009415FB /* WelcomeViewController.swift in Sources */,
+				635D8E5120557A2800297A0F /* ProfileViewController.swift in Sources */,
 				63C343532051BBF500C6985B /* FUser.swift in Sources */,
+				635D8E4B20552B7200297A0F /* UsersViewController.swift in Sources */,
 				632BE1F02051BA5800131EB6 /* AppDelegate.swift in Sources */,
 				63C343552051BC5500C6985B /* Constants.swift in Sources */,
 			);

@@ -25,7 +25,7 @@ public let APP_STARTED_NOTIFICATION = "AppStartedNotification"
 
 
 //IDS and Keys
-public let kFILEREFERENCE = "gs://dchat-71f33.appspot.com"
+public let kFILEREFERENCE = "gs://dchat-71f33.appspot.com"//wrong
 public let kONESIGNALAPPID = ""
 public let kSINCHKEY = ""
 public let kSINCHSECRET = ""
