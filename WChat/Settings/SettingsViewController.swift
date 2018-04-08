@@ -9,25 +9,72 @@
 import UIKit
 import ProgressHUD
 
-class SettingsViewController: UIViewController {
+class SettingsTableViewController: UITableViewController {
 
+    @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var deleteAccountButtonOutlet: UIButton!
-    @IBOutlet weak var nameLabel: UILabel!
+
+    @IBOutlet weak var avatarImageView: UIImageView!
+    @IBOutlet weak var fullNameLabel: UILabel!
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if FUser.currentUser() != nil {
+            setupUI()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        nameLabel.text = FUser.currentUser()?.fullname
+        tableView.tableHeaderView = headerView
+        //to remove empty cell lines
+        tableView.tableFooterView = UIView()
+        if FUser.currentUser() != nil {
+            setupUI()
+        }
+    }
+    
+    //MARK: TableViewDataSource
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 3
     }
     
     
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return ""
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        return UIView()
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        
+        if section == 0 {
+            return 0
+        }
+        return 30
+    }
+
+    
+    
     //MARK: IBActions
+    
+    @IBAction func editButtonPressed(_ sender: Any) {
+        performSegue(withIdentifier: "settingsToEditProfileSeg", sender: self)
+    }
+    
 
     @IBAction func logOutButtonPressed(_ sender: Any) {
         
         FUser.logOutCurrentUser { (success) in
             
-            print("logged out")
             self.showLoginView()
         }
         
@@ -67,6 +114,20 @@ class SettingsViewController: UIViewController {
     }
     
     //MARK: Helpers
+    
+    func setupUI() {
+
+        let currentUser = FUser.currentUser()!
+        
+        fullNameLabel.text = currentUser.fullname
+        
+        imageFromData(pictureData: currentUser.avatar) { (avatarImage) in
+            
+            if avatarImage != nil {
+                self.avatarImageView.image = avatarImage!.circleMasked
+            }
+        }
+    }
     
     func deleteUser() {
         

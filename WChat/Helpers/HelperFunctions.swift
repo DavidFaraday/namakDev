@@ -33,7 +33,14 @@ func imageFromData(pictureData: String, withBlock: (_ image: UIImage?) -> Void) 
     image = UIImage(data: decodedData! as Data)
     
     withBlock(image)
+}
+
+//for avatars
+func dataImageFromString(pictureString: String, withBlock: (_ image: Data?) -> Void) {
     
+    let imageData = NSData(base64Encoded: pictureString, options: NSData.Base64DecodingOptions(rawValue: 0))
+    
+    withBlock(imageData as Data?)
 }
 
 

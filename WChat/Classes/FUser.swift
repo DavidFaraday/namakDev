@@ -29,12 +29,12 @@ class FUser {
     var city: String
     
     var contacts: [String]
-    
+    var blockedUsers: [String]
     let loginMethod: String
     
     //MARK: Initializers
     
-    init(_objectId: String, _pushId: String?, _createdAt: Date, _updatedAt: Date, _email: String, _firstname: String, _lastname: String, _avatar: String = "", _loginMethod: String, _contacts: [String], _phoneNumber: String, _city: String, _country: String) {
+    init(_objectId: String, _pushId: String?, _createdAt: Date, _updatedAt: Date, _email: String, _firstname: String, _lastname: String, _avatar: String = "", _loginMethod: String, _phoneNumber: String, _city: String, _country: String) {
         
         objectId = _objectId
         pushId = _pushId
@@ -47,7 +47,6 @@ class FUser {
         lastname = _lastname
         fullname = _firstname + " " + _lastname
         avatar = _avatar
-        contacts = _contacts
         isOnline = true
         
         city = _city
@@ -56,6 +55,9 @@ class FUser {
         loginMethod = _loginMethod
         phoneNumber = _phoneNumber
         countryCode = ""
+        blockedUsers = []
+        contacts = []
+
     }
     
     
@@ -125,6 +127,12 @@ class FUser {
         } else {
             contacts = []
         }
+        if let block = _dictionary[kBLOCKEDUSERID] {
+            blockedUsers = block as! [String]
+        } else {
+            blockedUsers = []
+        }
+
         if let lgm = _dictionary[kLOGINMETHOD] {
             loginMethod = lgm as! String
         } else {
@@ -149,7 +157,6 @@ class FUser {
     class func currentId() -> String {
         
         return Auth.auth().currentUser!.uid
-        
     }
     
     class func currentUser () -> FUser? {
@@ -202,7 +209,7 @@ class FUser {
                 return
             }
             
-            let fUser = FUser(_objectId: firuser!.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: firuser!.email!, _firstname: firstName, _lastname: lastName, _avatar: avatar, _loginMethod: kEMAIL, _contacts: [], _phoneNumber: "", _city: "", _country: "")
+            let fUser = FUser(_objectId: firuser!.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: firuser!.email!, _firstname: firstName, _lastname: lastName, _avatar: avatar, _loginMethod: kEMAIL, _phoneNumber: "", _city: "", _country: "")
             
             
             saveUserLocally(fUser: fUser)
@@ -339,66 +346,76 @@ func userDictionaryFrom(user: FUser) -> NSDictionary {
     let createdAt = dateFormatter().string(from: user.createdAt)
     let updatedAt = dateFormatter().string(from: user.updatedAt)
     
-    return NSDictionary(objects: [user.objectId,  createdAt, updatedAt, user.email, user.loginMethod, user.pushId!, user.firstname, user.lastname, user.fullname, user.avatar, user.contacts, user.isOnline, user.phoneNumber, user.countryCode, user.city, user.country], forKeys: [kOBJECTID as NSCopying, kCREATEDAT as NSCopying, kUPDATEDAT as NSCopying, kEMAIL as NSCopying, kLOGINMETHOD as NSCopying, kPUSHID as NSCopying, kFIRSTNAME as NSCopying, kLASTNAME as NSCopying, kFULLNAME as NSCopying, kAVATAR as NSCopying, kCONTACT as NSCopying, kISONLINE as NSCopying, kPHONE as NSCopying, kCOUNTRYCODE as NSCopying, kCITY as NSCopying, kCOUNTRY as NSCopying])
+    return NSDictionary(objects: [user.objectId,  createdAt, updatedAt, user.email, user.loginMethod, user.pushId!, user.firstname, user.lastname, user.fullname, user.avatar, user.contacts, user.blockedUsers, user.isOnline, user.phoneNumber, user.countryCode, user.city, user.country], forKeys: [kOBJECTID as NSCopying, kCREATEDAT as NSCopying, kUPDATEDAT as NSCopying, kEMAIL as NSCopying, kLOGINMETHOD as NSCopying, kPUSHID as NSCopying, kFIRSTNAME as NSCopying, kLASTNAME as NSCopying, kFULLNAME as NSCopying, kAVATAR as NSCopying, kCONTACT as NSCopying, kBLOCKEDUSERID as NSCopying, kISONLINE as NSCopying, kPHONE as NSCopying, kCOUNTRYCODE as NSCopying, kCITY as NSCopying, kCOUNTRY as NSCopying])
     
 }
 
-//func getUsersFromFirebase(withIds: [String], withBlock: @escaping (_ usersArray: [FUser]) -> Void) {
-//
-//    var count = 0
-//    var usersArray: [FUser] = []
-//
-//    //go through each user and download it from firebase
-//    for userId in withIds {
-//
-//        userHandler = userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observe(.value, with: {
-//            snapshot in
-//
-//            if snapshot.exists() {
-//
-//                let userDictionary = ((snapshot.value as! NSDictionary).allValues as Array).first
-//
-//                let dictionary = userDictionary as! NSDictionary
-//
-//                let fUser = FUser.init(_dictionary: dictionary)
-//
-//                count += 1
-//                usersArray.append(fUser)
-//
-//            } else {
-//
-//                withBlock(usersArray)
-//                removeReferenseWith(handler: userHandler)
-//            }
-//
-//            if count == withIds.count {
-//
-//                //we have finished, return the array
-//                withBlock(usersArray)
-//                removeReferenseWith(handler: userHandler)
-//            }
-//
-//        })
-//
-//    }
-//
-//}
-//
-//
-//
+func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray: [FUser]) -> Void) {
+
+    var count = 0
+    var usersArray: [FUser] = []
+
+    //go through each user and download it from firebase
+    for userId in withIds {
+
+
+        userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observeSingleEvent(of: .value, with: {
+            snapshot in
+            
+            if snapshot.exists() {
+                
+                let userDictionary = ((snapshot.value as! NSDictionary).allValues as Array).first
+                
+                let dictionary = userDictionary as! NSDictionary
+                
+                let fUser = FUser.init(_dictionary: dictionary)
+                
+                count += 1
+                
+                //dont add if its current user
+                if fUser.objectId != FUser.currentId() {
+                    usersArray.append(fUser)
+                }
+
+            } else {
+                
+                completion(usersArray)
+            }
+            
+            if count == withIds.count {
+                //we have finished, return the array
+                completion(usersArray)
+            }
+
+            
+        })
+        
+
+    }
+
+}
+
+
+
 func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ error: Error?) -> Void) {
     
     if let dictionary = UserDefaults.standard.object(forKey: kCURRENTUSER) {
         
-        let currentUser = FUser.currentUser()!
+        var tempWithValues = withValues
+        
+        let currentUserId = FUser.currentId()
+        
+        let updatedAt = dateFormatter().string(from: Date())
+        
+        tempWithValues[kUPDATEDAT] = updatedAt
         
         let userObject = (dictionary as! NSDictionary).mutableCopy() as! NSMutableDictionary
         
-        userObject.setValuesForKeys(withValues)
+        userObject.setValuesForKeys(tempWithValues)
         
-        let ref = firebase.child(kUSER_PATH).child(currentUser.objectId)
+        let ref = firebase.child(kUSER_PATH).child(currentUserId)
         
-        ref.updateChildValues(withValues, withCompletionBlock: {
+        ref.updateChildValues(tempWithValues, withCompletionBlock: {
             error, ref in
             
             if error != nil {
@@ -451,18 +468,21 @@ func removeOneSignalId() {
 
 func updateCurrentUserOneSignalId(newId: String) {
     
-    let user = FUser.currentUser()
-    user!.pushId = newId
-    user!.updatedAt = Date()
+//    let user = FUser.currentUser()
+//    user!.pushId = newId
+//    user!.updatedAt = Date()
     
-    let updatedDate = dateFormatter().string(from: Date())
+//    let updatedDate = dateFormatter().string(from: Date())
     
-    updateCurrentUser(withValues: [kPUSHID : newId, kUPDATEDAT : updatedDate]) { (success) in
+    updateCurrentUser(withValues: [kPUSHID : newId]) { (error) in
         
+        if error != nil {
+            print("error updating push id \(error!.localizedDescription)")
+        }
     }
     
-    saveUserLocally(fUser: user!)
-    saveUserInBackground(fUser: user!)
+//    saveUserLocally(fUser: user!)
+//    saveUserInBackground(fUser: user!)
 }
 
 

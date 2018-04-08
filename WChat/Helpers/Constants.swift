@@ -25,7 +25,7 @@ public let APP_STARTED_NOTIFICATION = "AppStartedNotification"
 
 
 //IDS and Keys
-public let kFILEREFERENCE = "gs://dchat-71f33.appspot.com"//wrong
+public let kFILEREFERENCE = "gs://wchat-5c432.appspot.com"
 public let kONESIGNALAPPID = ""
 public let kSINCHKEY = ""
 public let kSINCHSECRET = ""
@@ -56,6 +56,8 @@ public let kISONLINE = "isOnline"
 public let kVERIFICATIONCODE = "firebase_verification"
 public let kCITY = "city"
 public let kCOUNTRY = "country"
+public let kBLOCKEDUSERID = "blockedUserId"
+
 
 
 //
@@ -76,6 +78,8 @@ public let kGROUP = "group"
 public let kGROUPID = "groupId"
 public let kRECENTID = "recentId"
 public let kMEMBERS = "members"
+public let kMESSAGE = "message"
+public let kMEMBERSTOPUSH = "membersToPush"
 public let kDISCRIPTION = "discription"
 public let kLASTMESSAGE = "lastMessage"
 public let kCOUNTER = "counter"
@@ -108,8 +112,10 @@ public let kLONGITUDE = "longitude"
 
 
 //message status
-public let kDELIVERED = "Delivered"
-public let kREAD = "Read"
+public let kDELIVERED = "delivered"
+public let kREAD = "read"
+public let kREADDATE = "readDate"
+
 
 //push
 public let kDEVICEID = "deviceId"

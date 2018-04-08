@@ -41,5 +41,15 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>WChat needs to access your camera</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Wchat needs to access your pictures</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Wchat needs to access your pictures</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Wchat needs to use microphone</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>WChat needs to user your location</string>
 </dict>
 </plist>

@@ -17,6 +17,7 @@ class UserTableViewCell: UITableViewCell {
     @IBOutlet weak var avatarImageView: UIImageView!
     @IBOutlet weak var fullNameLabel: UILabel!
     
+    
     var delegate: UserTableViewCellDelegate?
     var indexPath: IndexPath!
     
