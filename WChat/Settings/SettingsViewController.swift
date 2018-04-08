@@ -11,7 +11,6 @@ import ProgressHUD
 
 class SettingsTableViewController: UITableViewController {
 
-    @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var deleteAccountButtonOutlet: UIButton!
 
     @IBOutlet weak var avatarImageView: UIImageView!
@@ -23,10 +22,16 @@ class SettingsTableViewController: UITableViewController {
         }
     }
     
+    //because of bar button item bug
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.tintAdjustmentMode = .normal
+        self.navigationController?.navigationBar.tintAdjustmentMode = .automatic
+    }//end of bug fix
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.tableHeaderView = headerView
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
         if FUser.currentUser() != nil {
@@ -64,17 +69,11 @@ class SettingsTableViewController: UITableViewController {
 
     
     
-    //MARK: IBActions
+    //MARK: IBActions    
     
-    @IBAction func editButtonPressed(_ sender: Any) {
-        performSegue(withIdentifier: "settingsToEditProfileSeg", sender: self)
-    }
-    
-
     @IBAction func logOutButtonPressed(_ sender: Any) {
         
         FUser.logOutCurrentUser { (success) in
-            
             self.showLoginView()
         }
         

@@ -12,9 +12,8 @@ import ProgressHUD
 
 class EditProfileTableViewController: UITableViewController, ImagePickerDelegate {
 
-    @IBOutlet weak var headerView: UIView!
+    @IBOutlet weak var saveButtonOutlet: UIBarButtonItem!
     
-    @IBOutlet weak var saveButtonOutlet: UIButton!
     @IBOutlet var avatarTapGestureRecognizer: UITapGestureRecognizer!
     
     @IBOutlet weak var avatarImageView: UIImageView!
@@ -27,7 +26,6 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.tableHeaderView = headerView
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
 
@@ -37,10 +35,6 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
 
     // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 4
     }
@@ -49,18 +43,7 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
         return ""
     }
     
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        
-        return UIView()
-    }
     
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        
-        if section == 0 {
-            return 0
-        }
-        return 30
-    }
 
 
     //MARK: IBActions
@@ -104,9 +87,6 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
         }
     }
     
-    @IBAction func backButtonPressed(_ sender: Any) {
-        self.dismiss(animated: true, completion: nil)
-    }
     
     @IBAction func avatarTapped(_ sender: Any) {
 

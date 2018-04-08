@@ -74,9 +74,9 @@ class RecentChatsTableViewCell: UITableViewCell {
 
 
         //set counter if available
-        if (recentChat[kCOUNTER] as? Int)! != 0 {
+        if recentChat[kCOUNTER] as! Int != 0 {
 
-            self.messageCountLabel.text = recentChat[kCOUNTER] as? String
+            self.messageCountLabel.text = "\(recentChat[kCOUNTER] as! Int)"
             self.messageCountBackground.isHidden = false
             self.messageCountLabel.isHidden = false
         } else {

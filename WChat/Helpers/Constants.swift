@@ -29,6 +29,9 @@ public let kFILEREFERENCE = "gs://wchat-5c432.appspot.com"
 public let kONESIGNALAPPID = ""
 public let kSINCHKEY = ""
 public let kSINCHSECRET = ""
+public let kAPPURL = "https://itunes.apple.com/us/app/qchat/id1245294104?ls=1&mt=8"
+
+
 
 //Firebase Headers
 public let kUSER_PATH = "User"

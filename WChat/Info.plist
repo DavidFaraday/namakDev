@@ -51,5 +51,7 @@
 	<string>Wchat needs to use microphone</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>WChat needs to user your location</string>
+	<key>NSContactsUsageDescription</key>
+	<string>WChat needs to use your contacts</string>
 </dict>
 </plist>

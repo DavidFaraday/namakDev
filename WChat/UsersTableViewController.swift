@@ -142,7 +142,7 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
             chatVC.titleName = userToChat.firstname
             
             chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
-            chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: allUsers[indexPath.row])
+            chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
 
             chatVC.isGroup = false
             chatVC.hidesBottomBarWhenPushed = true
