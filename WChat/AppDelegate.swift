@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import CoreLocation
+import OneSignal
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
@@ -19,7 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     var locationManager: CLLocationManager?
     var coordinates: CLLocationCoordinate2D?
 
-    
     
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -41,6 +41,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
                 }
             }
         }
+
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, queue: nil, using: {
+            note in
+            
+            let userId = note.userInfo!["userId"] as! String
+            UserDefaults.standard.set(userId, forKey: "userId")
+            UserDefaults.standard.synchronize()
+            
+            userDidLogin(userId: userId)
+        })
+        
+        func userDidLogin(userId: String) {
+            
+//            self.push.registerUserNotificationSettings()
+//            self.initSinchWithUserId(userId: userId)
+            self.startOneSignal()
+        }
+
+
+        
+        OneSignal.initWithLaunchOptions(launchOptions, appId: kONESIGNALAPPID, handleNotificationReceived: nil, handleNotificationAction: nil, settings: [kOSSettingsKeyInAppAlerts : false])
+        
+        
+        
+        OneSignal.setLogLevel(ONE_S_LOG_LEVEL.LL_NONE, visualLevel: ONE_S_LOG_LEVEL.LL_NONE)
 
         
         return true
@@ -122,6 +148,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         
         self.window?.rootViewController = mainView
     }
+    
+    
+    //MARK: OneSignal
+    
+    func startOneSignal() {
+        
+        let status: OSPermissionSubscriptionState = OneSignal.getPermissionSubscriptionState()
+        
+        let userID = status.subscriptionStatus.userId
+        let pushToken = status.subscriptionStatus.pushToken
+        
+        if pushToken != nil {
+            if let playerID = userID {
+                UserDefaults.standard.setValue(playerID, forKey: kPUSHID)
+            } else {
+                UserDefaults.standard.removeObject(forKey: kPUSHID)
+            }
+        }
+        
+        updateOneSignalId()
+    }
+
 
 }
 

@@ -39,10 +39,10 @@ class GroupViewController: UIViewController, ImagePickerDelegate {
     
     @IBAction func saveButtonPressed(_ sender: Any) {
         
-        let tempGroup = group.mutableCopy() as! NSMutableDictionary
-
+        var withValues : [String : Any]!
+        
         if groupNameTextField.text != "" {
-            tempGroup[kNAME] = groupNameTextField.text!
+            withValues = [kNAME : groupNameTextField.text!]
         } else {
             ProgressHUD.showError("Name mast be set!")
             return
@@ -50,11 +50,16 @@ class GroupViewController: UIViewController, ImagePickerDelegate {
         
         let avatarData = UIImageJPEGRepresentation(cameraButtonOutlet.image!, 0.7)!
         let avatarString = avatarData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
-        tempGroup[kAVATAR] = avatarString
+        
+        withValues = [kNAME : groupNameTextField.text!, kAVATAR : avatarString]
 
-        Group.updateGroup(groupDigtionary: tempGroup)
+        Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: withValues)
+        
         //need to update recents of the group
-        updateExistingRicentsWithNewValues(group: tempGroup)
+        //chache with values because in recent the group name has different key
+        withValues = [kWITHUSERUSERNAME : groupNameTextField.text!, kAVATAR : avatarString]
+
+        updateExistingRicentsWithNewValues(chatRoomId: group[kGROUPID] as! String, members: group[kMEMBERS] as! [String], withValues: withValues)
 
         self.navigationController?.popToRootViewController(animated: true)
     }

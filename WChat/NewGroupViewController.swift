@@ -90,6 +90,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDelegate, UIColl
             chatVC.titleName = group.groupDictionary[kNAME] as! String
             
             chatVC.memberIds = group.groupDictionary[kMEMBERS] as! [String]
+            chatVC.membersToPush = group.groupDictionary[kMEMBERS] as! [String]
             
             chatVC.chatRoomId = groupId
             

@@ -16,6 +16,7 @@
 		632BE1F52051BA5800131EB6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 632BE1F32051BA5800131EB6 /* Main.storyboard */; };
 		632BE1F72051BA5800131EB6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 632BE1F62051BA5800131EB6 /* Assets.xcassets */; };
 		632BE1FA2051BA5800131EB6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 632BE1F82051BA5800131EB6 /* LaunchScreen.storyboard */; };
+		633CA5C3207BBE8F00C80C4B /* PushNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633CA5C2207BBE8F00C80C4B /* PushNotifications.swift */; };
 		6344EE1C20541FC6009415FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6344EE1B20541FC5009415FB /* GoogleService-Info.plist */; };
 		6344EE202054222D009415FB /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE1F2054222D009415FB /* WelcomeViewController.swift */; };
 		6344EE2220544E5C009415FB /* FinishRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */; };
@@ -56,6 +57,8 @@
 		632BE1F62051BA5800131EB6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		632BE1F92051BA5800131EB6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		632BE1FB2051BA5800131EB6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		633CA5C1207BB88600C80C4B /* WChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WChat.entitlements; sourceTree = "<group>"; };
+		633CA5C2207BBE8F00C80C4B /* PushNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotifications.swift; sourceTree = "<group>"; };
 		6344EE1B20541FC5009415FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6344EE1F2054222D009415FB /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishRegistrationViewController.swift; sourceTree = "<group>"; };
@@ -137,6 +140,7 @@
 		632BE1EE2051BA5800131EB6 /* WChat */ = {
 			isa = PBXGroup;
 			children = (
+				633CA5C1207BB88600C80C4B /* WChat.entitlements */,
 				632BE1EF2051BA5800131EB6 /* AppDelegate.swift */,
 				63B68E3420667EE40017B6B7 /* Settings */,
 				635D8E4E2055679100297A0F /* ChatsViewController.swift */,
@@ -159,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				63C343542051BC5500C6985B /* Constants.swift */,
+				633CA5C2207BBE8F00C80C4B /* PushNotifications.swift */,
 				630D254720700213003FAB62 /* Downloader.swift */,
 				63C343562051BC7E00C6985B /* HelperFunctions.swift */,
 				63D492F820696CDE007C19CA /* Camera.swift */,
@@ -259,6 +264,11 @@
 					632BE1EB2051BA5800131EB6 = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -396,6 +406,7 @@
 				639344812078BC66002BDF8A /* InviteUserTableViewController.swift in Sources */,
 				635D8E5120557A2800297A0F /* ProfileViewController.swift in Sources */,
 				63D492F720679945007C19CA /* ChatViewController.swift in Sources */,
+				633CA5C3207BBE8F00C80C4B /* PushNotifications.swift in Sources */,
 				63C343532051BBF500C6985B /* FUser.swift in Sources */,
 				63D492FD206AB13C007C19CA /* IncomingMessage.swift in Sources */,
 				6389AA73205EE6B5006EF77A /* NewGroupViewController.swift in Sources */,
@@ -548,6 +559,7 @@
 			baseConfigurationReference = D352BB2F037A433C152E56AF /* Pods-WChat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = WChat/WChat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7P6AJEE272;
 				INFOPLIST_FILE = WChat/Info.plist;
@@ -565,6 +577,7 @@
 			baseConfigurationReference = D80FC7BE8A527DD068885808 /* Pods-WChat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = WChat/WChat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7P6AJEE272;
 				INFOPLIST_FILE = WChat/Info.plist;

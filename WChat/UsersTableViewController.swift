@@ -129,18 +129,17 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         let sectionTitle = self.sectionTitleList[indexPath.section]
 
         if !isGroup {
-            tableView.deselectRow(at: indexPath, animated: true)
             
             //get all users of the section
             let users = self.allUsersGrouped[sectionTitle]
 
             let userToChat = users![indexPath.row]
             
-            
             let chatVC = ChatViewController()
 
             chatVC.titleName = userToChat.firstname
             
+            chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
             chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
             chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
 

@@ -231,29 +231,31 @@ class InviteUserTableViewController: UITableViewController, UserTableViewCellDel
     //MARK: Helper functions
     func updateGroup(group: NSDictionary) {
         
-        let tempGroup = group.mutableCopy() as! NSMutableDictionary
-        
         let tempMembers = group[kMEMBERS] as! [String] + newMemberIds
         let tempMembersToPush = group[kMEMBERSTOPUSH] as! [String] + newMemberIds
         
-        tempGroup[kMEMBERSTOPUSH] = tempMembersToPush
-        tempGroup[kMEMBERS] = tempMembers
+        let withValues = [kMEMBERS : tempMembers, kMEMBERSTOPUSH : tempMembersToPush]
+
+        Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: withValues)
         
-        firebase.child(kGROUP_PATH).child(tempGroup[kGROUPID] as! String).setValue(tempGroup)
+        //create new recents
+        createRecentsForNewMembers(groupId: group[kGROUPID] as! String, groupName: group[kNAME] as! String, membersToPush: tempMembersToPush, avatar: group[kAVATAR] as! String)
         
-        createRecentsForNewMembers(group: tempGroup)
-        updateExistingRicentsWithNewValues(group: tempGroup)
-        goToGroupChat(group: tempGroup)
+        //update recents
+        updateExistingRicentsWithNewValues(chatRoomId: group[kGROUPID] as! String, members: tempMembers, withValues: withValues)
+        
+        goToGroupChat(membersToPush: tempMembers, members: tempMembers)
     }
     
-    func goToGroupChat(group: NSDictionary) {
+    func goToGroupChat(membersToPush: [String], members: [String]) {
         
         let chatVC = ChatViewController()
         
-        chatVC.titleName = group[kNAME] as! String
+        chatVC.titleName = group[kNAME] as? String
         
-        chatVC.memberIds = group[kMEMBERS] as! [String]
-        
+        chatVC.memberIds = members
+        chatVC.membersToPush = membersToPush
+
         chatVC.chatRoomId = group[kGROUPID] as! String
         
         chatVC.isGroup = true

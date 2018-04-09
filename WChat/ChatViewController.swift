@@ -31,7 +31,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
     var typingCounter = 0
 
-    
+    var membersToPush: [String] = []
     var memberIds: [String] = []
     var withUsers: [FUser] = []
     var titleName: String?
@@ -95,8 +95,14 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }()
 
 
+    override func viewWillAppear(_ animated: Bool) {
+        clearRecentCounter(chatRoomID: chatRoomId)
+    }
     
-    
+    override func viewWillDisappear(_ animated: Bool) {
+        clearRecentCounter(chatRoomID: chatRoomId)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -526,7 +532,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             let imageData = UIImageJPEGRepresentation(pic, 0.5)
             
-            let encryptedText = "[kPICTURE]"
+            let encryptedText = "[\(kPICTURE)]"
             
             outgoingMessage = OutgoingMessage(message: encryptedText, pictureData: imageData! as NSData, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kPICTURE)
         }
@@ -550,7 +556,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 JSQSystemSoundPlayer.jsq_playMessageSentSound()
                 self.finishSendingMessage()
                 
-                outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds)
+                outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
             })
             
             return
@@ -569,7 +575,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 JSQSystemSoundPlayer.jsq_playMessageSentSound()
                 self.finishSendingMessage()
                 
-                outgoingMessage!.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds)
+                outgoingMessage!.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
                 
             })
             return
@@ -592,7 +598,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         JSQSystemSoundPlayer.jsq_playMessageSentSound()
         self.finishSendingMessage()
         
-        outgoingMessage!.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: memberIds)
+        outgoingMessage!.sendMessage(chatRoomID: chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: memberIds, membersToPush: membersToPush)
     }
 
 

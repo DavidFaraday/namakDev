@@ -358,7 +358,6 @@ func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray
     //go through each user and download it from firebase
     for userId in withIds {
 
-
         userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observeSingleEvent(of: .value, with: {
             snapshot in
             
@@ -378,7 +377,6 @@ func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray
                 }
 
             } else {
-                
                 completion(usersArray)
             }
             
@@ -386,13 +384,8 @@ func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray
                 //we have finished, return the array
                 completion(usersArray)
             }
-
-            
         })
-        
-
     }
-
 }
 
 
@@ -417,7 +410,7 @@ func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ err
         
         ref.updateChildValues(tempWithValues, withCompletionBlock: {
             error, ref in
-            
+
             if error != nil {
                 
                 completion(error)
@@ -440,13 +433,10 @@ func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ err
 func updateOneSignalId() {
     
     if FUser.currentUser() != nil {
-        
+
         if let pushId = UserDefaults.standard.string(forKey: kPUSHID) {
-            
             setOneSignalId(pushId: pushId)
-            
         } else {
-            
             removeOneSignalId()
         }
     }
@@ -467,13 +457,7 @@ func removeOneSignalId() {
 //MARK: Updating Current user funcs
 
 func updateCurrentUserOneSignalId(newId: String) {
-    
-//    let user = FUser.currentUser()
-//    user!.pushId = newId
-//    user!.updatedAt = Date()
-    
-//    let updatedDate = dateFormatter().string(from: Date())
-    
+
     updateCurrentUser(withValues: [kPUSHID : newId]) { (error) in
         
         if error != nil {
@@ -481,8 +465,6 @@ func updateCurrentUserOneSignalId(newId: String) {
         }
     }
     
-//    saveUserLocally(fUser: user!)
-//    saveUserInBackground(fUser: user!)
 }
 
 

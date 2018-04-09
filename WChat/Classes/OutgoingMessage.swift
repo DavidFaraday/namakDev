@@ -55,7 +55,7 @@ class OutgoingMessage {
     
     //MARK: SendMessage
 
-    func sendMessage(chatRoomID: String, messageDictionary: NSMutableDictionary, memberIds: [String]) {
+    func sendMessage(chatRoomID: String, messageDictionary: NSMutableDictionary, memberIds: [String], membersToPush: [String]) {
         
         let messageId = UUID().uuidString //unique number
         
@@ -70,6 +70,9 @@ class OutgoingMessage {
         updateRecents(chatRoomId: chatRoomID, memberIds: memberIds, lastMessage: messageDictionary[kMESSAGE] as! String)
 
         //send push
+        let pushText = "[\(messageDictionary[kTYPE] as! String) message]"
+        
+        sendPushNotification(membersToPush: membersToPush, message: pushText)
     }
 
     

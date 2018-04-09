@@ -58,15 +58,40 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return true
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
-        let tempRecent = recentChats[indexPath.row]
-        recentChats.remove(at: indexPath.row)
+        let tempRecent = self.recentChats[indexPath.row]
+
+        var muteTitle = "Unmute"
+        var mute = false
         
-        deleteRecentChat(recentDictionary: tempRecent)
+        if (tempRecent[kMEMBERSTOPUSH] as! [String]).contains(FUser.currentId()) {
+            muteTitle = "Mute"
+            mute = true
+        }
         
-        tableView.reloadData()
+        let muteRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: muteTitle, handler:{action, indexpath in
+            
+            self.updatePushMembers(recent: tempRecent, mute: mute)
+        })
+        
+        
+        muteRowAction.backgroundColor = .blue
+        
+        let deleteRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: "Delete", handler:{action, indexpath in
+
+            self.recentChats.remove(at: indexPath.row)
+            
+            deleteRecentChat(recentDictionary: tempRecent)
+            
+            tableView.reloadData()
+
+        })
+        
+        return [deleteRowAction, muteRowAction];
     }
+
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
@@ -81,6 +106,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         chatVC.hidesBottomBarWhenPushed = true
         chatVC.titleName = (recent[kWITHUSERUSERNAME] as? String)!
         chatVC.memberIds = (recent[kMEMBERS] as? [String])!
+        chatVC.membersToPush = (recent[kMEMBERSTOPUSH] as? [String])!
         chatVC.chatRoomId = (recent[kCHATROOMID] as? String)!
         chatVC.isGroup = (recent[kTYPE] as! String) == kGROUP
     
@@ -219,6 +245,20 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.navigationController?.pushViewController(profileVC, animated: true)
     }
     
-
+    func updatePushMembers(recent: NSDictionary, mute: Bool) {
+        
+        var membersToPush = recent[kMEMBERSTOPUSH] as! [String]
+        
+        if mute {
+            let index = membersToPush.index(of: FUser.currentId())!
+            membersToPush.remove(at: index)
+        } else {
+            membersToPush.append(FUser.currentId())
+        }
+        
+        updateExistingRicentsWithNewValues(chatRoomId: recent[kCHATROOMID] as! String, members: recent[kMEMBERS] as! [String], withValues: [kMEMBERSTOPUSH : membersToPush])
+        
+        Group.updateGroup(groupId: recent[kCHATROOMID] as! String, withValues: [kMEMBERSTOPUSH : membersToPush])
+    }
 
 }

@@ -26,7 +26,7 @@ public let APP_STARTED_NOTIFICATION = "AppStartedNotification"
 
 //IDS and Keys
 public let kFILEREFERENCE = "gs://wchat-5c432.appspot.com"
-public let kONESIGNALAPPID = ""
+public let kONESIGNALAPPID = "2859ef5b-4d09-4034-862c-d0a6aaae1148"
 public let kSINCHKEY = ""
 public let kSINCHSECRET = ""
 public let kAPPURL = "https://itunes.apple.com/us/app/qchat/id1245294104?ls=1&mt=8"

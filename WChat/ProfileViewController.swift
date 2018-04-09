@@ -65,7 +65,20 @@ class ProfileViewController: UITableViewController {
     
     @IBAction func chatButtonPressed(_ sender: Any) {
         
-        print("start chat")
+        let userToChat = user!
+        
+        let chatVC = ChatViewController()
+        
+        chatVC.titleName = userToChat.firstname
+        
+        chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
+        chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
+        chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
+        
+        chatVC.isGroup = false
+        chatVC.hidesBottomBarWhenPushed = true
+        
+        self.navigationController?.pushViewController(chatVC, animated: true)
     }
     
     @IBAction func blockButtonPressed(_ sender: Any) {

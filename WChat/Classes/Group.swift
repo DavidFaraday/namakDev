@@ -33,11 +33,10 @@ class Group {
         }
     }
     
-    class func updateGroup(groupDigtionary: NSDictionary) {
+    class func updateGroup(groupId: String ,withValues: [String : Any]) {
         
-        let reference = firebase.child(kGROUP_PATH).child(groupDigtionary[kGROUPID] as! String)
+    firebase.child(kGROUP_PATH).child(groupId).updateChildValues(withValues)
 
-        reference.setValue(groupDigtionary)
     }
     
     
