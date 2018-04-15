@@ -11,13 +11,17 @@ import Contacts
 import Firebase
 import ProgressHUD
 
-class ContactsTableViewController: UITableViewController, UISearchResultsUpdating {
+class ContactViewController: UIViewController, UISearchResultsUpdating, UITableViewDataSource, UITableViewDelegate {
     
 
     var users: [FUser] = []
     var matchedUsers: [FUser] = []
     var filteredMatchedUsers: [FUser] = []
 
+    var searchTextField: UITextField!
+    var isGroup = false
+    
+    
     let searchController = UISearchController(searchResultsController: nil)
 
     
@@ -78,7 +82,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         definesPresentationContext = true
         tableView.tableHeaderView = searchController.searchBar
         
-
+        setupButtons()
         loadUsers()
     }
 
@@ -159,7 +163,9 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     
     
     //MARK: IBActions
-    @IBAction func inviteUsersButtonPressed(_ sender: Any) {
+    
+    
+    @objc func inviteUsersButtonPressed() {
         
         let text = "Hey! Lets chat on WChat \(kAPPURL)"
         
@@ -173,6 +179,13 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         self.present(activityViewController, animated: true, completion: nil)
     }
     
+    @objc func searchNearByButtonPressed() {
+        print("nera")
+    }
+    
+
+    
+    
     //MARK: LoadUsers
     func loadUsers() {
         
@@ -183,7 +196,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         userHandler = query.observe(.value, with: { snapshot in
             
             if snapshot.exists() {
-                
+
                 self.matchedUsers = []
                 self.users.removeAll()
 
@@ -204,7 +217,9 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                 
                 ProgressHUD.dismiss()
                 self.tableView.reloadData()
-            }
+            } 
+            
+            
             ProgressHUD.dismiss()
             self.compareUsers()
         })
@@ -321,7 +336,15 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     }
 
     
+    //MARK: Helpers
     
+    func setupButtons() {
+        let inviteBarButton = UIBarButtonItem(image: UIImage(named: "invite"), style: .plain, target: self, action: #selector(self.inviteUsersButtonPressed))
+        let searchBarButton = UIBarButtonItem(image: UIImage(named: "nearMe"), style: .plain, target: self, action: #selector(self.searchNearByButtonPressed))
+        
+        self.navigationItem.rightBarButtonItems = [inviteBarButton, searchBarButton]
+
+    }
     
     
     

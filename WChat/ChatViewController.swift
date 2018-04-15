@@ -106,6 +106,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //required to be able to delete messages
+        JSQMessagesCollectionViewCell.registerMenuAction(#selector(delete))
+
+        navigationItem.largeTitleDisplayMode = .never
         self.navigationItem.leftBarButtonItems = [UIBarButtonItem(image: UIImage(named: "Back"), style: .plain, target: self, action: #selector(self.backAction))]
 
         jsqAvatarDictionary = [ : ]
@@ -262,6 +266,8 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
     
     override func didPressAccessoryButton(_ sender: UIButton!) {
+        
+
         let camera = Camera(delegate_: self)
         
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -406,6 +412,41 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         }
     }
     
+    //for multimedia messages delete option
+    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+        
+        super.collectionView(collectionView, shouldShowMenuForItemAt: indexPath)
+        return true
+    }
+   
+    //dont show copy for media messages
+    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
+        
+        if messages[indexPath.row].isMediaMessage {
+            if action.description == "delete:" {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            if action.description == "delete:" || action.description == "copy:"{
+                return true
+            } else {
+                return false
+            }
+        }
+        
+    }
+    
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didDeleteMessageAt indexPath: IndexPath!) {
+        
+        let messageId = objectMessages[indexPath.row][kMESSAGEID] as! String
+        objectMessages.remove(at: indexPath.row)
+        messages.remove(at: indexPath.row)
+        
+        OutgoingMessage.deleteMessage(withId: messageId, chatRoomId: chatRoomId)
+    }
 
 
     //MARK: LoadMessages
@@ -415,7 +456,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         createTypingObservers()
 
         //to update message status
-    chatRef.child(FUser.currentId()).child(chatRoomId).observe(.childChanged, with: {
+        chatRef.child(FUser.currentId()).child(chatRoomId).observe(.childChanged, with: {
             snapshot in
 
             self.updateMessage(messageDictionary: snapshot.value as! NSDictionary)
@@ -431,7 +472,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 
                 //remove bad messages
                 self.loadedMessages = self.removeBadMessages(allMessages: sorted)
-                
                 self.insertMessages()
                 self.finishReceivingMessage(animated: false)
                 self.initialLoadComplete = true
@@ -466,10 +506,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 
                 if let type = item[kTYPE] as? String {
                     
-                    if self.legitTypes.contains(type) {
+                    if self.legitTypes.contains(type) && !(item[kDELETED] as! Bool)  {
 
                         if self.insertInitialLoadMessages(messageDictionary: item) {
-                            
+
                             JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
                         }
                         
@@ -486,7 +526,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         //check if we have any old messages to load, we always get last 11 messages at first
         
         if loadedMessages.count > 10 {
-            
+
             let lastMessageDate = "\(Int(loadedMessages.first![kDATE] as! String)!-1)"
             
             chatRef.child(FUser.currentId()).child(chatRoomId).queryOrdered(byChild: kDATE).queryEnding(atValue: lastMessageDate).observeSingleEvent(of: .value, with: {
@@ -612,10 +652,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         if minMessageNumber < 0 {
             minMessageNumber = 0
         }
-        
+
         for i in minMessageNumber ..< maxMessageNumber {
-            
             let messageDictionary = loadedMessages[i]
+
             insertInitialLoadMessages(messageDictionary: messageDictionary)
             loadedMessagesCount += 1
         }
@@ -625,11 +665,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     
     func insertInitialLoadMessages(messageDictionary: NSDictionary) -> Bool {
-        
+
         let incomingMessage = IncomingMessage(collectionView_: self.collectionView!)
         
         if (messageDictionary[kSENDERID] as! String) != FUser.currentId() {
-            updateChatStatus(chatDictionary: messageDictionary, chatRoomId: chatRoomId)
+            
+            OutgoingMessage.updateMessage(withId: messageDictionary[kMESSAGEID] as! String, chatRoomId: chatRoomId, memberIds: memberIds)
         }
         
         let message = incomingMessage.createMessage(messageDictionary: messageDictionary, chatRoomId: chatRoomId)
@@ -668,6 +709,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         }
     }
 
+    //not needed
     func updateChatStatus(chatDictionary: NSDictionary, chatRoomId: String) {
 
         let readDate = dateFormatter().string(from: Date())
@@ -761,7 +803,11 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         self.navigationItem.leftBarButtonItems?.append(leftBarButtonItem)
         
-        avatarButton.addTarget(self, action: #selector(self.showGroup), for: .touchUpInside)
+        if isGroup! {
+            avatarButton.addTarget(self, action: #selector(self.showGroup), for: .touchUpInside)
+        } else {
+            avatarButton.addTarget(self, action: #selector(self.showUserProfile), for: .touchUpInside)
+        }
 
         getUsersFromFirebase(withIds: memberIds) { (withUsers) in
             
@@ -929,14 +975,17 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         var tempMessages = allMessages
         
         for message in tempMessages {
-            if message[kTYPE] != nil {
-                if !self.legitTypes.contains(message[kTYPE] as! String) {
-                    //remove the message from array
+
+            if message[kTYPE] != nil  {
+                if !self.legitTypes.contains(message[kTYPE] as! String) || message[kDELETED] as! Bool {
+                    message[kDELETED]
+                    //remove the message from array if its deleted or bad message
                     tempMessages.remove(at: tempMessages.index(of: message)!)
                 }
+            } else {
+                tempMessages.remove(at: tempMessages.index(of: message)!)
             }
         }
-        
         return tempMessages
     }
 

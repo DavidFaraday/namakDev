@@ -26,6 +26,8 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationItem.largeTitleDisplayMode = .never
+
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
 
@@ -47,6 +49,8 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
 
 
     //MARK: IBActions
+    
+    
     
     @IBAction func saveButtonPressed(_ sender: Any) {
         

@@ -118,6 +118,8 @@ public let kLONGITUDE = "longitude"
 public let kDELIVERED = "delivered"
 public let kREAD = "read"
 public let kREADDATE = "readDate"
+public let kDELETED = "deleted"
+
 
 
 //push

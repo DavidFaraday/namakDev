@@ -27,6 +27,8 @@ class NewGroupViewController: UIViewController, UICollectionViewDelegate, UIColl
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.largeTitleDisplayMode = .never
+
         groupIconImageView.isUserInteractionEnabled = true
         groupIconImageView.addGestureRecognizer(iconTapGesture)
         

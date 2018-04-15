@@ -12,7 +12,8 @@ import ProgressHUD
 class SettingsTableViewController: UITableViewController {
 
     @IBOutlet weak var deleteAccountButtonOutlet: UIButton!
-
+    @IBOutlet weak var versionLabel: UILabel!
+    
     @IBOutlet weak var avatarImageView: UIImageView!
     @IBOutlet weak var fullNameLabel: UILabel!
     
@@ -32,6 +33,8 @@ class SettingsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationController?.navigationBar.prefersLargeTitles = true
+
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
         if FUser.currentUser() != nil {
@@ -42,11 +45,11 @@ class SettingsTableViewController: UITableViewController {
     //MARK: TableViewDataSource
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     
@@ -70,6 +73,21 @@ class SettingsTableViewController: UITableViewController {
     
     
     //MARK: IBActions    
+    
+    
+    @IBAction func tellAFriendButtonPressed(_ sender: Any) {
+        let text = "Hey! Lets chat on WChat \(kAPPURL)"
+        
+        let objectsToShare: [Any] = [text]
+        
+        let activityViewController = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = self.view // so that iPads won't crash
+        
+        activityViewController.setValue(NSLocalizedString("Lets chat on WChat", comment: ""), forKey: "subject")
+        
+        self.present(activityViewController, animated: true, completion: nil)
+
+    }
     
     @IBAction func logOutButtonPressed(_ sender: Any) {
         
@@ -125,6 +143,10 @@ class SettingsTableViewController: UITableViewController {
             if avatarImage != nil {
                 self.avatarImageView.image = avatarImage!.circleMasked
             }
+        }
+        
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            versionLabel.text = version
         }
     }
     

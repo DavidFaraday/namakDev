@@ -20,6 +20,8 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationItem.largeTitleDisplayMode = .never
+
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
 

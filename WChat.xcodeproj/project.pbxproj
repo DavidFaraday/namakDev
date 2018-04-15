@@ -25,7 +25,7 @@
 		635D8E4D20552D2A00297A0F /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4C20552D2A00297A0F /* UserTableViewCell.swift */; };
 		635D8E4F2055679100297A0F /* ChatsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4E2055679100297A0F /* ChatsViewController.swift */; };
 		635D8E5120557A2800297A0F /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E5020557A2800297A0F /* ProfileViewController.swift */; };
-		63798BED207A0793005A0061 /* ContactsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63798BEC207A0793005A0061 /* ContactsTableViewController.swift */; };
+		63798BED207A0793005A0061 /* ContactsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63798BEC207A0793005A0061 /* ContactsViewController.swift */; };
 		63798BEF207A0C95005A0061 /* CountryCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63798BEE207A0C95005A0061 /* CountryCode.swift */; };
 		638742EA2077FB0A00B4DCB5 /* GroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638742E92077FB0A00B4DCB5 /* GroupViewController.swift */; };
 		6389AA6F20585A06006EF77A /* Recent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6389AA6E20585A06006EF77A /* Recent.swift */; };
@@ -67,7 +67,7 @@
 		635D8E4C20552D2A00297A0F /* UserTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTableViewCell.swift; sourceTree = "<group>"; };
 		635D8E4E2055679100297A0F /* ChatsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsViewController.swift; sourceTree = "<group>"; };
 		635D8E5020557A2800297A0F /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
-		63798BEC207A0793005A0061 /* ContactsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsTableViewController.swift; sourceTree = "<group>"; };
+		63798BEC207A0793005A0061 /* ContactsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift; sourceTree = "<group>"; };
 		63798BEE207A0C95005A0061 /* CountryCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryCode.swift; sourceTree = "<group>"; };
 		638742E92077FB0A00B4DCB5 /* GroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewController.swift; sourceTree = "<group>"; };
 		6389AA6E20585A06006EF77A /* Recent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recent.swift; sourceTree = "<group>"; };
@@ -144,7 +144,7 @@
 				632BE1EF2051BA5800131EB6 /* AppDelegate.swift */,
 				63B68E3420667EE40017B6B7 /* Settings */,
 				635D8E4E2055679100297A0F /* ChatsViewController.swift */,
-				63798BEC207A0793005A0061 /* ContactsTableViewController.swift */,
+				63798BEC207A0793005A0061 /* ContactsViewController.swift */,
 				63D492F5206797D9007C19CA /* Secondary Views */,
 				6344EE2320545D30009415FB /* Welcome */,
 				6322EE9E2055ABB300C74A5C /* CustomCells */,
@@ -397,7 +397,7 @@
 				6389AA71205EE699006EF77A /* GroupMemberCollectionViewCell.swift in Sources */,
 				63A51202206034A200F3EF31 /* Group.swift in Sources */,
 				63D492F420675FB6007C19CA /* UsersTableViewController.swift in Sources */,
-				63798BED207A0793005A0061 /* ContactsTableViewController.swift in Sources */,
+				63798BED207A0793005A0061 /* ContactsViewController.swift in Sources */,
 				635D8E4D20552D2A00297A0F /* UserTableViewCell.swift in Sources */,
 				635D8E4F2055679100297A0F /* ChatsViewController.swift in Sources */,
 				63C343572051BC7E00C6985B /* HelperFunctions.swift in Sources */,

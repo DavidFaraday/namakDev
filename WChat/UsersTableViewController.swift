@@ -10,17 +10,19 @@ import UIKit
 import Firebase
 import ProgressHUD
 
-class UsersTableViewController: UITableViewController, UserTableViewCellDelegate {
+class UsersTableViewController: UITableViewController, UserTableViewCellDelegate, UISearchResultsUpdating {
 
     @IBOutlet weak var headerView: UIView!
     
-    var isGroup = false
-    var memberIdsOfGroupChat: [String] = []
-    var membersOfGroupChat: [FUser] = []
     
     var allUsers: [FUser] = []
+    var filteredUsers: [FUser] = []
     var allUsersGrouped = NSDictionary() as! [String : [FUser]]
     var sectionTitleList: [String] = []
+    
+    let searchController = UISearchController(searchResultsController: nil)
+
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         ProgressHUD.dismiss()
@@ -34,27 +36,20 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         tableView.tableHeaderView = headerView
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
+        
+        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.searchController = searchController
+        
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        definesPresentationContext = true
 
-        if isGroup {
-            self.navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(self.nextButtonPressed))]
-            self.navigationItem.rightBarButtonItem?.isEnabled = false
-        }
 
         loadUsers(filter: kCITY)
     }
     
 
     //MARK: IBActions
-    
-    @objc func nextButtonPressed() {
-        
-        let newGroupVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "newGroupView") as! NewGroupViewController
-        
-        newGroupVC.memberIds = memberIdsOfGroupChat
-        newGroupVC.allMembers = membersOfGroupChat
-        
-        self.navigationController?.pushViewController(newGroupVC, animated: true)
-    }
     
     
     @IBAction func filterSegmentChanged(_ sender: UISegmentedControl) {
@@ -75,31 +70,50 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return self.allUsersGrouped.count
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return 1
+        } else {
+            return self.allUsersGrouped.count
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        // find section title
-        let sectionTitle = self.sectionTitleList[section]
         
-        // find users for given section title
-        let users = self.allUsersGrouped[sectionTitle]
-        
-        // return count for users
-        return users!.count
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return filteredUsers.count
+        } else {
+            // find section title
+            let sectionTitle = self.sectionTitleList[section]
+            
+            // find users for given section title
+            let users = self.allUsersGrouped[sectionTitle]
+            
+            // return count for users
+            return users!.count
+        }
+
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! UserTableViewCell
         
-        let sectionTitle = self.sectionTitleList[indexPath.section]
+        var user: FUser
 
-        //get all users of the section
-        let users = self.allUsersGrouped[sectionTitle]
+        if searchController.isActive && searchController.searchBar.text != "" {
+            user = filteredUsers[indexPath.row]
+        } else {
+            
+            let sectionTitle = self.sectionTitleList[indexPath.section]
+            //get all users of the section
+            let users = self.allUsersGrouped[sectionTitle]
+            
+            user = users![indexPath.row]
+        }
 
-        cell.generateCellWith(fUser: users![indexPath.row], indexPath: indexPath)
+        
+        cell.generateCellWith(fUser: user, indexPath: indexPath)
         
         cell.delegate = self
         
@@ -108,11 +122,20 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 
-        return self.sectionTitleList[section]
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return ""
+        } else {
+            return self.sectionTitleList[section]
+        }
+        
     }
 
     override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return self.sectionTitleList
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return nil
+        } else {
+            return self.sectionTitleList
+        }
     }
     
     
@@ -128,61 +151,31 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         
         let sectionTitle = self.sectionTitleList[indexPath.section]
 
-        if !isGroup {
-            
+        let userToChat: FUser
+
+        if searchController.isActive && searchController.searchBar.text != "" {
+            userToChat = filteredUsers[indexPath.row]
+        } else {
             //get all users of the section
             let users = self.allUsersGrouped[sectionTitle]
-
-            let userToChat = users![indexPath.row]
             
-            let chatVC = ChatViewController()
-
-            chatVC.titleName = userToChat.firstname
-            
-            chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
-            chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
-            chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
-
-            chatVC.isGroup = false
-            chatVC.hidesBottomBarWhenPushed = true
-
-            self.navigationController?.pushViewController(chatVC, animated: true)
-            
-        } else {
-            
-            //checkmarks
-            if let cell = tableView.cellForRow(at: indexPath) {
-                
-                if cell.accessoryType == .checkmark {
-                    cell.accessoryType = .none
-                } else {
-                    cell.accessoryType = .checkmark
-                }
-            }
-            
-            //add/remove user from array
-            let users = self.allUsersGrouped[sectionTitle]
-            
-            let selectedUser = users![indexPath.row]
-            
-            let selected = memberIdsOfGroupChat.contains(selectedUser.objectId as String)
-            
-            if selected {
-                
-                let objectIndex = memberIdsOfGroupChat.index(of: selectedUser.objectId as String)
-                memberIdsOfGroupChat.remove(at: objectIndex!)
-                membersOfGroupChat.remove(at: objectIndex!)
-                
-            } else {
-                
-                memberIdsOfGroupChat.append(selectedUser.objectId as String)
-                membersOfGroupChat.append(selectedUser)
-            }
-            
-            
-            //if we have users selected, the button is active
-            self.navigationItem.rightBarButtonItem?.isEnabled = memberIdsOfGroupChat.count > 0
+            userToChat = users![indexPath.row]
         }
+
+        
+        let chatVC = ChatViewController()
+        
+        chatVC.titleName = userToChat.firstname
+        
+        chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
+        chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
+        chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
+        
+        chatVC.isGroup = false
+        chatVC.hidesBottomBarWhenPushed = true
+        
+        self.navigationController?.pushViewController(chatVC, animated: true)
+
     }
 
 
@@ -274,6 +267,26 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         })
         
     }
+    
+    //MARK: search controler functions
+    
+    func filteredContentForSearchText(searchText: String, scope: String = "All") {
+        
+        filteredUsers = allUsers.filter({ (user) -> Bool in
+            
+            return user.firstname.lowercased().contains(searchText.lowercased())
+            
+        })
+        
+        tableView.reloadData()
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        
+        filteredContentForSearchText(searchText: searchController.searchBar.text!)
+    }
+    
+
 
     //MARK: UserTableViewCellDelegate
     
@@ -281,14 +294,20 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         
         let profileVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "profileView") as! ProfileViewController
         
-        let sectionTitle = self.sectionTitleList[indexPath.section]
+        var user: FUser!
+
+        if searchController.isActive && searchController.searchBar.text != "" {
+            user = filteredUsers[indexPath.row]
+        } else {
+            let sectionTitle = self.sectionTitleList[indexPath.section]
+            
+            //get all users of the section
+            let users = self.allUsersGrouped[sectionTitle]
+            user = users![indexPath.row]
+        }
         
-        //get all users of the section
-        let users = self.allUsersGrouped[sectionTitle]
-        
-        profileVC.user = users![indexPath.row]
+        profileVC.user = user
         self.navigationController?.pushViewController(profileVC, animated: true)
-        
     }
 
 

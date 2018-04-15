@@ -9,26 +9,36 @@
 import UIKit
 import Firebase
 
-class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, RecentChatsTableViewCellDelegate {
+class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, RecentChatsTableViewCellDelegate, UISearchResultsUpdating {
 
     let searchController = UISearchController(searchResultsController: nil)
 
     @IBOutlet weak var tableView: UITableView!
     
     var recentChats: [NSDictionary] = []
+    var filteredChats: [NSDictionary] = []
+    
     
     override func viewWillAppear(_ animated: Bool) {
         
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
 
-        tableView.contentInset = UIEdgeInsetsMake(-self.searchController.searchBar.frame.size.height, 0, 0, 0);
+//        tableView.contentInset = UIEdgeInsetsMake(-self.searchController.searchBar.frame.size.height, 0, 0, 0);
         loadRecentChats()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = true
+        
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        definesPresentationContext = true
+
         setTableViewHeader()
     }
     
@@ -39,7 +49,11 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return recentChats.count
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return filteredChats.count
+        } else {
+            return recentChats.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -47,7 +61,16 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! RecentChatsTableViewCell
 
         cell.delegate = self
-        cell.generateCell(recentChat: recentChats[indexPath.row], indexPath: indexPath)
+        var recentChat: NSDictionary!
+        
+        if searchController.isActive && searchController.searchBar.text != "" {
+            recentChat = filteredChats[indexPath.row]
+        } else {
+            recentChat = recentChats[indexPath.row]
+        }
+
+        
+        cell.generateCell(recentChat: recentChat, indexPath: indexPath)
         
         return cell
     }
@@ -61,7 +84,14 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
-        let tempRecent = self.recentChats[indexPath.row]
+        
+        var tempRecent: NSDictionary!
+
+        if searchController.isActive && searchController.searchBar.text != "" {
+            tempRecent = filteredChats[indexPath.row]
+        } else {
+            tempRecent = recentChats[indexPath.row]
+        }
 
         var muteTitle = "Unmute"
         var mute = false
@@ -97,7 +127,13 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let recent = recentChats[indexPath.row]
+        var recent: NSDictionary!
+        
+        if searchController.isActive && searchController.searchBar.text != "" {
+            recent = filteredChats[indexPath.row]
+        } else {
+            recent = recentChats[indexPath.row]
+        }
         
         restartRecentChat(recent: recent)
         
@@ -113,22 +149,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         navigationController?.pushViewController(chatVC, animated: true)
     }
     
-    //show/hide table search bar
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        
-        let offset = self.tableView.contentOffset
-        let barHeight = self.searchController.searchBar.frame.size.height
-        
-        if (offset.y <= barHeight/2.0) {
-            self.tableView.contentInset = UIEdgeInsets.zero
-            
-        } else {
-            self.tableView.contentInset = UIEdgeInsetsMake(-barHeight, 0, 0, 0);
-        }
-        
-        self.tableView.contentOffset = offset
-        
-    }
     
     //MARK: IBActions
     @IBAction func newChatButtonPressed(_ sender: Any) {
@@ -203,10 +223,10 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func setTableViewHeader() {
         
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 90))
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 45))
         
         //button
-        let buttonVview = UIView(frame: CGRect(x: 0, y: 55, width: tableView.frame.width, height: 35))
+        let buttonView = UIView(frame: CGRect(x: 0, y: 5, width: tableView.frame.width, height: 35))
         let groupButton = UIButton(frame: CGRect(x: tableView.frame.width - 110, y: 10, width: 100, height: 20))
         groupButton.addTarget(self, action: #selector(self.groupButtonPressed), for: .touchUpInside)
         groupButton.setTitle("New Group", for: .normal)
@@ -219,21 +239,21 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         lineView.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
         
         //add subviews
-        buttonVview.addSubview(groupButton)
-        headerView.addSubview(searchController.searchBar)
-        headerView.addSubview(buttonVview)
+        buttonView.addSubview(groupButton)
+//        headerView.addSubview(searchController.searchBar)
+        headerView.addSubview(buttonView)
         headerView.addSubview(lineView)
         
         
         tableView.tableHeaderView = headerView
     }
-    
+    	
     func selectUserForChat(isGroup: Bool) {
-        let usersVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "usersTableView") as! UsersTableViewController
+        let contactsVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "contactsView") as! ContactsViewController
         
-        usersVC.isGroup = isGroup
+        contactsVC.isGroup = isGroup
         
-        self.navigationController?.pushViewController(usersVC, animated: true)
+        self.navigationController?.pushViewController(contactsVC, animated: true)
     }
 
     func showUserProfile(user: FUser) {
@@ -260,5 +280,26 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         Group.updateGroup(groupId: recent[kCHATROOMID] as! String, withValues: [kMEMBERSTOPUSH : membersToPush])
     }
+    
+    
+    //MARK: search controler functions
+    
+    func filteredContentForSearchText(searchText: String, scope: String = "All") {
+        
+        filteredChats = recentChats.filter({ (recentChat) -> Bool in
+            
+            return (recentChat[kWITHUSERUSERNAME] as! String).lowercased().contains(searchText.lowercased())
+            
+        })
+        
+        tableView.reloadData()
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        
+        filteredContentForSearchText(searchText: searchController.searchBar.text!)
+    }
+    
+
 
 }
