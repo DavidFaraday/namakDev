@@ -53,5 +53,10 @@
 	<string>WChat needs to user your location</string>
 	<key>NSContactsUsageDescription</key>
 	<string>WChat needs to use your contacts</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>voip</string>
+	</array>
 </dict>
 </plist>

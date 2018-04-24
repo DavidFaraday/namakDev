@@ -33,6 +33,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDelegate, UIColl
         groupIconImageView.addGestureRecognizer(iconTapGesture)
         
         updateParticipantsLabel()
+
     }
 
     override func viewWillLayoutSubviews() {

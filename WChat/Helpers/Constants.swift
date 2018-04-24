@@ -39,6 +39,7 @@ public let kTYPINGPATH_PATH = "Typing"
 public let kRECENT_PATH = "Recent"
 public let kMESSAGE_PATH = "Message"
 public let kGROUP_PATH = "Group"
+public let kCALL_PATH = "Call"
 
 //FUser
 public let kOBJECTID = "objectId"
@@ -64,8 +65,9 @@ public let kBLOCKEDUSERID = "blockedUserId"
 
 
 //
-public let kAVATARSTATE = "avatarState"
-public let kPASSWORDPROTECT = "passwordState"
+public let kBACKGROUBNDIMAGE = "backgroundImage"
+public let kSHOWAVATAR = "showAvatar"
+public let kPASSWORDPROTECT = "passwordProtect"
 public let kFIRSTRUN = "firstRun"
 public let kNUMBEROFMESSAGES = 10
 public let kMAXDURATION = 120.0
@@ -127,18 +129,24 @@ public let kDEVICEID = "deviceId"
 
 
 
-//backgroung color
-public let kRED = "red"
-public let kGREEN = "green"
-public let kBLUE = "blue"
+//Call
+
+public let kISINCOMING = "isIncoming"
+public let kCALLERID = "callerId"
+public let kCALLERFULLNAME = "callerFullName"
+public let kCALLSTATUS = "callStatus"
+public let kWITHUSERFULLNAME = "withUserFullName"
+public let kCALLERAVATAR = "callerAvatar"
+public let kWITHUSERAVATAR = "withUserAvatar"
+
 
 //chat bubble color
-public let kINCOMINGRED = "incomingRed"
-public let kINCOMINGGREEN = "incomingGreen"
-public let kINCOMINGBLUE = "incomingBlue"
+//public let kINCOMINGRED = "incomingRed"
+//public let kINCOMINGGREEN = "incomingGreen"
+//public let kINCOMINGBLUE = "incomingBlue"
+//
+//public let kOUTGOINGRED = "oiutgoingRed"
+//public let kOUTGOINGGREEN = "outgoingGreen"
+//public let kOUTGOINGBLUE = "outgoingBlue"
 
-public let kOUTGOINGRED = "oiutgoingRed"
-public let kOUTGOINGGREEN = "outgoingGreen"
-public let kOUTGOINGBLUE = "outgoingBlue"
-
-public let kIOSDEFAULTS = "iOSDefaults"
+//public let kIOSDEFAULTS = "iOSDefaults"

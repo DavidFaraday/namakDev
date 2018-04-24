@@ -49,6 +49,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     var jsqAvatarDictionary: NSMutableDictionary?
     var avatarImagesDictionary: NSMutableDictionary?
     var showAvatars = true
+    var firstLoad: Bool?
 
 
     
@@ -97,6 +98,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
     override func viewWillAppear(_ animated: Bool) {
         clearRecentCounter(chatRoomID: chatRoomId)
+        loadUserDefaults()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -563,8 +565,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         //text message
         if let text = text {
-
-            outgoingMessage = OutgoingMessage(message: text, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kTEXT)
+            
+            let encryptedText = Encryption.encryptText(chatRoomId: chatRoomId, message: text)
+            
+            outgoingMessage = OutgoingMessage(message: encryptedText, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kTEXT)
         }
         
         //send picture message
@@ -572,7 +576,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             let imageData = UIImageJPEGRepresentation(pic, 0.5)
             
-            let encryptedText = "[\(kPICTURE)]"
+            let encryptedText = Encryption.encryptText(chatRoomId: chatRoomId, message: "[\(kPICTURE)]")
             
             outgoingMessage = OutgoingMessage(message: encryptedText, pictureData: imageData! as NSData, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kPICTURE)
         }
@@ -588,7 +592,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             uploadVideo(video: videoData!, chatRoomId: chatRoomId, view: (self.navigationController?.view)!, completion: { (videoLink) in
                 
-                let encryptedText = "[\(kVIDEO)]"
+                let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kVIDEO)]")
                 
                 outgoingMessage = OutgoingMessage(message: encryptedText, video: videoLink!, thumbnail: dataThumbnail! as NSData, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kVIDEO)
                 
@@ -608,7 +612,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             uploadAudio(audioPath: audioPath, chatRoomId: chatRoomId, view: (self.navigationController?.view)!, completion: { (audioLink) in
                 
-                let encryptedText = "[\(kAUDIO)]"
+                let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kAUDIO)]")
                 
                 outgoingMessage = OutgoingMessage(message: encryptedText, audio: audioLink!, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kAUDIO)
                 
@@ -627,7 +631,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             let lat: NSNumber = NSNumber(value: appDelegate.coordinates!.latitude)
             let long: NSNumber = NSNumber(value: appDelegate.coordinates!.longitude)
             
-            let encryptedText = "[\(kLOCATION)]"
+            let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kLOCATION)]")
             
             outgoingMessage = OutgoingMessage(message: encryptedText, latitude: lat, longitude: long, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kLOCATION)
         }
@@ -1008,6 +1012,35 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         return currentDateFormater.string(from: date!)
     }
+    
+    func loadUserDefaults() {
+        
+        firstLoad = userDefaults.bool(forKey: kFIRSTRUN)
+        
+        if !firstLoad! {
+            
+            userDefaults.set(true, forKey: kFIRSTRUN)
+            userDefaults.set(showAvatars, forKey: kSHOWAVATAR)
+            
+            userDefaults.synchronize()
+        }
+        
+        showAvatars = userDefaults.bool(forKey: kSHOWAVATAR)
+        checkForBackgroundColor()
+    }
+    
+    func checkForBackgroundColor() {
+        
+        if userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
+            self.collectionView.backgroundColor = .clear
+            
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+            imageView.image = UIImage(named: userDefaults.object(forKey: kBACKGROUBNDIMAGE) as! String)!
+            
+            self.view.insertSubview(imageView, at: 0)
+        }
+    }
+
 
     
     //MARK: Location access

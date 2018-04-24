@@ -24,7 +24,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
 
-//        tableView.contentInset = UIEdgeInsetsMake(-self.searchController.searchBar.frame.size.height, 0, 0, 0);
         loadRecentChats()
     }
 
@@ -166,23 +165,30 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func loadRecentChats() {
         
-    firebase.child(kRECENT_PATH).child(FUser.currentId()).observe(.value, with: {
+    firebase.child(kRECENT_PATH).queryOrdered(byChild: kUSERID).queryEqual(toValue: FUser.currentId()).observe(.value, with: {
             snapshot in
-            
-            self.recentChats.removeAll()
+
+        self.recentChats.removeAll()
             
             if snapshot.exists() {
                 
                 let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: false)])
                 
                 for recent in sorted {
-                    
+
                     let currentRecent = recent as! NSDictionary
                     
-                    if currentRecent[kLASTMESSAGE] as! String != "" {
-                        
+                    if currentRecent[kLASTMESSAGE] as! String != "" && currentRecent[kCHATROOMID] != nil && currentRecent[kRECENTID] != nil {
+
                         self.recentChats.append(currentRecent)
                     }
+                    
+                    
+                    //required for offline working
+                    firebase.child(kRECENT_PATH).queryOrdered(byChild: kCHATROOMID).queryEqual(toValue: currentRecent[kCHATROOMID]).observe(.value, with: {
+                        snapshot in
+                    })
+                    //end of offline requirement
                     
                 }
                 
@@ -190,6 +196,8 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             self.tableView.reloadData()
         })
+        
+        
     }
     
     
@@ -280,6 +288,8 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         Group.updateGroup(groupId: recent[kCHATROOMID] as! String, withValues: [kMEMBERSTOPUSH : membersToPush])
     }
+    
+   
     
     
     //MARK: search controler functions

@@ -17,6 +17,13 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet weak var avatarImageView: UIImageView!
     @IBOutlet weak var fullNameLabel: UILabel!
     
+    @IBOutlet weak var showAvatarSwitchOutlet: UISwitch!
+    var avatarSwitchStatus = false
+    var firstLoad: Bool?
+    
+    let userDefaults = UserDefaults.standard
+
+
     override func viewDidAppear(_ animated: Bool) {
         if FUser.currentUser() != nil {
             setupUI()
@@ -37,8 +44,10 @@ class SettingsTableViewController: UITableViewController {
 
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
+        
         if FUser.currentUser() != nil {
             setupUI()
+            loadUserDefaults()
         }
     }
     
@@ -49,6 +58,8 @@ class SettingsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        if section == 1 { return 4}
         return 2
     }
     
@@ -74,6 +85,16 @@ class SettingsTableViewController: UITableViewController {
     
     //MARK: IBActions    
     
+    @IBAction func showAvatarSwitchValueChanged(_ sender: UISwitch) {
+
+        if sender.isOn {
+            avatarSwitchStatus = true
+        } else {
+            avatarSwitchStatus = false
+        }
+        
+        saveUserDefaults()
+    }
     
     @IBAction func tellAFriendButtonPressed(_ sender: Any) {
         let text = "Hey! Lets chat on WChat \(kAPPURL)"
@@ -153,9 +174,9 @@ class SettingsTableViewController: UITableViewController {
     func deleteUser() {
         
         //delete local user
-        UserDefaults.standard.removeObject(forKey: kPUSHID)
-        UserDefaults.standard.removeObject(forKey: kCURRENTUSER)
-        UserDefaults.standard.synchronize()
+        userDefaults.removeObject(forKey: kPUSHID)
+        userDefaults.removeObject(forKey: kCURRENTUSER)
+        userDefaults.synchronize()
         
         //delete user object in firebase database
         firebase.child(kUSER_PATH).child(FUser.currentId()).removeValue()
@@ -176,6 +197,7 @@ class SettingsTableViewController: UITableViewController {
 
     }
     
+
     func showLoginView() {
         
         let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "welcome")
@@ -183,5 +205,26 @@ class SettingsTableViewController: UITableViewController {
         self.present(mainView, animated: true, completion: nil)
     }
 
+    func saveUserDefaults() {
+        
+        userDefaults.set(avatarSwitchStatus, forKey: kSHOWAVATAR)
+        userDefaults.synchronize()
+    }
+
     
+    func loadUserDefaults() {
+        
+        firstLoad = userDefaults.bool(forKey: kFIRSTRUN)
+        
+        if !firstLoad! {
+            userDefaults.set(true, forKey: kFIRSTRUN)
+            userDefaults.set(avatarSwitchStatus, forKey: kSHOWAVATAR)
+            userDefaults.synchronize()
+            
+        }
+        
+        avatarSwitchStatus = userDefaults.bool(forKey: kSHOWAVATAR)
+        showAvatarSwitchOutlet.isOn = avatarSwitchStatus
+    }
+
 }

@@ -28,7 +28,7 @@ class GroupViewController: UIViewController, ImagePickerDelegate {
         cameraButtonOutlet.addGestureRecognizer(iconTapGesture)
 
         setupUI()
-        
+
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "Invite Users", style: .plain, target: self, action: #selector(self.inviteUsers))]
 
     }

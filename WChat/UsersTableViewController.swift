@@ -37,6 +37,8 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
         
+        clearsSelectionOnViewWillAppear = true
+
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.searchController = searchController
         
