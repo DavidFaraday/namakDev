@@ -73,7 +73,7 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
                 withValues[kAVATAR] = avatarString
             }
             
-            updateCurrentUser(withValues: withValues, completion: { (error) in
+            updateCurrentUserInFirestore(withValues: withValues, completion: { (error) in
                 
                 if error != nil {
                     print("couldnt update user \(error!.localizedDescription)")
@@ -82,7 +82,7 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
                 ProgressHUD.showSuccess("Saved")
                 
                 self.saveButtonOutlet.isEnabled = true
-                self.dismiss(animated: true, completion: nil)
+                self.navigationController?.popViewController(animated: true)
             })
 
             

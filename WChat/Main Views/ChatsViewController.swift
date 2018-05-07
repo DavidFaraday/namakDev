@@ -34,6 +34,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
         
+        
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
@@ -151,7 +152,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     //MARK: IBActions
     @IBAction func newChatButtonPressed(_ sender: Any) {
-        
+
         selectUserForChat(isGroup: false)
     }
     
@@ -165,39 +166,43 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func loadRecentChats() {
         
-    firebase.child(kRECENT_PATH).queryOrdered(byChild: kUSERID).queryEqual(toValue: FUser.currentId()).observe(.value, with: {
-            snapshot in
-
-        self.recentChats.removeAll()
+        //to be updated when changes accure
+        let options = QueryListenOptions()
+        options.includeDocumentMetadataChanges(true) // in case recent changes
+        options.includeQueryMetadataChanges(true) // in case recent gets deleted
+        
+        reference(collectionReference: .Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener(options: options) { (snapshot, error) in
             
-            if snapshot.exists() {
+            guard let snapshot = snapshot else { return }
+            
+            if !snapshot.isEmpty {
                 
-                let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: false)])
+                self.recentChats = []
                 
-                for recent in sorted {
-
-                    let currentRecent = recent as! NSDictionary
+                print("have snapshot")
+                for recent in snapshot.documents {
+                    print("1")
+                    let currentRecent = recent.data() as NSDictionary
                     
                     if currentRecent[kLASTMESSAGE] as! String != "" && currentRecent[kCHATROOMID] != nil && currentRecent[kRECENTID] != nil {
+                        print("have a recent")
 
                         self.recentChats.append(currentRecent)
                     }
-                    
+
                     
                     //required for offline working
-                    firebase.child(kRECENT_PATH).queryOrdered(byChild: kCHATROOMID).queryEqual(toValue: currentRecent[kCHATROOMID]).observe(.value, with: {
-                        snapshot in
+                    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: currentRecent[kCHATROOMID] as! String).addSnapshotListener({ (snapshot, error) in
+                        
                     })
                     //end of offline requirement
-                    
                 }
                 
             }
             
             self.tableView.reloadData()
-        })
-        
-        
+        }
+
     }
     
     

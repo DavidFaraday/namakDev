@@ -71,19 +71,22 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         
         if nameTextField.text != "" && surnameTextField.text != "" && cityTextField.text != "" && countryTextField.text != "" && phoneTextField.text != "" {
             
+            //for email registration
             FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!, completion: { (error) in
-                
+
                 if error != nil {
-                    
+
                     ProgressHUD.dismiss()
                     ProgressHUD.showError(error!.localizedDescription)
                     return
                 }
-                
+
                 self.registerUser()
-                
+
             })
             
+            //for phone reg
+            //registerUser()
             
         } else {
             ProgressHUD.showError("All fields are required")
@@ -115,7 +118,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         
         let fullName = nameTextField.text! + " " + surnameTextField.text!
 
-        var tempDictionary: Dictionary = [kFULLNAME : fullName, kCOUNTRY : countryTextField.text!, kCITY : cityTextField.text!, kPHONE : phoneTextField.text!] as [String : Any]
+        var tempDictionary: Dictionary = [kFIRSTNAME : nameTextField.text!, kLASTNAME: surnameTextField.text!, kFULLNAME : fullName, kCOUNTRY : countryTextField.text!, kCITY : cityTextField.text!, kPHONE : phoneTextField.text!] as [String : Any]
         
         
         //add avatar if available
@@ -149,10 +152,9 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
     
     func finishRegistration(withValues: [String : Any]) {
         
-        updateCurrentUser(withValues: withValues, completion: { (error) in
-            
+        updateCurrentUserInFirestore(withValues: withValues) { (error) in
             if error != nil {
-            
+                
                 DispatchQueue.main.async {
                     ProgressHUD.showError(error!.localizedDescription)
                 }
@@ -162,7 +164,9 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
             
             //enter the application
             self.goToApp()
-        })
+
+        }
+
     }
     
 

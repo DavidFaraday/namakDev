@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 
 class FUser {
     
@@ -63,7 +64,7 @@ class FUser {
     
     
     init(_dictionary: NSDictionary) {
-        
+
         objectId = _dictionary[kOBJECTID] as! String
         pushId = _dictionary[kPUSHID] as? String
         
@@ -189,7 +190,7 @@ class FUser {
             } else {
                 
                 //get user from firebase and save locally
-                fetchCurrentUser(userId: firUser!.uid)
+                fetchCurrentUserFromFirestore(userId: firUser!.uid)
                 completion(error)
             }
             
@@ -213,7 +214,7 @@ class FUser {
             
             
             saveUserLocally(fUser: fUser)
-            saveUserInBackground(fUser: fUser)
+            saveUserToFirestore(fUser: fUser)
             completion(error)
             
         })
@@ -222,45 +223,46 @@ class FUser {
     
     //phoneNumberRegistration
     
-    //    class func registerUserWith(phoneNumber: String, verificationCode: String, completion: @escaping (_ error: Error?, _ shouldLogin: Bool) -> Void) {
-    //
-    //        let verificationID = UserDefaults.standard.value(forKey: kVERIFICATIONCODE)
-    //
-    //        let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID! as! String, verificationCode: verificationCode)
-    //
-    //        Auth.auth().signIn(with: credential) { (firuser, error) in
-    //
-    //            if error != nil {
-    //
-    //                completion(error!, false)
-    //                return
-    //            }
-    //
-    //            //check if user exist - login else register
-    //            fetchUserWith(userId: firuser!.uid, withBlock: { (user) in
-    //
-    //                if user != nil && user!.firstname != "" {
-    //                    //we have user, login
-    //
-    //                    saveUserLocally(fUser: user!)
-    //                    saveUserInBackground(fUser: user!)
-    //                    completion(error, true)
-    //
-    //                } else {
-    //
-    //                    //we have no user, register
-    ////                    let fUser = FUser(_objectId: firuser!.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: "", _firstname: "", _lastname: "", _avatar: "", _loginMethod: kPHONE, _friends: [], _phoneNumber: firuser!.phoneNumber!)
-    ////
-    ////                    saveUserLocally(fUser: fUser)
-    ////                    saveUserInBackground(fUser: fUser)
-    ////                    completion(error, false)
-    //
-    //                }
-    //            })
-    //
-    //        }
-    //
-    //    }
+    class func registerUserWith(phoneNumber: String, verificationCode: String, verificationId: String!, completion: @escaping (_ error: Error?, _ shouldLogin: Bool) -> Void) {
+    
+    
+            let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationId, verificationCode: verificationCode)
+    
+            Auth.auth().signIn(with: credential) { (firuser, error) in
+    
+                if error != nil {
+    
+                    completion(error!, false)
+                    return
+                }
+    
+                //check if user exist - login else register
+                fetchCurrentUserFromFirestore(userId: firuser!.uid, completion: { (user) in
+                    
+                    if user != nil && user!.firstname != "" {
+                        //we have user, login
+                        print("user is ....... \(user!)")
+                        saveUserLocally(fUser: user!)
+//                        saveUserInBackground(fUser: user!)
+                        saveUserToFirestore(fUser: user!)
+
+                        completion(error, true)
+                        
+                    } else {
+                        
+                        //    we have no user, register
+                        let fUser = FUser(_objectId: firuser!.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: "", _firstname: "", _lastname: "", _avatar: "", _loginMethod: kPHONE, _phoneNumber: firuser!.phoneNumber!, _city: "", _country: "")
+                        print("no user, saving new")
+                        saveUserLocally(fUser: fUser)
+//                        saveUserInBackground(fUser: fUser)
+                        saveUserToFirestore(fUser: fUser)
+                        completion(error, false)
+                        
+                    }
+
+                })
+            }
+        }
     
     
     //MARK: LogOut func
@@ -306,11 +308,21 @@ class FUser {
 
 
 //MARK: Save user funcs
-func saveUserInBackground(fUser: FUser) {
-    
-    let ref = firebase.child(kUSER_PATH).child(fUser.objectId)
-    ref.setValue(userDictionaryFrom(user: fUser))
+
+//NEW firestore
+func saveUserToFirestore(fUser: FUser) {
+    reference(collectionReference: .User).document(fUser.objectId).setData(userDictionaryFrom(user: fUser) as! [String : Any]) { (error) in
+        
+        print("error is \(error?.localizedDescription)")
+    }
 }
+
+//OLD Firebase
+//func saveUserInBackground(fUser: FUser) {
+//
+//    let ref = firebase.child(kUSER_PATH).child(fUser.objectId)
+//    ref.setValue(userDictionaryFrom(user: fUser))
+//}
 
 
 func saveUserLocally(fUser: FUser) {
@@ -322,22 +334,80 @@ func saveUserLocally(fUser: FUser) {
 
 //MARK: Fetch User funcs
 
-func fetchCurrentUser(userId: String) {
-    
-    userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observe(.value, with: {
-        snapshot in
+//New firestore
+func fetchCurrentUserFromFirestore(userId: String) {
+
+    reference(collectionReference: .User).document(userId).getDocument { (snapshot, error) in
+
+        guard let snapshot = snapshot else {  return }
         
-        if snapshot.exists() {
+        if snapshot.exists {
+            print("updated current users param")
             
-            let user = ((snapshot.value as! NSDictionary).allValues as NSArray).firstObject! as! NSDictionary
-            
-            UserDefaults.standard.setValue(user, forKeyPath: kCURRENTUSER)
+            UserDefaults.standard.setValue(snapshot.data() as NSDictionary, forKeyPath: kCURRENTUSER)
             UserDefaults.standard.synchronize()
+
         }
         
-    })
+    }
     
 }
+
+//Old firebase
+//func fetchCurrentUser(userId: String) {
+//
+//    userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observe(.value, with: {
+//        snapshot in
+//
+//        if snapshot.exists() {
+//
+//            let user = ((snapshot.value as! NSDictionary).allValues as NSArray).firstObject! as! NSDictionary
+//
+//            UserDefaults.standard.setValue(user, forKeyPath: kCURRENTUSER)
+//            UserDefaults.standard.synchronize()
+//        }
+//
+//    })
+//
+//}
+
+//NEW firestore
+func fetchCurrentUserFromFirestore(userId: String, completion: @escaping (_ user: FUser?)->Void) {
+    
+    reference(collectionReference: .User).document(userId).getDocument { (snapshot, error) in
+        
+        guard let snapshot = snapshot else {  return }
+        
+        if snapshot.exists {
+
+            let user = FUser(_dictionary: snapshot.data() as NSDictionary)
+            completion(user)
+        } else {
+            completion(nil)
+        }
+ 
+    }
+}
+
+//Old firebase
+//func fetchCurrentUser(userId: String, completion: @escaping (_ user: FUser?)->Void) {
+//
+//    firebase.child(kUSER_PATH).queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observeSingleEvent(of: .value) { (snapshot) in
+//
+//        if snapshot.exists() {
+//
+//            let userDictionary = ((snapshot.value as! NSDictionary).allValues as NSArray).firstObject! as! NSDictionary
+//
+//            let user = FUser(_dictionary: userDictionary)
+//            completion(user)
+//
+//        } else {
+//            completion(nil)
+//        }
+//
+//    }
+//}
+
 
 //MARK: Helper funcs
 
@@ -350,30 +420,27 @@ func userDictionaryFrom(user: FUser) -> NSDictionary {
     
 }
 
-func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray: [FUser]) -> Void) {
-
+//NEW firestore
+func getUsersFromFirestore(withIds: [String], completion: @escaping (_ usersArray: [FUser]) -> Void) {
+    
     var count = 0
     var usersArray: [FUser] = []
-
-    //go through each user and download it from firebase
+    
+    //go through each user and download it from firestore
     for userId in withIds {
-
-        userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observeSingleEvent(of: .value, with: {
-            snapshot in
+        
+        reference(collectionReference: .User).document(userId).getDocument { (snapshot, error) in
             
-            if snapshot.exists() {
-                
-                let userDictionary = ((snapshot.value as! NSDictionary).allValues as Array).first
-                
-                let dictionary = userDictionary as! NSDictionary
-                
-                let fUser = FUser.init(_dictionary: dictionary)
-                
+            guard let snapshot = snapshot else {  return }
+            
+            if snapshot.exists {
+
+                let user = FUser(_dictionary: snapshot.data() as NSDictionary)
                 count += 1
                 
                 //dont add if its current user
-                if fUser.objectId != FUser.currentId() {
-                    usersArray.append(fUser)
+                if user.objectId != FUser.currentId() {
+                    usersArray.append(user)
                 }
 
             } else {
@@ -384,13 +451,54 @@ func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray
                 //we have finished, return the array
                 completion(usersArray)
             }
-        })
+
+        }
+        
     }
 }
 
 
+//old firebase
+//func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray: [FUser]) -> Void) {
+//
+//    var count = 0
+//    var usersArray: [FUser] = []
+//
+//    //go through each user and download it from firebase
+//    for userId in withIds {
+//
+//        userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observeSingleEvent(of: .value, with: {
+//            snapshot in
+//            
+//            if snapshot.exists() {
+//                
+//                let userDictionary = ((snapshot.value as! NSDictionary).allValues as Array).first
+//                
+//                let dictionary = userDictionary as! NSDictionary
+//                
+//                let fUser = FUser.init(_dictionary: dictionary)
+//                
+//                count += 1
+//                
+//                //dont add if its current user
+//                if fUser.objectId != FUser.currentId() {
+//                    usersArray.append(fUser)
+//                }
+//
+//            } else {
+//                completion(usersArray)
+//            }
+//            
+//            if count == withIds.count {
+//                //we have finished, return the array
+//                completion(usersArray)
+//            }
+//        })
+//    }
+//}
 
-func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ error: Error?) -> Void) {
+//NEW firestore
+func updateCurrentUserInFirestore(withValues : [String : Any], completion: @escaping (_ error: Error?) -> Void) {
     
     if let dictionary = UserDefaults.standard.object(forKey: kCURRENTUSER) {
         
@@ -406,26 +514,61 @@ func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ err
         
         userObject.setValuesForKeys(tempWithValues)
         
-        let ref = firebase.child(kUSER_PATH).child(currentUserId)
-        
-        ref.updateChildValues(tempWithValues, withCompletionBlock: {
-            error, ref in
-
+        reference(collectionReference: .User).document(currentUserId).updateData(withValues) { (error) in
+            
             if error != nil {
                 
                 completion(error)
                 return
             }
-            
+
             //update current user
             UserDefaults.standard.setValue(userObject, forKeyPath: kCURRENTUSER)
             UserDefaults.standard.synchronize()
             
             completion(error)
-            
-        })
+        }
+
     }
 }
+
+//old firebase
+//func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ error: Error?) -> Void) {
+//
+//    if let dictionary = UserDefaults.standard.object(forKey: kCURRENTUSER) {
+//
+//        var tempWithValues = withValues
+//
+//        let currentUserId = FUser.currentId()
+//
+//        let updatedAt = dateFormatter().string(from: Date())
+//
+//        tempWithValues[kUPDATEDAT] = updatedAt
+//
+//        let userObject = (dictionary as! NSDictionary).mutableCopy() as! NSMutableDictionary
+//
+//        userObject.setValuesForKeys(tempWithValues)
+//
+//        let ref = firebase.child(kUSER_PATH).child(currentUserId)
+//
+//        ref.updateChildValues(tempWithValues, withCompletionBlock: {
+//            error, ref in
+//
+//            if error != nil {
+//
+//                completion(error)
+//                return
+//            }
+//
+//            //update current user
+//            UserDefaults.standard.setValue(userObject, forKeyPath: kCURRENTUSER)
+//            UserDefaults.standard.synchronize()
+//
+//            completion(error)
+//
+//        })
+//    }
+//}
 
 
 //MARK: OneSignal
@@ -444,13 +587,11 @@ func updateOneSignalId() {
 
 
 func setOneSignalId(pushId: String) {
-    
     updateCurrentUserOneSignalId(newId: pushId)
 }
 
 
 func removeOneSignalId() {
-    
     updateCurrentUserOneSignalId(newId: "")
 }
 
@@ -458,14 +599,14 @@ func removeOneSignalId() {
 
 func updateCurrentUserOneSignalId(newId: String) {
 
-    updateCurrentUser(withValues: [kPUSHID : newId]) { (error) in
-        
+    updateCurrentUserInFirestore(withValues: [kPUSHID : newId]) { (error) in
         if error != nil {
             print("error updating push id \(error!.localizedDescription)")
         }
+
     }
-    
 }
+
 
 
 

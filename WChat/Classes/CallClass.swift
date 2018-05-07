@@ -9,7 +9,7 @@
 import Foundation
 
 
-class Call {
+class CallN {
     
     var objectId: String
     var callerId: String

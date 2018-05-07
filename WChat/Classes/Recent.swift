@@ -39,15 +39,16 @@ func createRecent(members: [String], chatRoomId: String, withUserUsername: Strin
     var tempMembers = members
     
     //check if the user has recent with that chartoom id, if no create one
-    firebase.child(kRECENT_PATH).queryOrdered(byChild: kCHATROOMID).queryEqual(toValue: chatRoomId).observeSingleEvent(of: .value, with: {
-        snapshot in
-
-
-        if snapshot.exists() {
+    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+        guard let snapshot = snapshot else { return }
+        
+        
+        
+        if !snapshot.isEmpty {
             
-            for recent in ((snapshot.value as! NSDictionary).allValues as Array) {
-
-                let currentRecent = recent as! NSDictionary
+            for recent in snapshot.documents {
+                
+                let currentRecent = recent.data() as NSDictionary
                 
                 //check if recent has userId
                 if let curretUserId = currentRecent[kUSERID] {
@@ -58,25 +59,23 @@ func createRecent(members: [String], chatRoomId: String, withUserUsername: Strin
                     }
                     
                 }
-                
             }
-            
         }
         
         //create recents for remaining users
         for userId in tempMembers {
             creatRecentItem(userId: userId, chatRoomId: chatRoomId, members: members, withUserUsername: withUserUsername, type: type, users: users, avatarOfGroup: avatarOfGroup)
         }
-
-
-    })
+    }
+ 
 }
 
 func creatRecentItem(userId: String, chatRoomId: String, members: [String], withUserUsername: String, type: String, users: [FUser]?, avatarOfGroup: String?) {
     
-    let refernce = firebase.child(kRECENT_PATH).childByAutoId()
+    let refernce = reference(collectionReference: .Recent).document()
 
-    let recentId = refernce.key
+    let recentId = refernce.documentID
+
     let date = dateFormatter().string(from: Date())
 
     var recent: [String : Any]!
@@ -106,7 +105,7 @@ func creatRecentItem(userId: String, chatRoomId: String, members: [String], with
         }
     }
     
-    refernce.setValue(recent)
+    refernce.setData(recent)
 }
 
 
@@ -133,30 +132,26 @@ func deleteRecentChat(recentDictionary: NSDictionary) {
    
     if let recentId = recentDictionary[kRECENTID] {
         
-        firebase.child(kRECENT_PATH).child(recentId as! String).removeValue { (error, ref) in
-            
-            if error != nil {
-                print("cannot delete recent \(error!.localizedDescription)")
-            }
-        }
+        reference(collectionReference: .Recent).document(recentId as! String).delete()
+        
     }
 }
 
 //Update RecentChat
 func updateRecents(chatRoomId: String, memberIds: [String], lastMessage: String) {
     
-    firebase.child(kRECENT_PATH).queryOrdered(byChild: kCHATROOMID).queryEqual(toValue: chatRoomId).observeSingleEvent(of: .value, with: {
-        snapshot in
+    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+        guard let snapshot = snapshot else { return }
         
-        if snapshot.exists() {
+        if !snapshot.isEmpty {
             
-            for recent in ((snapshot.value as! NSDictionary).allValues as Array) {
-                updateRecentItem(recent: recent as! NSDictionary, lastMessage: lastMessage)
+            for recent in snapshot.documents {
+                
+                updateRecentItem(recent: recent.data() as NSDictionary, lastMessage: lastMessage)
             }
+
         }
-        
-    })
-        
+    }
 }
 
 
@@ -174,36 +169,37 @@ func updateRecentItem(recent: NSDictionary, lastMessage: String) {
     
     let values = [kLASTMESSAGE: lastMessage, kCOUNTER: counter, kDATE: date] as [String : Any]
     
-    firebase.child(kRECENT_PATH).child(recent[kRECENTID] as! String).updateChildValues(values)
+    reference(collectionReference: .Recent).document(recent[kRECENTID] as! String).updateData(values)
 }
 
 //Clear counter
 
-func clearRecentCounter(chatRoomID: String) {
+func clearRecentCounter(chatRoomId: String) {
     
-    firebase.child(kRECENT_PATH).queryOrdered(byChild: kCHATROOMID).queryEqual(toValue: chatRoomID).observeSingleEvent(of: .value, with: {
-        snapshot in
-
-        if snapshot.exists() {
+    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+        
+        guard let snapshot = snapshot else { return }
+        
+        if !snapshot.isEmpty {
             
-            for recent in ((snapshot.value as! NSDictionary).allValues as Array) {
+            for recent in snapshot.documents {
                 
-                let currentRecent = recent as! NSDictionary
+                let currentRecent = recent.data() as NSDictionary
 
                 if currentRecent[kUSERID] as? String == FUser.currentUser()!.objectId {
-
+                    
                     clearRecentCounterItem(recent: currentRecent)
                 }
-
             }
             
         }
-        
-    })
+
+    }
+
 }
 
 func clearRecentCounterItem(recent: NSDictionary) {
-    firebase.child(kRECENT_PATH).child(recent[kRECENTID] as! String).updateChildValues([kCOUNTER : 0])
+    reference(collectionReference: .Recent).document(recent[kRECENTID] as! String).updateData([kCOUNTER : 0])
 }
 
 
@@ -226,22 +222,25 @@ func createRecentsForNewMembers(groupId: String, groupName: String,  membersToPu
 
 func updateExistingRicentsWithNewValues(chatRoomId: String, members: [String], withValues: [String : Any]) {
     
-    firebase.child(kRECENT_PATH).queryOrdered(byChild: kCHATROOMID).queryEqual(toValue: chatRoomId).observeSingleEvent(of: .value, with: {
-        snapshot in
+    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
         
-        if snapshot.exists() {
+        guard let snapshot = snapshot else { return }
+        
+        if !snapshot.isEmpty {
             
-            for recent in ((snapshot.value as! NSDictionary).allValues as Array) {
+            for recent in snapshot.documents {
                 
-                let recent = recent as! NSDictionary
+                let recent = recent.data() as NSDictionary
                 updateRecet(recentId: recent[kRECENTID] as! String, withValues: withValues)
             }
+
         }
-    })
+    }
 }
 
 func updateRecet(recentId: String, withValues: [String : Any]) {
-    firebase.child(kRECENT_PATH).child(recentId).updateChildValues(withValues)
+    
+    reference(collectionReference: .Recent).document(recentId).updateData(withValues)
 }
 
 

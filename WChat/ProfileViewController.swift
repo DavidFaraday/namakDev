@@ -10,7 +10,7 @@ import UIKit
 
 
 class ProfileViewController: UITableViewController {
-
+    
     @IBOutlet weak var fullNameLabel: UILabel!
     @IBOutlet weak var phoneNumberLabel: UILabel!
     
@@ -19,7 +19,8 @@ class ProfileViewController: UITableViewController {
     @IBOutlet weak var blockButtonOutlet: UIButton!
     @IBOutlet weak var avatarImageView: UIImageView!
     
-    
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
     var user:FUser?
 
     override func viewDidLoad() {
@@ -60,12 +61,12 @@ class ProfileViewController: UITableViewController {
     //MARK: IBActions
     
     @IBAction func callButtonPressed(_ sender: Any) {
-        print("call")
+
+        callUser()
         
         let currentUser = FUser.currentUser()!
         
-        
-        let call = Call(_callerId: currentUser.objectId, _withUserId: user!.objectId, _callerFullName: currentUser.fullname, _withUserFullName: user!.fullname, _callerAvatar: currentUser.avatar, _withUserAvatar: user!.avatar)
+        let call = CallN(_callerId: currentUser.objectId, _withUserId: user!.objectId, _callerFullName: currentUser.fullname, _withUserFullName: user!.fullname, _callerAvatar: "", _withUserAvatar: "")
         
         call.saveCallInBackground()
     }
@@ -98,7 +99,7 @@ class ProfileViewController: UITableViewController {
             currentUserBlockedIds.append(user!.objectId)
         }
         
-        updateCurrentUser(withValues: [kBLOCKEDUSERID : currentUserBlockedIds]) { (error) in
+        updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID : currentUserBlockedIds]) { (error) in
             
             if error != nil {
                 print("error blocking \(error!.localizedDescription)")
@@ -109,6 +110,27 @@ class ProfileViewController: UITableViewController {
 
     }
     
+    //MARK: CallFunctions
+    
+    func callClient() -> SINCallClient {
+        
+        return appDelegate._client.call()
+    }
+    
+    func callUser() {
+        
+        let userToCallId = user!.objectId
+        let call = callClient().callUser(withId: userToCallId, headers: [kFULLNAME : user!.fullname])
+
+        let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
+
+        callVC._call = call
+
+        self.present(callVC, animated: true, completion: nil)
+        
+
+    }
+
     
     //MARK: Helpers
     

@@ -76,7 +76,7 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
         blockedUsersArray.remove(at: indexPath.row)
         
         //save the removed user in firebase
-        updateCurrentUser(withValues: [kBLOCKEDUSERID : tempBlockedUsers]) { (error) in
+        updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID : tempBlockedUsers]) { (error) in
             
             if error != nil {
                 
@@ -104,7 +104,7 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
             
             ProgressHUD.show()
             
-            getUsersFromFirebase(withIds: FUser.currentUser()!.blockedUsers) { (allBlockedUsers) in
+            getUsersFromFirestore(withIds: FUser.currentUser()!.blockedUsers) { (allBlockedUsers) in
                 
                 ProgressHUD.dismiss()
                 

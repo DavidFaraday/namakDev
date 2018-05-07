@@ -8,7 +8,7 @@
 
 import UIKit
 import Contacts
-import Firebase
+import FirebaseFirestore
 import ProgressHUD
 
 class ContactsViewController: UIViewController, UISearchResultsUpdating, UITableViewDataSource, UITableViewDelegate, UserTableViewCellDelegate {
@@ -291,37 +291,35 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         
         ProgressHUD.show()
         
-        let query = userRef.queryOrdered(byChild: kFIRSTNAME)
-        
-        userHandler = query.observe(.value, with: { snapshot in
+        //to limit the load of users, need to get only the users from my country (update the code later)
+        reference(collectionReference: .User).order(by: kFIRSTNAME, descending: false).getDocuments { (snapshot, error) in
             
-            if snapshot.exists() {
-
+            guard let snapshot = snapshot else { return }
+            
+            if !snapshot.isEmpty {
+                
                 self.matchedUsers = []
                 self.users.removeAll()
 
-                let sortedUsersDictionary = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kFIRSTNAME, ascending: true)])
-                
-                
-                for userDictionary in sortedUsersDictionary {
+                for userDictionary in snapshot.documents {
                     
-                    let userDictionary = userDictionary as! NSDictionary
-                    let fUser = FUser.init(_dictionary: userDictionary)
+                    let userDictionary = userDictionary.data() as NSDictionary
+                    let fUser = FUser(_dictionary: userDictionary)
                     
                     if fUser.objectId != FUser.currentId() {
                         
                         self.users.append(fUser)
                     }
-                    
                 }
                 
                 ProgressHUD.dismiss()
                 self.tableView.reloadData()
-            } 
+            }
             
             ProgressHUD.dismiss()
             self.compareUsers()
-        })
+        }
+        
     }
 
     func compareUsers() {

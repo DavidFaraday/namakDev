@@ -228,46 +228,48 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         
         ProgressHUD.show()
         
-        var query: DatabaseQuery!
+        var query: Query!
         
         switch filter {
         case kCITY:
-            query = userRef.queryOrdered(byChild: kCITY).queryEqual(toValue: FUser.currentUser()!.city)
+            query = reference(collectionReference: .User).whereField(kCITY, isEqualTo: FUser.currentUser()!.city).order(by: kFIRSTNAME, descending: false)
         case kCOUNTRY:
-            query = userRef.queryOrdered(byChild: kCOUNTRY).queryEqual(toValue: FUser.currentUser()!.country)
+            query = reference(collectionReference: .User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country).order(by: kFIRSTNAME, descending: false)
         default:
-            query = userRef.queryOrdered(byChild: kFIRSTNAME)
+            query = reference(collectionReference: .User).order(by: kFIRSTNAME, descending: false)
         }
-        
-        userHandler = query.observe(.value, with: { snapshot in
 
-            if snapshot.exists() {
+            
+            query.getDocuments { (snapshot, error) in
+            
+                guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
+            
+            if !snapshot.isEmpty {
                 
                 self.allUsers = []
                 self.sectionTitleList = []
                 self.allUsersGrouped = [:]
-                
-                let sortedUsersDictionary = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kFIRSTNAME, ascending: true)])
-                
-                
-                for userDictionary in sortedUsersDictionary {
+
+                for userDictionary in snapshot.documents {
                     
-                    let userDictionary = userDictionary as! NSDictionary
-                    let fUser = FUser.init(_dictionary: userDictionary)
+                    let userDictionary = userDictionary.data() as NSDictionary
+                    let fUser = FUser(_dictionary: userDictionary)
                     
                     if fUser.objectId != FUser.currentId() {
                         
                         self.allUsers.append(fUser)
                     }
-                    
+
                 }
                 
-                ProgressHUD.dismiss()
                 self.splitDataInToSection()
                 self.tableView.reloadData()
             }
-        })
-        
+                print("dismiss")
+            self.tableView.reloadData()
+            ProgressHUD.dismiss()
+        }
+ 
     }
     
     //MARK: search controler functions

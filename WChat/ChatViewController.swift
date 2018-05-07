@@ -97,12 +97,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
 
     override func viewWillAppear(_ animated: Bool) {
-        clearRecentCounter(chatRoomID: chatRoomId)
+        clearRecentCounter(chatRoomId: chatRoomId)
         loadUserDefaults()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        clearRecentCounter(chatRoomID: chatRoomId)
+        clearRecentCounter(chatRoomId: chatRoomId)
     }
 
     override func viewDidLoad() {
@@ -813,7 +813,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             avatarButton.addTarget(self, action: #selector(self.showUserProfile), for: .touchUpInside)
         }
 
-        getUsersFromFirebase(withIds: memberIds) { (withUsers) in
+        getUsersFromFirestore(withIds: memberIds) { (withUsers) in
             
             self.withUsers = withUsers
             self.getAvatarImages()

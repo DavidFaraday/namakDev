@@ -8,17 +8,19 @@
 
 import UIKit
 import ProgressHUD
+import UserNotifications
 
 class CallTableViewController: UITableViewController, UISearchResultsUpdating {
 
-    var allCalls: [Call] = []
-    var filteredCalls: [Call] = []
+    var allCalls: [CallN] = []
+    var filteredCalls: [CallN] = []
 
     let searchController = UISearchController(searchResultsController: nil)
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        setBadges(controller: self.tabBarController!)
 
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
@@ -26,7 +28,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
-        
+
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
@@ -50,7 +52,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! CallTableViewCell
         
-        var call: Call!
+        var call: CallN!
         
         if searchController.isActive && searchController.searchBar.text != "" {
             call = filteredCalls[indexPath.row]
@@ -68,7 +70,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        var call: Call!
+        var call: CallN!
         
         if searchController.isActive && searchController.searchBar.text != "" {
             call = filteredCalls[indexPath.row]
@@ -89,7 +91,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         
         if editingStyle == .delete {
 
-            var tempCall: Call!
+            var tempCall: CallN!
             
             if searchController.isActive && searchController.searchBar.text != "" {
                 tempCall = filteredCalls[indexPath.row]
@@ -110,27 +112,25 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     func loadCalls() {
         
-        firebase.child(kCALL_PATH).child(FUser.currentId()).observe(.value, with: {
-            snapshot in
-            
-            self.allCalls = []
-
-            if snapshot.exists() {
-                
-                let allCallDictionaries = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: false)])
-                
-                
-                for callDictionary in allCallDictionaries {
-                    
-                    let call = Call(_dictionary: callDictionary as! NSDictionary)
-                    self.allCalls.append(call)
-                }
-                
-            }
-            
-            
-            self.tableView.reloadData()
-        })
+//        firebase.child(kCALL_PATH).child(FUser.currentId()).queryOrdered(byChild: kDATE).queryLimited(toLast: 20).observe(.value, with: {
+//            snapshot in
+//
+//            self.allCalls = []
+//
+//            if snapshot.exists() {
+//
+//                let allCallDictionaries = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: false)])
+//
+//                for callDictionary in allCallDictionaries {
+//
+//                    let call = CallN(_dictionary: callDictionary as! NSDictionary)
+//                    self.allCalls.append(call)
+//                }
+//
+//            }
+//
+//            self.tableView.reloadData()
+//        })
     }
 
     //MARK: search controler functions

@@ -28,7 +28,7 @@ class CallTableViewCell: UITableViewCell {
 
     }
     
-    func generateCellWith(call: Call) {
+    func generateCellWith(call: CallN) {
         
         
         dateLabel.text = formatCallTime(date: call.callDate)

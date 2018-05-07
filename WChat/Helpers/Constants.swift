@@ -17,6 +17,9 @@ let userDefaults = UserDefaults.standard
 var userHandler: UInt = 0
 let userRef = firebase.child(kUSER_PATH)
 
+let recentBadgeRef = firebase.child(kRECENT_PATH)
+var recentBadgeHandler: UInt = 0
+
 
 //NOTIFICATIONS
 public let USER_DID_LOGIN_NOTIFICATION = "UserDidLoginNotification"
@@ -27,8 +30,8 @@ public let APP_STARTED_NOTIFICATION = "AppStartedNotification"
 //IDS and Keys
 public let kFILEREFERENCE = "gs://wchat-5c432.appspot.com"
 public let kONESIGNALAPPID = "2859ef5b-4d09-4034-862c-d0a6aaae1148"
-public let kSINCHKEY = ""
-public let kSINCHSECRET = ""
+public let kSINCHKEY = "6d6bc598-3bbc-4d95-9c13-6873e697da96"
+public let kSINCHSECRET = "2V/Rqg4kNkynAQs3Dqnd7g=="
 public let kAPPURL = "https://itunes.apple.com/us/app/qchat/id1245294104?ls=1&mt=8"
 
 
