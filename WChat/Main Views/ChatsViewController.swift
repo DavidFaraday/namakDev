@@ -13,6 +13,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     let searchController = UISearchController(searchResultsController: nil)
 
+    var recentListener: ListenerRegistration!
     @IBOutlet weak var tableView: UITableView!
     
     var recentChats: [NSDictionary] = []
@@ -20,11 +21,16 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     
     override func viewWillAppear(_ animated: Bool) {
-        
+        loadRecentChats()
+
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
 
-        loadRecentChats()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        
+        recentListener.remove()
     }
 
     override func viewDidLoad() {
@@ -34,7 +40,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
         
-        
+
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
@@ -168,41 +174,50 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         //to be updated when changes accure
         let options = QueryListenOptions()
-        options.includeDocumentMetadataChanges(true) // in case recent changes
+//        options.includeDocumentMetadataChanges(true) // in case recent changes
         options.includeQueryMetadataChanges(true) // in case recent gets deleted
         
-        reference(collectionReference: .Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener(options: options) { (snapshot, error) in
+        recentListener = reference(collectionReference: .Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener(options: options, listener: { (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
             
+//            snapshot.documentChanges.forEach { diff in
+//                if (diff.type == .added) {
+//                    print("New city: \(diff.document.data()[kRECENTID])")
+//                }
+//                if (diff.type == .modified) {
+//                    print("Modified city: \(diff.document.data()[kRECENTID])")
+//                }
+//                if (diff.type == .removed) {
+//                    print("Removed city: \(diff.document.data()[kRECENTID])")
+//                }
+//            }
+            self.recentChats = []
+            
             if !snapshot.isEmpty {
                 
-                self.recentChats = []
                 
-                print("have snapshot")
-                for recent in snapshot.documents {
-                    print("1")
-                    let currentRecent = recent.data() as NSDictionary
+                let sorted = ((dictionaryFromSnapshots(snapshots: snapshot.documents)) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: false)]) as! [NSDictionary]
+                
+                for recent in sorted {
                     
-                    if currentRecent[kLASTMESSAGE] as! String != "" && currentRecent[kCHATROOMID] != nil && currentRecent[kRECENTID] != nil {
-                        print("have a recent")
-
-                        self.recentChats.append(currentRecent)
+                    if recent[kLASTMESSAGE] as! String != "" && recent[kCHATROOMID] != nil && recent[kRECENTID] != nil {
+                        
+                        self.recentChats.append(recent)
                     }
-
+                    
                     
                     //required for offline working
-                    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: currentRecent[kCHATROOMID] as! String).addSnapshotListener({ (snapshot, error) in
-                        
-                    })
+                    //                    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: currentRecent[kCHATROOMID] as! String).addSnapshotListener({ (snapshot, error) in
+                    //
+                    //                    })
                     //end of offline requirement
                 }
-                
             }
             
             self.tableView.reloadData()
-        }
-
+        })
+        
     }
     
     
@@ -215,19 +230,18 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
         if recentChat[kTYPE] as! String == kPRIVATE {
 
-            firebase.child(kUSER_PATH).child(recentChat[kWITHUSERUSERID] as! String).observeSingleEvent(of: .value, with: {
-                snapshot in
+            reference(collectionReference: .User).document(recentChat[kWITHUSERUSERID] as! String).getDocument { (snapshot, error) in
+                
+                guard let snapshot = snapshot else { return }
 
-                if snapshot.exists() {
+                if snapshot.exists {
+                    let userDictionary = snapshot.data() as NSDictionary
                     
-                    let userDictionary = snapshot.value as! NSDictionary
-
                     let tempUser = FUser(_dictionary: userDictionary)
                     
                     self.showUserProfile(user: tempUser)
                 }
-                
-            })
+            }
         }
         
     }
@@ -253,7 +267,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         //add subviews
         buttonView.addSubview(groupButton)
-//        headerView.addSubview(searchController.searchBar)
         headerView.addSubview(buttonView)
         headerView.addSubview(lineView)
         

@@ -9,13 +9,26 @@
 import UIKit
 import ProgressHUD
 import UserNotifications
+import FirebaseFirestore
 
 class CallTableViewController: UITableViewController, UISearchResultsUpdating {
 
     var allCalls: [CallN] = []
     var filteredCalls: [CallN] = []
 
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
     let searchController = UISearchController(searchResultsController: nil)
+    var callListener: ListenerRegistration!
+
+    override func viewWillAppear(_ animated: Bool) {
+        loadCalls()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        callListener.remove()
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +46,6 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
 
-        loadCalls()
     }
 
 
@@ -79,7 +91,15 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         }
 
         call.saveCallInBackground()
+        
         //call user again
+        let newCall = call!
+        
+        newCall.objectId = UUID().uuidString
+        newCall.callDate = Date()
+
+        newCall.saveCallInBackground()
+        callUser(withId: call.withUserId, withName: call.withUserFullName)
     }
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -112,25 +132,26 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     func loadCalls() {
         
-//        firebase.child(kCALL_PATH).child(FUser.currentId()).queryOrdered(byChild: kDATE).queryLimited(toLast: 20).observe(.value, with: {
-//            snapshot in
-//
-//            self.allCalls = []
-//
-//            if snapshot.exists() {
-//
-//                let allCallDictionaries = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: false)])
-//
-//                for callDictionary in allCallDictionaries {
-//
-//                    let call = CallN(_dictionary: callDictionary as! NSDictionary)
-//                    self.allCalls.append(call)
-//                }
-//
-//            }
-//
-//            self.tableView.reloadData()
-//        })
+        callListener = reference(collectionReference: .Call).document(FUser.currentId()).collection(FUser.currentId()).order(by: kDATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
+            
+            self.allCalls = []
+
+            guard let snapshot = snapshot else { return }
+            
+            if !snapshot.isEmpty {
+                
+                let sortedDictionary = dictionaryFromSnapshots(snapshots: snapshot.documents)
+                
+                for callDictionary in sortedDictionary {
+
+                    let call = CallN(_dictionary: callDictionary)
+                    self.allCalls.append(call)
+                }
+
+            }
+            self.tableView.reloadData()
+        })
+
     }
 
     //MARK: search controler functions
@@ -157,5 +178,24 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         
         filteredContentForSearchText(searchText: searchController.searchBar.text!)
     }
+    
+    //MARK: CallUser
+    
+    func callUser(withId: String, withName: String) {
+
+        let call = callClient().callUser(withId: withId, headers: [kFULLNAME : withName])
+        
+        let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
+        
+        callVC._call = call
+        
+        self.present(callVC, animated: true, completion: nil)
+        
+    }
+
+    func callClient() -> SINCallClient {
+        return appDelegate._client.call()
+    }
+
 
 }

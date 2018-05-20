@@ -317,13 +317,6 @@ func saveUserToFirestore(fUser: FUser) {
     }
 }
 
-//OLD Firebase
-//func saveUserInBackground(fUser: FUser) {
-//
-//    let ref = firebase.child(kUSER_PATH).child(fUser.objectId)
-//    ref.setValue(userDictionaryFrom(user: fUser))
-//}
-
 
 func saveUserLocally(fUser: FUser) {
     
@@ -389,25 +382,6 @@ func fetchCurrentUserFromFirestore(userId: String, completion: @escaping (_ user
     }
 }
 
-//Old firebase
-//func fetchCurrentUser(userId: String, completion: @escaping (_ user: FUser?)->Void) {
-//
-//    firebase.child(kUSER_PATH).queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observeSingleEvent(of: .value) { (snapshot) in
-//
-//        if snapshot.exists() {
-//
-//            let userDictionary = ((snapshot.value as! NSDictionary).allValues as NSArray).firstObject! as! NSDictionary
-//
-//            let user = FUser(_dictionary: userDictionary)
-//            completion(user)
-//
-//        } else {
-//            completion(nil)
-//        }
-//
-//    }
-//}
-
 
 //MARK: Helper funcs
 
@@ -458,46 +432,6 @@ func getUsersFromFirestore(withIds: [String], completion: @escaping (_ usersArra
 }
 
 
-//old firebase
-//func getUsersFromFirebase(withIds: [String], completion: @escaping (_ usersArray: [FUser]) -> Void) {
-//
-//    var count = 0
-//    var usersArray: [FUser] = []
-//
-//    //go through each user and download it from firebase
-//    for userId in withIds {
-//
-//        userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observeSingleEvent(of: .value, with: {
-//            snapshot in
-//            
-//            if snapshot.exists() {
-//                
-//                let userDictionary = ((snapshot.value as! NSDictionary).allValues as Array).first
-//                
-//                let dictionary = userDictionary as! NSDictionary
-//                
-//                let fUser = FUser.init(_dictionary: dictionary)
-//                
-//                count += 1
-//                
-//                //dont add if its current user
-//                if fUser.objectId != FUser.currentId() {
-//                    usersArray.append(fUser)
-//                }
-//
-//            } else {
-//                completion(usersArray)
-//            }
-//            
-//            if count == withIds.count {
-//                //we have finished, return the array
-//                completion(usersArray)
-//            }
-//        })
-//    }
-//}
-
-//NEW firestore
 func updateCurrentUserInFirestore(withValues : [String : Any], completion: @escaping (_ error: Error?) -> Void) {
     
     if let dictionary = UserDefaults.standard.object(forKey: kCURRENTUSER) {
@@ -532,44 +466,6 @@ func updateCurrentUserInFirestore(withValues : [String : Any], completion: @esca
     }
 }
 
-//old firebase
-//func updateCurrentUser(withValues : [String : Any], completion: @escaping (_ error: Error?) -> Void) {
-//
-//    if let dictionary = UserDefaults.standard.object(forKey: kCURRENTUSER) {
-//
-//        var tempWithValues = withValues
-//
-//        let currentUserId = FUser.currentId()
-//
-//        let updatedAt = dateFormatter().string(from: Date())
-//
-//        tempWithValues[kUPDATEDAT] = updatedAt
-//
-//        let userObject = (dictionary as! NSDictionary).mutableCopy() as! NSMutableDictionary
-//
-//        userObject.setValuesForKeys(tempWithValues)
-//
-//        let ref = firebase.child(kUSER_PATH).child(currentUserId)
-//
-//        ref.updateChildValues(tempWithValues, withCompletionBlock: {
-//            error, ref in
-//
-//            if error != nil {
-//
-//                completion(error)
-//                return
-//            }
-//
-//            //update current user
-//            UserDefaults.standard.setValue(userObject, forKeyPath: kCURRENTUSER)
-//            UserDefaults.standard.synchronize()
-//
-//            completion(error)
-//
-//        })
-//    }
-//}
-
 
 //MARK: OneSignal
 
@@ -603,7 +499,6 @@ func updateCurrentUserOneSignalId(newId: String) {
         if error != nil {
             print("error updating push id \(error!.localizedDescription)")
         }
-
     }
 }
 

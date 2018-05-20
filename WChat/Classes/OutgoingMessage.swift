@@ -10,8 +10,6 @@ import Foundation
 
 class OutgoingMessage {
     
-    let message_ref = firebase.child(kMESSAGE_PATH)
-
     let messageDictionary: NSMutableDictionary
 
     //MARK: Initializers
@@ -22,11 +20,9 @@ class OutgoingMessage {
     }
 
     //picture
-    init(message: String, pictureData: NSData, senderId: String, senderName: String, date: Date, status: String, type: String) {
+    init(message: String, pictureLink: String, senderId: String, senderName: String, date: Date, status: String, type: String) {
         
-        let pic = pictureData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
-        
-        messageDictionary = NSMutableDictionary(objects: [message, pic, senderId, senderName, dateFormatter().string(from: date), status, type, false], forKeys: [kMESSAGE as NSCopying, kPICTURE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
+        messageDictionary = NSMutableDictionary(objects: [message, pictureLink, senderId, senderName, dateFormatter().string(from: date), status, type, false], forKeys: [kMESSAGE as NSCopying, kPICTURE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
     }
 
 
@@ -58,13 +54,11 @@ class OutgoingMessage {
     func sendMessage(chatRoomID: String, messageDictionary: NSMutableDictionary, memberIds: [String], membersToPush: [String]) {
         
         let messageId = UUID().uuidString //unique number
+        messageDictionary[kMESSAGEID] = messageId
         
         for memberId in memberIds {
-            let messagePath = message_ref.child(memberId).child(chatRoomID).child(messageId)
-            
-            messageDictionary[kMESSAGEID] = messageId
+        reference(collectionReference: .Message).document(memberId).collection(chatRoomID).document(messageId).setData(messageDictionary as! [String : Any])
 
-            messagePath.setValue(messageDictionary)
         }
         
         updateRecents(chatRoomId: chatRoomID, memberIds: memberIds, lastMessage: messageDictionary[kMESSAGE] as! String)
@@ -81,7 +75,7 @@ class OutgoingMessage {
     class func deleteMessage(withId: String, chatRoomId: String) {
         
         let values = [kDELETED : true]
-        firebase.child(kMESSAGE_PATH).child(FUser.currentId()).child(chatRoomId).child(withId).updateChildValues(values)
+        reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).document(withId).updateData(values)
     }
 
     class func updateMessage(withId: String, chatRoomId: String, memberIds: [String]) {
@@ -90,8 +84,7 @@ class OutgoingMessage {
         let values = [kSTATUS : kREAD, kREADDATE : readDate]
         
         for userId in memberIds {
-            firebase.child(kMESSAGE_PATH).child(userId).child(chatRoomId).child(withId).updateChildValues(values)
-            
+            reference(collectionReference: .Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
         }
     }
     

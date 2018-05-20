@@ -45,7 +45,8 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         UserDefaults.standard.synchronize()
         
         //delete user object
-        firebase.child(kUSER_PATH).child(FUser.currentId()).removeValue()
+       
+   reference(collectionReference: .User).document(FUser.currentId()).delete()
         
         FUser.deleteUser { (error) in
             

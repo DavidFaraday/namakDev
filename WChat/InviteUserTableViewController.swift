@@ -23,10 +23,11 @@ class InviteUserTableViewController: UITableViewController, UserTableViewCellDel
     var group: NSDictionary!
     
     
-    
+    override func viewWillAppear(_ animated: Bool) {
+        loadUsers(filter: kCITY)
+    }
     override func viewWillDisappear(_ animated: Bool) {
         ProgressHUD.dismiss()
-        userRef.removeObserver(withHandle: userHandler)
     }
 
     
@@ -41,7 +42,6 @@ class InviteUserTableViewController: UITableViewController, UserTableViewCellDel
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonPressed))]
         self.navigationItem.rightBarButtonItem?.isEnabled = false
 
-        loadUsers(filter: kCITY)
         
         currentMemberIds = group[kMEMBERS] as! [String]
     }

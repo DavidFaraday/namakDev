@@ -80,7 +80,7 @@ class IncomingMessage {
     
     
     func createPictureMessage(messageDictionary: NSDictionary) -> JSQMessage {
-        
+
         let name = messageDictionary[kSENDERNAME] as? String
         let userId = messageDictionary[kSENDERID] as? String
         
@@ -101,12 +101,13 @@ class IncomingMessage {
         mediaItem?.appliesMediaViewMaskAsOutgoing = returnOutgoingStatusFromUser(senderId: userId!)
         
         //update the colletion view when image is set
-        imageFromData(pictureData: (messageDictionary[kPICTURE] as? String)!) { (image) in
+        downloadImage(imageUrl: messageDictionary[kPICTURE] as! String) { (image) in
             
-            mediaItem?.image = image
-            self.collectionView.reloadData()
+            if image != nil {
+                mediaItem?.image = image!
+                self.collectionView.reloadData()
+            }
         }
-        
         
         return JSQMessage(senderId: userId, senderDisplayName: name, date: date, media: mediaItem)
     }

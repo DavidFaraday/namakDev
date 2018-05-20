@@ -10,16 +10,8 @@ import Foundation
 import Firebase
 import FirebaseDatabase
 
-
-var firebase = Database.database().reference()
+public var recentBadgeHandler: ListenerRegistration?
 let userDefaults = UserDefaults.standard
-
-var userHandler: UInt = 0
-let userRef = firebase.child(kUSER_PATH)
-
-let recentBadgeRef = firebase.child(kRECENT_PATH)
-var recentBadgeHandler: UInt = 0
-
 
 //NOTIFICATIONS
 public let USER_DID_LOGIN_NOTIFICATION = "UserDidLoginNotification"

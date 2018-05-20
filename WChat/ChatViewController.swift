@@ -13,14 +13,15 @@ import IQAudioRecorderController
 import IDMPhotoBrowser
 import AVFoundation
 import AVKit
-
+import FirebaseFirestore
 
 class ChatViewController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, IQAudioRecorderViewControllerDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
-    let chatRef = firebase.child(kMESSAGE_PATH)
-    let typingRef = firebase.child(kTYPINGPATH_PATH)
+    var typingListener: ListenerRegistration?
+    var updatedChatListener: ListenerRegistration?
+    var newChatListener: ListenerRegistration?
 
     let legitTypes = [kAUDIO, kVIDEO, kTEXT, kLOCATION, kPICTURE]
 
@@ -43,7 +44,8 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     var messages: [JSQMessage] = []
     var objectMessages: [NSDictionary] = []
     var loadedMessages: [NSDictionary] = []
-
+    var allPictureMessages: [String] = []
+    
     var initialLoadComplete = false
 
     var jsqAvatarDictionary: NSMutableDictionary?
@@ -98,7 +100,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
     override func viewWillAppear(_ animated: Bool) {
         clearRecentCounter(chatRoomId: chatRoomId)
-        loadUserDefaults()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -108,6 +109,9 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        createTypingObservers()
+        loadUserDefaults()
+
         //required to be able to delete messages
         JSQMessagesCollectionViewCell.registerMenuAction(#selector(delete))
 
@@ -130,7 +134,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         collectionView?.collectionViewLayout.outgoingAvatarViewSize = CGSize.zero
 
         loadMessegas()
-        
+
         //Custom send buttom
         self.inputToolbar.contentView.rightBarButtonItem.setImage(UIImage(named: "mic"), for: .normal)
         self.inputToolbar.contentView.rightBarButtonItem.setTitle("", for: .normal)
@@ -210,10 +214,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
         switch message[kSTATUS] as! String {
         case kDELIVERED:
-            status = NSAttributedString(string: "✔︎✔︎")
+            status = NSAttributedString(string: kDELIVERED)
         case kREAD:
             
-            let statusString = readTimeFrom(dateString: message[kREADDATE] as! String) + "✔︎✔︎"
+            let statusString = "Read" + " " + readTimeFrom(dateString: message[kREADDATE] as! String)
             status = NSAttributedString(string: statusString, attributes: attributedStringColor)
         default:
             status = NSAttributedString(string: "✔︎")
@@ -455,40 +459,70 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     func loadMessegas() {
         
-        createTypingObservers()
-
         //to update message status
-        chatRef.child(FUser.currentId()).child(chatRoomId).observe(.childChanged, with: {
-            snapshot in
+        updatedChatListener = reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener { (snapshot, error) in
 
-            self.updateMessage(messageDictionary: snapshot.value as! NSDictionary)
-        })
-        
-        
-        chatRef.child(FUser.currentId()).child(chatRoomId).queryLimited(toLast: 11).observeSingleEvent(of: .value, with: {
-            snapshot in
+            guard let snapshot = snapshot else { return }
+
+            if !snapshot.isEmpty {
+                snapshot.documentChanges.forEach { diff in
+                    if (diff.type == .modified) {
+
+                        self.updateMessage(messageDictionary: diff.document.data() as NSDictionary)
+
+                    }
+                }
+            }
+        }
+
+        reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 11).getDocuments(completion: { (snapshot, error) in
             
-            if snapshot.exists() {
-                
-                let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
-                
-                //remove bad messages
-                self.loadedMessages = self.removeBadMessages(allMessages: sorted)
-                self.insertMessages()
-                self.finishReceivingMessage(animated: false)
-                self.initialLoadComplete = true
-                
-                self.getOldChatsInBackground()
-                self.listenForNewChats()
-                
-            } else {
+            guard let snapshot = snapshot else {
                 //we have no available chats
                 self.initialLoadComplete = true
                 self.listenForNewChats()
-                
+                return
             }
+
+            let sorted = ((dictionaryFromSnapshots(snapshots: snapshot.documents)) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
+
+            //remove bad messages
+            self.loadedMessages = self.removeBadMessages(allMessages: sorted)
+            self.insertMessages()
+            self.finishReceivingMessage(animated: false)
+            self.initialLoadComplete = true
+
+            self.getPictureMessages()
             
+            self.getOldChatsInBackground()
+            self.listenForNewChats()
+
         })
+        
+//        chatRef.child(FUser.currentId()).child(chatRoomId).queryLimited(toLast: 11).observeSingleEvent(of: .value, with: {
+//            snapshot in
+//
+//            if snapshot.exists() {
+//
+//                let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
+//
+//                //remove bad messages
+//                self.loadedMessages = self.removeBadMessages(allMessages: sorted)
+//                self.insertMessages()
+//                self.finishReceivingMessage(animated: false)
+//                self.initialLoadComplete = true
+//
+//                self.getOldChatsInBackground()
+//                self.listenForNewChats()
+//
+//            } else {
+//                //we have no available chats
+//                self.initialLoadComplete = true
+//                self.listenForNewChats()
+//
+//            }
+//
+//        })
     }
     
     func listenForNewChats() {
@@ -496,31 +530,66 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         var lastMessageDate = "0"
         
         if loadedMessages.count > 0 {
-            lastMessageDate = "\(Int(loadedMessages.last![kDATE] as! String)!+1)"
+            lastMessageDate = loadedMessages.last![kDATE] as! String
         }
         
-        chatRef.child(FUser.currentId()).child(chatRoomId).queryOrdered(byChild: kDATE).queryStarting(atValue: lastMessageDate).observe(.childAdded, with: {
-            snapshot in
-            
-            if snapshot.exists() {
-                
-                let item = (snapshot.value as? NSDictionary)!
-                
-                if let type = item[kTYPE] as? String {
-                    
-                    if self.legitTypes.contains(type) && !(item[kDELETED] as! Bool)  {
+        
+        newChatListener = reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener { (snapshot, error) in
 
-                        if self.insertInitialLoadMessages(messageDictionary: item) {
+            guard let snapshot = snapshot else { return }
 
-                            JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
+            if !snapshot.isEmpty {
+
+                for diff in snapshot.documentChanges {
+
+                    if (diff.type == .added) {
+
+                        let item = diff.document.data() as NSDictionary
+
+                        if let type = item[kTYPE] as? String {
+
+                            if self.legitTypes.contains(type) && !(item[kDELETED] as! Bool)  {
+                                //for adding link to pictures
+                                if item[kTYPE] as! String == kPICTURE {
+                                    self.addNewPictureMessageLink(link: item[kPICTURE] as! String)
+                                }
+                                
+                                if self.insertInitialLoadMessages(messageDictionary: item) {
+
+                                    JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
+                                }
+
+                                self.finishReceivingMessage()
+                            }
+
                         }
-                        
-                        self.finishReceivingMessage()
                     }
-                    
                 }
             }
-        })
+        }
+        
+//        chatRef.child(FUser.currentId()).child(chatRoomId).queryOrdered(byChild: kDATE).queryStarting(atValue: lastMessageDate).observe(.childAdded, with: {
+//            snapshot in
+//
+//            if snapshot.exists() {
+//
+//                let item = (snapshot.value as? NSDictionary)!
+//
+//                if let type = item[kTYPE] as? String {
+//
+//                    if self.legitTypes.contains(type) && !(item[kDELETED] as! Bool)  {
+//
+//                        if self.insertInitialLoadMessages(messageDictionary: item) {
+//
+//                            JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
+//                        }
+//
+//                        self.finishReceivingMessage()
+//                    }
+//
+//                }
+//            }
+//        })
     }
 
     func getOldChatsInBackground() {
@@ -529,25 +598,43 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         if loadedMessages.count > 10 {
 
-            let lastMessageDate = "\(Int(loadedMessages.first![kDATE] as! String)!-1)"
+            let lastMessageDate = loadedMessages.first![kDATE] as! String
             
-            chatRef.child(FUser.currentId()).child(chatRoomId).queryOrdered(byChild: kDATE).queryEnding(atValue: lastMessageDate).observeSingleEvent(of: .value, with: {
-                snapshot in
+            reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isLessThan: lastMessageDate).getDocuments { (snapshot, error) in
                 
-                if snapshot.exists() {
+                guard let snapshot = snapshot else { return }
 
-                    let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
-                    
-                    //take new objects and add to the beginning of the array
-                    self.loadedMessages = self.removeBadMessages(allMessages: sorted) + self.loadedMessages
-                    
-                }
+                let sorted = ((dictionaryFromSnapshots(snapshots: snapshot.documents)) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
 
+                //take new objects and add to the beginning of the array
+                self.loadedMessages = self.removeBadMessages(allMessages: sorted) + self.loadedMessages
+
+                self.getPictureMessages()
+                
                 //update new min/max values
                 self.maxMessageNumber = self.loadedMessages.count - self.loadedMessagesCount - 1
                 self.minMessageNumber = self.maxMessageNumber - kNUMBEROFMESSAGES
 
-            })
+            }
+            
+            
+//            chatRef.child(FUser.currentId()).child(chatRoomId).queryOrdered(byChild: kDATE).queryEnding(atValue: lastMessageDate).observeSingleEvent(of: .value, with: {
+//                snapshot in
+//
+//                if snapshot.exists() {
+//
+//                    let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
+//
+//                    //take new objects and add to the beginning of the array
+//                    self.loadedMessages = self.removeBadMessages(allMessages: sorted) + self.loadedMessages
+//
+//                }
+//
+//                //update new min/max values
+//                self.maxMessageNumber = self.loadedMessages.count - self.loadedMessagesCount - 1
+//                self.minMessageNumber = self.maxMessageNumber - kNUMBEROFMESSAGES
+//
+//            })
             
         }
         
@@ -574,11 +661,18 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         //send picture message
         if let pic = picture {
             
-            let imageData = UIImageJPEGRepresentation(pic, 0.5)
-            
-            let encryptedText = Encryption.encryptText(chatRoomId: chatRoomId, message: "[\(kPICTURE)]")
-            
-            outgoingMessage = OutgoingMessage(message: encryptedText, pictureData: imageData! as NSData, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kPICTURE)
+            uploadImage(image: pic, chatRoomId: chatRoomId, view: self.navigationController!.view) { (imageLink) in
+                
+                let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kPICTURE)]")
+                
+                outgoingMessage = OutgoingMessage(message: encryptedText, pictureLink: imageLink!, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kPICTURE)
+                
+                JSQSystemSoundPlayer.jsq_playMessageSentSound()
+                self.finishSendingMessage()
+                
+                outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
+            }
+            return
         }
 
         //send video
@@ -590,7 +684,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
             let dataThumbnail = UIImageJPEGRepresentation(thumbNail, 0.3)
             
-            uploadVideo(video: videoData!, chatRoomId: chatRoomId, view: (self.navigationController?.view)!, completion: { (videoLink) in
+            uploadVideo(video: videoData!, chatRoomId: chatRoomId, view: self.navigationController!.view, completion: { (videoLink) in
                 
                 let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kVIDEO)]")
                 
@@ -720,7 +814,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         let values = [kSTATUS : kREAD, kREADDATE : readDate]
         
         for userId in memberIds {
-        chatRef.child(userId).child(chatRoomId).child((chatDictionary[kMESSAGEID] as? String)!).updateChildValues(values)
+            reference(collectionReference: .Message).document(userId).collection(chatRoomId).document(chatDictionary[kMESSAGEID] as! String).updateData(values)
 
         }
     }
@@ -750,20 +844,22 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         self.showLoadEarlierMessagesHeader = (loadedMessagesCount != loadedMessages.count)
     }
 
-
-
-    
-    
-    
-    
-
     //MARK: IBActions
     
     @objc func backAction() {
-//        clearRecentCounter(chatRoomID: chatRoomId)
-    chatRef.child(FUser.currentId()).child(chatRoomId).removeAllObservers()
-        typingRef.child(chatRoomId).removeAllObservers()
+        clearRecentCounter(chatRoomId: chatRoomId)
+        removeListners()
         self.navigationController?.popToRootViewController(animated: true)
+    }
+    
+    @objc func infoButtonPressed() {
+        
+        let mediaVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "mediaView") as! PictureMediaCollectionViewController
+        
+        mediaVC.allImageLinks = allPictureMessages
+        
+        self.navigationController?.pushViewController(mediaVC, animated: true)
+        
     }
 
     
@@ -773,10 +869,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         let video = info[UIImagePickerControllerMediaURL] as? NSURL
         let picture = info[UIImagePickerControllerOriginalImage] as? UIImage
-        
+
         sendMessage(text: nil, date: Date(), picture: picture, location: nil, video: video, audio: nil)
-        
+
         picker.dismiss(animated: true, completion: nil)
+
+        
     }
 
     //MARK: IQAudioRecorder delegate
@@ -801,6 +899,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         leftBarButtonView.addSubview(avatarButton)
         leftBarButtonView.addSubview(titleLabel)
         leftBarButtonView.addSubview(subTitleLabel)
+        
+        
+        let infoButton = UIBarButtonItem(image: UIImage(named: "info"), style: UIBarButtonItemStyle.plain, target: self, action: #selector (self.infoButtonPressed))
+        
+        self.navigationItem.rightBarButtonItem = infoButton
+
         
         
         let leftBarButtonItem = UIBarButtonItem(customView: leftBarButtonView)
@@ -888,20 +992,32 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     //MARK: Typing indicator
     
     func createTypingObservers() {
-        
-        typingRef.child(chatRoomId).observe(.childChanged, with: {
-            snapshot in
+
+        typingListener = reference(collectionReference: .Typing).document(chatRoomId).addSnapshotListener { (snapshot, error) in
             
-            if snapshot.key != FUser.currentId() {
+            guard let snapshot = snapshot else { return }
+            
+            if snapshot.exists {
                 
-                let typing = snapshot.value as! Bool
-                self.showTypingIndicator = typing
-                
-                if typing {
-                    self.scrollToBottom(animated: true)
+                for data in snapshot.data() {
+                    if data.key != FUser.currentId() {
+                        
+                        let typing = data.value as! Bool
+                        self.showTypingIndicator = typing
+
+                        if typing {
+                            self.scrollToBottom(animated: true)
+                        }
+                    }
                 }
+                
+            } else {
+                //create typing othervise it will crash on updated
+                reference(collectionReference: .Typing).document(self.chatRoomId).setData([FUser.currentId() : false])
             }
-        })
+            
+        }
+        
     }
     
     
@@ -923,7 +1039,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
     
     func typingIndicatorSave(typing: Bool) {
-    typingRef.child(chatRoomId).updateChildValues([FUser.currentId() : typing])
+        reference(collectionReference: .Typing).document(chatRoomId).updateData([FUser.currentId() : typing])
     }
 
     //MARK: UITextViewDelegate
@@ -936,16 +1052,49 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
     
     //MARK: Helpers
+    func addNewPictureMessageLink(link: String) {
+        allPictureMessages.append(link)
+        print(allPictureMessages.count)
+
+    }
+    
+    func getPictureMessages() {
+        
+        allPictureMessages = []
+        
+        for message in loadedMessages {
+            if message[kTYPE] as! String == kPICTURE {
+                //add to array
+                allPictureMessages.append(message[kPICTURE] as! String)
+            }
+        }
+        print("picMes = \(allPictureMessages.count)")
+    }
+    
+    func removeListners() {
+        if typingListener != nil {
+            typingListener!.remove()
+        }
+        if newChatListener != nil {
+            newChatListener!.remove()
+        }
+        if updatedChatListener != nil {
+            updatedChatListener!.remove()
+        }
+    }
+    
     
     func getCurrentGroup(withId: String) {
-        firebase.child(kGROUP_PATH).child(withId).observeSingleEvent(of: .value, with: {
-            snapshot in
+    reference(collectionReference: .Group).document(withId).getDocument { (snapshot, error) in
+            
+            guard let snapshot = snapshot else { return }
         
-            if snapshot.exists() {
-                self.group = snapshot.value! as! NSDictionary
+        
+            if snapshot.exists {
+                self.group = snapshot.data() as NSDictionary
                 self.setUIforGroupChat()
             }
-        })
+        }
     }
 
     

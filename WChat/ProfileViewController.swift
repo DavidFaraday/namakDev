@@ -119,8 +119,10 @@ class ProfileViewController: UITableViewController {
     
     func callUser() {
         
+        let headers = ["1" : "dddds"]
         let userToCallId = user!.objectId
-        let call = callClient().callUser(withId: userToCallId, headers: [kFULLNAME : user!.fullname])
+        let call = callClient().callUser(withId: userToCallId, headers: headers)
+        print(call?.headers)
 
         let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
 

@@ -109,24 +109,21 @@ class CallN {
     
     //MARK: Save funcs
     func saveCallInBackground() {
-        
-        firebase.child(kCALL_PATH).child(callerId).child(objectId).setValue(dictionaryFromCall())
-        firebase.child(kCALL_PATH).child(withUserId).child(objectId).setValue(dictionaryFromCall())
+        reference(collectionReference: .Call).document(callerId).collection(callerId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
+        reference(collectionReference: .Call).document(withUserId).collection(withUserId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
     }
 
     //MARK: Update funcs
 
     func updateCall(withValues: [String : Any]) {
-        
-        firebase.child(kCALL_PATH).child(callerId).child(objectId).updateChildValues(withValues)
-        firebase.child(kCALL_PATH).child(withUserId).child(objectId).updateChildValues(withValues)
+        reference(collectionReference: .Call).document(callerId).collection(callerId).document(objectId).updateData(dictionaryFromCall() as! [String : Any])
+        reference(collectionReference: .Call).document(withUserId).collection(withUserId).document(objectId).updateData(dictionaryFromCall() as! [String : Any])
     }
     
     //MARK: Delet funcs
     
     func deleteCall() {
-        
-        firebase.child(kCALL_PATH).child(FUser.currentId()).child(objectId).removeValue()
+        reference(collectionReference: .Call).document(FUser.currentId()).collection(FUser.currentId()).document(objectId).delete()
     }
 
     

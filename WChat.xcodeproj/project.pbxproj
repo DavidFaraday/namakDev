@@ -24,6 +24,8 @@
 		6344EE2520545D42009415FB /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE2420545D42009415FB /* SettingsViewController.swift */; };
 		634553A52094830F00BB2D17 /* CallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634553A42094830F00BB2D17 /* CallViewController.swift */; };
 		634553A92094971700BB2D17 /* ringback.wav in Resources */ = {isa = PBXBuildFile; fileRef = 634553A82094971700BB2D17 /* ringback.wav */; };
+		6345654520A5D54B001F420F /* incoming.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6345654420A5D54A001F420F /* incoming.wav */; };
+		6345654720A5D557001F420F /* ringback.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6345654620A5D557001F420F /* ringback.wav */; };
 		6347221020753E3400F9C17C /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6347220F20753E3400F9C17C /* MapViewController.swift */; };
 		6349A880208F8A1700706246 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6349A87F208F8A1700706246 /* Encryption.swift */; };
 		6349A882208F8A6700706246 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6349A881208F8A6700706246 /* RNCryptor.framework */; };
@@ -39,6 +41,8 @@
 		6389AA6F20585A06006EF77A /* Recent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6389AA6E20585A06006EF77A /* Recent.swift */; };
 		6389AA71205EE699006EF77A /* GroupMemberCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6389AA70205EE699006EF77A /* GroupMemberCollectionViewCell.swift */; };
 		6389AA73205EE6B5006EF77A /* NewGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6389AA72205EE6B5006EF77A /* NewGroupViewController.swift */; };
+		638B44C820B039AF00E11BE8 /* PicturesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638B44C720B039AF00E11BE8 /* PicturesCollectionViewCell.swift */; };
+		638B44CA20B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638B44C920B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift */; };
 		639344812078BC66002BDF8A /* InviteUserTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639344802078BC66002BDF8A /* InviteUserTableViewController.swift */; };
 		639D06DF2098469300879C3C /* ProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06DE2098469300879C3C /* ProviderDelegate.swift */; };
 		639D06E1209851E100879C3C /* SINCallKitProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06E0209851E100879C3C /* SINCallKitProvider.swift */; };
@@ -82,6 +86,8 @@
 		634553A42094830F00BB2D17 /* CallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallViewController.swift; sourceTree = "<group>"; };
 		634553A6209484AB00BB2D17 /* WChat-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WChat-Bridging-Header.h"; sourceTree = "<group>"; };
 		634553A82094971700BB2D17 /* ringback.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ringback.wav; sourceTree = "<group>"; };
+		6345654420A5D54A001F420F /* incoming.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = incoming.wav; sourceTree = "<group>"; };
+		6345654620A5D557001F420F /* ringback.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = ringback.wav; path = ../../myQC3swift4/QuickChat2.0/ringback.wav; sourceTree = "<group>"; };
 		6347220F20753E3400F9C17C /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		6349A87F208F8A1700706246 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		6349A881208F8A6700706246 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,6 +103,8 @@
 		6389AA6E20585A06006EF77A /* Recent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recent.swift; sourceTree = "<group>"; };
 		6389AA70205EE699006EF77A /* GroupMemberCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupMemberCollectionViewCell.swift; sourceTree = "<group>"; };
 		6389AA72205EE6B5006EF77A /* NewGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGroupViewController.swift; sourceTree = "<group>"; };
+		638B44C720B039AF00E11BE8 /* PicturesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicturesCollectionViewCell.swift; sourceTree = "<group>"; };
+		638B44C920B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureMediaCollectionViewController.swift; sourceTree = "<group>"; };
 		639344802078BC66002BDF8A /* InviteUserTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteUserTableViewController.swift; sourceTree = "<group>"; };
 		639D06DE2098469300879C3C /* ProviderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderDelegate.swift; sourceTree = "<group>"; };
 		639D06E0209851E100879C3C /* SINCallKitProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SINCallKitProvider.swift; sourceTree = "<group>"; };
@@ -150,6 +158,7 @@
 				6389AA70205EE699006EF77A /* GroupMemberCollectionViewCell.swift */,
 				63FFDEF02088FE33005F9033 /* BackgroundImageCollectionViewCell.swift */,
 				6384354D208B0EA1003AA0AC /* CallTableViewCell.swift */,
+				638B44C720B039AF00E11BE8 /* PicturesCollectionViewCell.swift */,
 			);
 			path = CustomCells;
 			sourceTree = "<group>";
@@ -190,6 +199,8 @@
 				632BE1F32051BA5800131EB6 /* Main.storyboard */,
 				632BE1F62051BA5800131EB6 /* Assets.xcassets */,
 				632BE1F82051BA5800131EB6 /* LaunchScreen.storyboard */,
+				6345654420A5D54A001F420F /* incoming.wav */,
+				6345654620A5D557001F420F /* ringback.wav */,
 				632BE1FB2051BA5800131EB6 /* Info.plist */,
 				6344EE1B20541FC5009415FB /* GoogleService-Info.plist */,
 				634553A6209484AB00BB2D17 /* WChat-Bridging-Header.h */,
@@ -271,6 +282,7 @@
 				639344802078BC66002BDF8A /* InviteUserTableViewController.swift */,
 				6347220F20753E3400F9C17C /* MapViewController.swift */,
 				634553A42094830F00BB2D17 /* CallViewController.swift */,
+				638B44C920B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift */,
 			);
 			name = "Secondary Views";
 			sourceTree = "<group>";
@@ -352,10 +364,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6345654720A5D557001F420F /* ringback.wav in Resources */,
 				632BE1FA2051BA5800131EB6 /* LaunchScreen.storyboard in Resources */,
 				6344EE1C20541FC6009415FB /* GoogleService-Info.plist in Resources */,
 				634553A92094971700BB2D17 /* ringback.wav in Resources */,
 				632BE1F72051BA5800131EB6 /* Assets.xcassets in Resources */,
+				6345654520A5D54B001F420F /* incoming.wav in Resources */,
 				632BE1F52051BA5800131EB6 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -465,6 +479,7 @@
 			files = (
 				639D06E3209853DE00879C3C /* AudioControllDelegate.swift in Sources */,
 				6322EEA02055ABD600C74A5C /* RecentChatsTableViewCell.swift in Sources */,
+				638B44CA20B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift in Sources */,
 				63FC55B0209F2F2E00A43237 /* FCollectionReference.swift in Sources */,
 				630D254A20700A21003FAB62 /* VideoMessage.swift in Sources */,
 				634553A52094830F00BB2D17 /* CallViewController.swift in Sources */,
@@ -480,6 +495,7 @@
 				635D8E4F2055679100297A0F /* ChatsViewController.swift in Sources */,
 				63C343572051BC7E00C6985B /* HelperFunctions.swift in Sources */,
 				63F7D8A2209CE077004CB6BD /* PhoneNumberLoginViewController.swift in Sources */,
+				638B44C820B039AF00E11BE8 /* PicturesCollectionViewCell.swift in Sources */,
 				6344EE2520545D42009415FB /* SettingsViewController.swift in Sources */,
 				6344EE202054222D009415FB /* WelcomeViewController.swift in Sources */,
 				639344812078BC66002BDF8A /* InviteUserTableViewController.swift in Sources */,

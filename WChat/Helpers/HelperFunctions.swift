@@ -9,6 +9,7 @@
 
 import Foundation
 import UIKit
+import FirebaseFirestore
 
 //MARK: GLOBAL FUNCTIONS
 private let dateFormat = "yyyyMMddHHmmss"
@@ -41,6 +42,16 @@ func dataImageFromString(pictureString: String, withBlock: (_ image: Data?) -> V
     let imageData = NSData(base64Encoded: pictureString, options: NSData.Base64DecodingOptions(rawValue: 0))
     
     withBlock(imageData as Data?)
+}
+
+//for calls and chats
+func dictionaryFromSnapshots(snapshots: [DocumentSnapshot]) -> [NSDictionary] {
+    
+    var allMessages: [NSDictionary] = []
+    for snapshot in snapshots {
+        allMessages.append(snapshot.data() as NSDictionary)
+    }
+    return allMessages
 }
 
 

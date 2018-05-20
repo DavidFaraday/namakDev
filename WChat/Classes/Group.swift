@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import FirebaseFirestore
 
 class Group {
     
@@ -20,26 +20,14 @@ class Group {
 
     func saveGroup(group: NSMutableDictionary) {
         
-        let reference = firebase.child(kGROUP_PATH).child(groupDictionary[kGROUPID] as! String)
         let date = dateFormatter().string(from: Date())
-        
         groupDictionary[kDATE] = date
-        
-        reference.setValue(groupDictionary) { (error, ref) in
-            
-            if error != nil {
-                print("Error saving group: \(error!.localizedDescription)")
-            }
-        }
+        reference(collectionReference: .Group).document(groupDictionary[kGROUPID] as! String).setData(groupDictionary as! [String : Any])
     }
     
     class func updateGroup(groupId: String ,withValues: [String : Any]) {
-        
-    firebase.child(kGROUP_PATH).child(groupId).updateChildValues(withValues)
+        reference(collectionReference: .Group).document(groupId).updateData(withValues)
 
     }
-    
-    
-    
 
 }

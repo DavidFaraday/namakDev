@@ -30,8 +30,6 @@ class CallViewController: UIViewController, SINCallDelegate {
     var callAnswered = false
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
-    
     
     override func viewWillAppear(_ animated: Bool) {
         
@@ -77,7 +75,7 @@ class CallViewController: UIViewController, SINCallDelegate {
             
             showButtons()
             
-//            audioController().startPlayingSoundFile(self.pathForSound(soundName: "incoming"), loop: true)
+            audioController().startPlayingSoundFile(self.pathForSound(soundName: "incoming"), loop: true)
             
         } else {
             
@@ -152,7 +150,7 @@ class CallViewController: UIViewController, SINCallDelegate {
     func callDidProgress(_ call: SINCall!) {
         
         setCallStatusText(text: "Ringing...")
-//        audioController().startPlayingSoundFile(pathForSound(soundName: "ringback"), loop: true)
+        audioController().startPlayingSoundFile(pathForSound(soundName: "ringback"), loop: true)
     }
     
     func callDidEstablish(_ call: SINCall!) {

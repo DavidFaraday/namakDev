@@ -551,9 +551,9 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="Wr4-G1-01w"/>
                                                     </constraints>
-                                                    <state key="normal" title="Tell a Friend"/>
+                                                    <state key="normal" title="Clean Cache"/>
                                                     <connections>
-                                                        <action selector="tellAFriendButtonPressed:" destination="Csi-St-6YS" eventType="touchUpInside" id="DGm-3x-gg4"/>
+                                                        <action selector="cleanCacheButtonPressed:" destination="Csi-St-6YS" eventType="touchUpInside" id="cSu-JX-MEK"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -564,12 +564,37 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="a9y-8d-25I">
+                                        <rect key="frame" x="0.0" y="347" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="a9y-8d-25I" id="EQA-cU-3bR">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nBa-Y7-GO0">
+                                                    <rect key="frame" x="16" y="6" width="343" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="Xci-Ln-KmK"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Tell a Friend"/>
+                                                    <connections>
+                                                        <action selector="tellAFriendButtonPressed:" destination="Csi-St-6YS" eventType="touchUpInside" id="snu-pL-E66"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="nBa-Y7-GO0" firstAttribute="leading" secondItem="EQA-cU-3bR" secondAttribute="leading" constant="16" id="AnH-Yv-GVD"/>
+                                                <constraint firstAttribute="trailing" secondItem="nBa-Y7-GO0" secondAttribute="trailing" constant="16" id="ePI-00-9aj"/>
+                                                <constraint firstItem="nBa-Y7-GO0" firstAttribute="centerY" secondItem="EQA-cU-3bR" secondAttribute="centerY" id="hXc-RW-j96"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="Section-3" id="qXi-li-xxT">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="zgX-9v-T5i">
-                                        <rect key="frame" x="0.0" y="375" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="419" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zgX-9v-T5i" id="l7w-CS-Vel">
                                             <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
@@ -594,7 +619,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="CE9-kG-nQQ">
-                                        <rect key="frame" x="0.0" y="419" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="463" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="CE9-kG-nQQ" id="9ak-SQ-yzL">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -634,7 +659,7 @@
                             <tableViewSection headerTitle="Section-4" id="c9N-Qy-0UX">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="U8U-iE-H7U">
-                                        <rect key="frame" x="0.0" y="491" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="535" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="U8U-iE-H7U" id="cFg-rr-oKU">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -657,7 +682,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="q0r-L0-Fu8">
-                                        <rect key="frame" x="0.0" y="535" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="579" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="q0r-L0-Fu8" id="8FH-b4-Roo">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -698,6 +723,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="avatarImageView" destination="e4j-mw-Bt5" id="lzk-Ab-5EP"/>
+                        <outlet property="cleanCacheButtonOutlet" destination="1Dx-5k-vpU" id="Sga-Ef-C9W"/>
                         <outlet property="deleteAccountButtonOutlet" destination="wZs-IQ-ho2" id="NNi-zQ-xPd"/>
                         <outlet property="fullNameLabel" destination="xZW-F2-3sG" id="gUd-AI-vCc"/>
                         <outlet property="showAvatarSwitchOutlet" destination="j3K-r2-wbT" id="OI1-7C-q3w"/>
@@ -2186,7 +2212,7 @@ If you have any questions about these Terms, please contact us.
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="ehY-md-Mwe" firstAttribute="trailing" secondItem="tUS-QK-XoQ" secondAttribute="trailing" constant="16" id="1YE-h3-7Dz"/>
                             <constraint firstItem="4Dm-JG-lvT" firstAttribute="top" secondItem="T5W-Eb-qbs" secondAttribute="bottom" constant="91" id="3xK-w0-fnb"/>
@@ -2225,6 +2251,54 @@ If you have any questions about these Terms, please contact us.
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7a5-FI-AgT" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="7320.8000000000002" y="590.55472263868069"/>
+        </scene>
+        <!--Picture Media Collection View Controller-->
+        <scene sceneID="Xo3-WF-up9">
+            <objects>
+                <collectionViewController storyboardIdentifier="mediaView" id="S9J-SO-yCn" customClass="PictureMediaCollectionViewController" customModule="WChat" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="YLA-wm-3VD">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="aaF-66-7Y6">
+                            <size key="itemSize" width="105" height="106"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="10" minY="10" maxX="25" maxY="10"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell" id="lqQ-Kw-h7P" customClass="PicturesCollectionViewCell" customModule="WChat" customModuleProvider="target">
+                                <rect key="frame" x="10" y="10" width="105" height="106"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                    <rect key="frame" x="0.0" y="0.0" width="105" height="106"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9Lq-VL-JKr">
+                                            <rect key="frame" x="0.0" y="0.0" width="105" height="106"/>
+                                        </imageView>
+                                    </subviews>
+                                </view>
+                                <constraints>
+                                    <constraint firstItem="9Lq-VL-JKr" firstAttribute="centerY" secondItem="lqQ-Kw-h7P" secondAttribute="centerY" id="ATc-80-eMn"/>
+                                    <constraint firstItem="9Lq-VL-JKr" firstAttribute="width" secondItem="lqQ-Kw-h7P" secondAttribute="width" id="UlA-gc-tmT"/>
+                                    <constraint firstItem="9Lq-VL-JKr" firstAttribute="height" secondItem="lqQ-Kw-h7P" secondAttribute="height" id="XxQ-UK-otm"/>
+                                    <constraint firstItem="9Lq-VL-JKr" firstAttribute="centerX" secondItem="lqQ-Kw-h7P" secondAttribute="centerX" id="ycu-Dp-BhM"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="imageView" destination="9Lq-VL-JKr" id="SIK-hf-Ibd"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="S9J-SO-yCn" id="7fY-et-tm5"/>
+                            <outlet property="delegate" destination="S9J-SO-yCn" id="pt3-8k-xki"/>
+                        </connections>
+                    </collectionView>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Bbs-UC-UJU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="8042.3999999999996" y="590.55472263868069"/>
         </scene>
         <!--Settings-->
         <scene sceneID="xXg-NZ-UKc">

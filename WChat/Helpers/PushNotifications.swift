@@ -45,12 +45,13 @@ func getMembersToPush(members: [String], completion: @escaping (_ usersArray: [S
     var count = 0
 
     for memberId in members {
-        firebase.child(kUSER_PATH).child(memberId).observeSingleEvent(of: .value, with: {
-            snapshot in
+        reference(collectionReference: .User).document(memberId).getDocument { (snapshot, error) in
             
-            if snapshot.exists() {
-
-                let userDictionary = snapshot.value as! NSDictionary
+            guard let snapshot = snapshot else { completion(pushIds); return }
+            
+            if snapshot.exists {
+                
+                let userDictionary = snapshot.data() as! NSDictionary
                 
                 let fUser = FUser.init(_dictionary: userDictionary)
                 
@@ -58,15 +59,14 @@ func getMembersToPush(members: [String], completion: @escaping (_ usersArray: [S
                 count += 1
                 
                 if members.count == count {
-                    
                     completion(pushIds)
                 }
-                
+
             } else {
                 completion(pushIds)
             }
             
-        })
+        }
     }
 }
 

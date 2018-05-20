@@ -22,11 +22,12 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
     
     let searchController = UISearchController(searchResultsController: nil)
 
-    
+    override func viewWillAppear(_ animated: Bool) {
+        loadUsers(filter: kCITY)
+    }
     
     override func viewWillDisappear(_ animated: Bool) {
         ProgressHUD.dismiss()
-        userRef.removeObserver(withHandle: userHandler)
     }
     
     override func viewDidLoad() {
@@ -46,8 +47,6 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
 
-
-        loadUsers(filter: kCITY)
     }
     
 
@@ -240,9 +239,16 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         }
 
             
-            query.getDocuments { (snapshot, error) in
-            
-                guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
+        query.getDocuments { (snapshot, error) in
+                
+            if error != nil {
+                print(error?.localizedDescription)
+                ProgressHUD.dismiss()
+                return
+            }
+
+                
+            guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
             
             if !snapshot.isEmpty {
                 
@@ -265,9 +271,10 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
                 self.splitDataInToSection()
                 self.tableView.reloadData()
             }
-                print("dismiss")
+
             self.tableView.reloadData()
             ProgressHUD.dismiss()
+                
         }
  
     }

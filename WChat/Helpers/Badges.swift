@@ -7,24 +7,24 @@
 //
 
 import Foundation
-
+import FirebaseFirestore
 
 func recentBadgeCount(withBlock: @escaping (_ badgeNumber: Int) -> Void) {
     
-    recentBadgeHandler = recentBadgeRef.queryOrdered(byChild: kUSERID).queryEqual(toValue: FUser.currentId()).observe(.value, with: {
-        snapshot in
+    
+    recentBadgeHandler = reference(collectionReference: .Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener({ (snapshot, error) in
         
         var badge = 0
         var counter = 0
-        
-        if snapshot.exists() {
 
-            let recents = (snapshot.value as! NSDictionary).allValues as Array
-            
+        guard let snapshot = snapshot else { return }
+        
+        if !snapshot.isEmpty {
+            let recents = snapshot.documents
             
             for recent in recents {
                 
-                let currentRecent = recent as! NSDictionary
+                let currentRecent = recent.data() as NSDictionary
                 
                 badge += currentRecent[kCOUNTER] as! Int
                 counter += 1
@@ -32,17 +32,13 @@ func recentBadgeCount(withBlock: @escaping (_ badgeNumber: Int) -> Void) {
                 if counter == recents.count {
                     
                     withBlock(badge)
-                    
                 }
             }
-            
         } else {
-            
             withBlock(badge)
         }
-        
     })
-    
+
 }
 
 

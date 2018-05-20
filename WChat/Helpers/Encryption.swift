@@ -29,16 +29,18 @@ class Encryption {
         
         var message: NSString = ""
         
-        
-        do {
-            let decryptedData = try decryptor.decrypt(data: encryptedData! as Data)
-            
-            message = NSString(data: decryptedData, encoding: String.Encoding.utf8.rawValue)!
-        } catch {
-            
-            
-            print("Error decoding text: \(error)")
+        if encryptedData != nil {
+            do {
+                let decryptedData = try decryptor.decrypt(data: encryptedData! as Data)
+                
+                message = NSString(data: decryptedData, encoding: String.Encoding.utf8.rawValue)!
+            } catch {
+                
+                
+                print("Error decoding text: \(error)")
+            }
         }
+
         
         return message as String
     }

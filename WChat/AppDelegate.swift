@@ -31,7 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         FirebaseApp.configure()
-        Database.database().isPersistenceEnabled = true
+//        FirestoreSettings().isPersistenceEnabled = true
+//        Database.database().isPersistenceEnabled = true
 
         //AutoLogin
         authListener = Auth.auth().addStateDidChangeListener { auth, user in
@@ -115,9 +116,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         
-        userRef.removeObserver(withHandle: userHandler)
-        recentBadgeRef.removeObserver(withHandle: recentBadgeHandler)
-        
+        recentBadgeHandler?.remove()
         updateCurrentUserInFirestore(withValues: [kISONLINE : false]) { (success) in
             
         }
@@ -291,10 +290,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     //MARK: SinManagedPushDelegate
     func managedPush(_ managedPush: SINManagedPush!, didReceiveIncomingPushWithPayload payload: [AnyHashable : Any]!, forType pushType: String!) {
         
+        let result = SINPushHelper.queryPushNotificationPayload(payload)
+        
+        if result!.isCall() {
+            print("headers of call \(result?.call().headers)")
+            // You can then invoke relayRemotePushNotification:userInfo
+            // on a SINClient instance to further process the incoming call.
+
+            self.handleRemoteNotification(userInfo: payload as NSDictionary)
+        }
+
+
         if pushType == "PKPushTypeVoIP" {
             print("push type is \(pushType!)")
         }
-        self.handleRemoteNotification(userInfo: payload as NSDictionary)
     }
     
     func handleRemoteNotification(userInfo: NSDictionary) {
@@ -309,8 +318,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         let result = self._client.relayRemotePushNotification(userInfo as! [AnyHashable : Any])
         
         if result!.isCall() && result!.call().isCallCanceled {
-
-            self.presentMissedCallNotificationWithRemoteUserId(remoteUserId: result!.call().remoteUserId)
+            self.presentMissedCallNotificationWithRemoteUserId(remoteUserId: result!.call().callId)
         }
 
     }
@@ -356,12 +364,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     
     func client(_ client: SINCallClient!, willReceiveIncomingCall call: SINCall!) {
         print("will receive")
+        print("..,,, \(call.headers)")
         callKitProvider.reportNewIncomingCall(call: call)
     }
     
     func client(_ client: SINCallClient!, didReceiveIncomingCall call: SINCall!) {
         print("did receive")
-
+        print("..,,, \(call.headers)") 
         var top = self.window?.rootViewController
 
         while (top?.presentedViewController != nil) {
@@ -405,13 +414,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     // Handle incoming pushes
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
 
-        if type.rawValue == "PKPushTypeVoIP" {
-            self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
-        }
-//        self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+//        if type.rawValue == "PKPushTypeVoIP" {
+//            self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+//        }
+        self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
 
     }
 
-    
 }
 

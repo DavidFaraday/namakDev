@@ -17,6 +17,98 @@ import ProgressHUD
 let storage = Storage.storage()
 
 
+//image
+func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @escaping (_ imageLink: String?) -> Void) {
+    
+    let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
+    
+    progressHUD.mode = .determinateHorizontalBar
+    
+    let dateString = dateFormatter().string(from: Date())
+    
+    let videoFileName = "PictureMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".jpg"
+    
+    let storageRef = storage.reference(forURL: kFILEREFERENCE).child(videoFileName)
+    
+    let imageDate = UIImageJPEGRepresentation(image, 0.7)
+    
+    var task : StorageUploadTask!
+    
+    task = storageRef.putData(imageDate!, metadata: nil, completion: {
+        metadata, error in
+        
+        task.removeAllObservers()
+        progressHUD.hide(animated: true)
+        
+        if error != nil {
+            
+            print("error uploading image \(error!.localizedDescription)")
+            ProgressHUD.showError(error!.localizedDescription)
+            
+            return
+        }
+        
+        
+        let link = metadata!.downloadURL()
+        completion(link?.absoluteString)
+    })
+    
+    task.observe(StorageTaskStatus.progress, handler: {
+        snapshot in
+        progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float( (snapshot.progress?.totalUnitCount)!)
+        
+    })
+}
+
+func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -> Void) {
+    
+    let imageURL = NSURL(string: imageUrl)
+    
+    let imageFileName = (imageUrl.components(separatedBy: "%").last!).components(separatedBy: "?").first!
+    
+    
+    if fileExistsAtPath(path: imageFileName) {
+        
+        if let contentsOfFile = UIImage(contentsOfFile: fileInDocumentsDirectory(filename: imageFileName)) {
+            completion(contentsOfFile)
+        } else {
+            print("couldnt generate image")
+            completion(nil)
+        }
+        
+    } else {
+        
+        let dowloadQueue = DispatchQueue(label: "imageDownloadQueue")
+        
+        dowloadQueue.async {
+            
+            let data = NSData(contentsOf: imageURL! as URL)
+            
+            if data != nil {
+                
+                var docURL = getDocumentsURL()
+                
+                docURL = docURL.appendingPathComponent(imageFileName, isDirectory: false)
+                
+                data!.write(to: docURL, atomically: true)
+                
+                let imageToReturn = UIImage(data: data! as Data)
+                
+                DispatchQueue.main.async {
+                    completion(imageToReturn!)
+                }
+                
+            } else {
+                DispatchQueue.main.async {
+                    print("No image in database")
+                    completion(nil!)
+                }
+            }
+        }
+    }
+}
+
+
 //video
 func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @escaping (_ videoLink: String?) -> Void) {
     

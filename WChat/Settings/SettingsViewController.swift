@@ -17,6 +17,7 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet weak var avatarImageView: UIImageView!
     @IBOutlet weak var fullNameLabel: UILabel!
     
+    @IBOutlet weak var cleanCacheButtonOutlet: UIButton!
     @IBOutlet weak var showAvatarSwitchOutlet: UISwitch!
     var avatarSwitchStatus = false
     var firstLoad: Bool?
@@ -59,7 +60,7 @@ class SettingsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if section == 1 { return 4}
+        if section == 1 { return 5}
         return 2
     }
     
@@ -83,7 +84,69 @@ class SettingsTableViewController: UITableViewController {
 
     
     
-    //MARK: IBActions    
+    //MARK: IBActions
+    
+    @IBAction func cleanCacheButtonPressed(_ sender: Any) {
+        
+        self.cleanCache()
+
+//        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//
+//        let cleanPhotoes = UIAlertAction(title: NSLocalizedString("Clean Photoes", comment: ""), style: .default) { (alert: UIAlertAction!) in
+//
+//            self.cleanCache(kPICTURE)
+//        }
+//
+//        let cleanVideos = UIAlertAction(title: NSLocalizedString("Clean Videos", comment: ""), style: .default) { (alert: UIAlertAction!) in
+//
+//            self.cleanCache(kVIDEO)
+//        }
+//
+//        let cleanAudios = UIAlertAction(title: NSLocalizedString("Clean Audios", comment: ""), style: .default) { (alert: UIAlertAction!) in
+//
+//            self.cleanCache(kAUDIO)
+//        }
+//
+//
+//        let cleanAll = UIAlertAction(title: NSLocalizedString("Clean All", comment: ""), style: .default) { (alert: UIAlertAction!) in
+//            self.cleanCache("all")
+//        }
+//
+//        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
+//
+//        }
+//
+//        cleanPhotoes.setValue(UIImage(named: "picture"), forKey: "image")
+//        cleanVideos.setValue(UIImage(named: "video"), forKey: "image")
+//        cleanAudios.setValue(UIImage(named: "mic"), forKey: "image")
+//        cleanAll.setValue(UIImage(named: "location"), forKey: "image")
+//
+//
+//        optionMenu.addAction(cleanPhotoes)
+//        optionMenu.addAction(cleanVideos)
+//        optionMenu.addAction(cleanAudios)
+//        optionMenu.addAction(cleanAll)
+//        optionMenu.addAction(cancelAction)
+//
+//        //for iPad not to crash
+//        if ( UI_USER_INTERFACE_IDIOM() == .pad )
+//        {
+//            if let currentPopoverpresentioncontroller = optionMenu.popoverPresentationController{
+//
+//                currentPopoverpresentioncontroller.sourceView = self.cleanCacheButtonOutlet
+//                currentPopoverpresentioncontroller.sourceRect = self.cleanCacheButtonOutlet.bounds
+//
+//
+//                currentPopoverpresentioncontroller.permittedArrowDirections = .up
+//                self.present(optionMenu, animated: true, completion: nil)
+//            }
+//        }else{
+//            self.present(optionMenu, animated: true, completion: nil)
+//
+//        }
+
+        
+    }
     
     @IBAction func showAvatarSwitchValueChanged(_ sender: UISwitch) {
 
@@ -179,7 +242,7 @@ class SettingsTableViewController: UITableViewController {
         userDefaults.synchronize()
         
         //delete user object in firebase database
-        firebase.child(kUSER_PATH).child(FUser.currentId()).removeValue()
+       reference(collectionReference: .User).document(FUser.currentId()).delete()
         
         FUser.deleteUser { (error) in
             
@@ -225,6 +288,19 @@ class SettingsTableViewController: UITableViewController {
         
         avatarSwitchStatus = userDefaults.bool(forKey: kSHOWAVATAR)
         showAvatarSwitchOutlet.isOn = avatarSwitchStatus
+    }
+    
+    func cleanCache() {
+        //add individual clean later on
+        do {
+            let files = try FileManager.default.contentsOfDirectory(atPath: getDocumentsURL().path)
+            for file in files {
+                try FileManager.default.removeItem(atPath: "\(getDocumentsURL().path)/\(file)")
+            }
+            ProgressHUD.showSuccess("Cache cleaned!")
+        } catch {
+            ProgressHUD.showError("couldnt clean pics")
+        }
     }
 
 }

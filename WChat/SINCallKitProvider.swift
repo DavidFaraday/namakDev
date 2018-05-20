@@ -42,8 +42,13 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
     }
     
     func reportNewIncomingCall (call: SINCall) {
+        var caller = "yo"
+        if let call = call.headers[kFULLNAME] {
+            caller = call as! String
+        }
+        
         let update = CXCallUpdate()
-        update.remoteHandle = CXHandle(type: .generic, value: call.remoteUserId)
+        update.remoteHandle = CXHandle(type: .generic, value: caller)
 
         _provider.reportNewIncomingCall(with: UUID(uuidString: call.callId)!, update: update) { (error) in
             if error != nil {

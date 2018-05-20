@@ -13,7 +13,6 @@ import ProgressHUD
 
 class ContactsViewController: UIViewController, UISearchResultsUpdating, UITableViewDataSource, UITableViewDelegate, UserTableViewCellDelegate {
     
-
     var users: [FUser] = []
     var matchedUsers: [FUser] = []
     var filteredMatchedUsers: [FUser] = []
@@ -73,7 +72,6 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
 
     override func viewWillDisappear(_ animated: Bool) {
         ProgressHUD.dismiss()
-        userRef.removeObserver(withHandle: userHandler)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -86,6 +84,8 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         self.navigationController?.navigationBar.tintAdjustmentMode = .normal
         self.navigationController?.navigationBar.tintAdjustmentMode = .automatic
         //end of bug fix
+        
+        loadUsers()
     }
 
     
@@ -101,7 +101,6 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         definesPresentationContext = true
         
         setupButtons()
-        loadUsers()
     }
 
     
