@@ -39,7 +39,7 @@ func createRecent(members: [String], chatRoomId: String, withUserUsername: Strin
     var tempMembers = members
     
     //check if the user has recent with that chartoom id, if no create one
-    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+    reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
         guard let snapshot = snapshot else { return }
         
         
@@ -72,7 +72,7 @@ func createRecent(members: [String], chatRoomId: String, withUserUsername: Strin
 
 func creatRecentItem(userId: String, chatRoomId: String, members: [String], withUserUsername: String, type: String, users: [FUser]?, avatarOfGroup: String?) {
     
-    let refernce = reference(collectionReference: .Recent).document()
+    let refernce = reference(.Recent).document()
 
     let recentId = refernce.documentID
 
@@ -132,15 +132,15 @@ func deleteRecentChat(recentDictionary: NSDictionary) {
    
     if let recentId = recentDictionary[kRECENTID] {
         
-        reference(collectionReference: .Recent).document(recentId as! String).delete()
+        reference(.Recent).document(recentId as! String).delete()
         
     }
 }
 
 //Update RecentChat
-func updateRecents(chatRoomId: String, memberIds: [String], lastMessage: String) {
+func updateRecents(chatRoomId: String, lastMessage: String) {
     
-    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+    reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
         guard let snapshot = snapshot else { return }
         
         if !snapshot.isEmpty {
@@ -169,14 +169,14 @@ func updateRecentItem(recent: NSDictionary, lastMessage: String) {
     
     let values = [kLASTMESSAGE: lastMessage, kCOUNTER: counter, kDATE: date] as [String : Any]
     
-    reference(collectionReference: .Recent).document(recent[kRECENTID] as! String).updateData(values)
+    reference(.Recent).document(recent[kRECENTID] as! String).updateData(values)
 }
 
 //Clear counter
 
 func clearRecentCounter(chatRoomId: String) {
     
-    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+    reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
         
         guard let snapshot = snapshot else { return }
         
@@ -199,7 +199,7 @@ func clearRecentCounter(chatRoomId: String) {
 }
 
 func clearRecentCounterItem(recent: NSDictionary) {
-    reference(collectionReference: .Recent).document(recent[kRECENTID] as! String).updateData([kCOUNTER : 0])
+    reference(.Recent).document(recent[kRECENTID] as! String).updateData([kCOUNTER : 0])
 }
 
 
@@ -219,10 +219,10 @@ func createRecentsForNewMembers(groupId: String, groupName: String,  membersToPu
     
     createRecent(members: membersToPush, chatRoomId: groupId, withUserUsername: groupName, type: kGROUP, users: nil, avatarOfGroup: avatar)
 }
-
+/////
 func updateExistingRicentsWithNewValues(chatRoomId: String, members: [String], withValues: [String : Any]) {
     
-    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+    reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
         
         guard let snapshot = snapshot else { return }
         
@@ -240,7 +240,42 @@ func updateExistingRicentsWithNewValues(chatRoomId: String, members: [String], w
 
 func updateRecet(recentId: String, withValues: [String : Any]) {
     
-    reference(collectionReference: .Recent).document(recentId).updateData(withValues)
+    reference(.Recent).document(recentId).updateData(withValues)
 }
 
+
+//Blocking users
+
+func blockUser(userToBlock: FUser) {
+    
+    let userId1 = FUser.currentId()
+    let userId2 = userToBlock.objectId
+    
+    var chatRoomId: String = ""
+    
+    let value = userId1.compare(userId2).rawValue
+    
+    if value < 0 {
+        chatRoomId = userId1 + userId2
+    } else {
+        chatRoomId = userId2 + userId1
+    }
+ 
+    getRecentsFor(chatRoomId: chatRoomId)
+}
+
+func getRecentsFor(chatRoomId: String) {
+    
+    reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in
+        
+        guard let snapshot = snapshot else { return }
+        
+        if !snapshot.isEmpty {
+            for recent in snapshot.documents {
+                let recent = recent.data() as NSDictionary
+                deleteRecentChat(recentDictionary: recent)
+            }
+        }
+    }
+}
 

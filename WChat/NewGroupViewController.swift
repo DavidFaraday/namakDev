@@ -69,13 +69,15 @@ class NewGroupViewController: UIViewController, UICollectionViewDelegate, UIColl
             memberIds.append(FUser.currentId())
             
             //defaultAvatar
-            let avatarData = UIImageJPEGRepresentation(UIImage(named: "groupIcon")!, 0.7)!
+            let avatarData = UIImage(named: "groupIcon")!.jpegData(compressionQuality: 0.5)!
+
             var avatar = avatarData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
 
             //chage avatar if we have one
             if groupIcon != nil {
                 
-                let avatarData = UIImageJPEGRepresentation(groupIcon!, 0.7)!
+                let avatarData = groupIcon!.jpegData(compressionQuality: 0.5)!
+
                 avatar = avatarData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
             }
             
@@ -83,14 +85,14 @@ class NewGroupViewController: UIViewController, UICollectionViewDelegate, UIColl
             
             let group = Group(groupId: groupId, subject: groupSubjectTextField.text!, ownerId: FUser.currentId(), members: memberIds, avatar: avatar)
         
-            group.saveGroup(group: group.groupDictionary)
+            group.saveGroup()
             
             //when done, create group recent and go to chat
             startGroupChat(group: group)
             
             let chatVC = ChatViewController()
             
-            chatVC.titleName = group.groupDictionary[kNAME] as! String
+            chatVC.titleName = group.groupDictionary[kNAME] as? String
             
             chatVC.memberIds = group.groupDictionary[kMEMBERS] as! [String]
             chatVC.membersToPush = group.groupDictionary[kMEMBERS] as! [String]

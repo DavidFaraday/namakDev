@@ -190,7 +190,7 @@ class FUser {
             } else {
                 
                 //get user from firebase and save locally
-                fetchCurrentUserFromFirestore(userId: firUser!.uid)
+                fetchCurrentUserFromFirestore(userId: firUser!.user.uid)
                 completion(error)
             }
             
@@ -210,7 +210,7 @@ class FUser {
                 return
             }
             
-            let fUser = FUser(_objectId: firuser!.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: firuser!.email!, _firstname: firstName, _lastname: lastName, _avatar: avatar, _loginMethod: kEMAIL, _phoneNumber: "", _city: "", _country: "")
+            let fUser = FUser(_objectId: firuser!.user.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: firuser!.user.email!, _firstname: firstName, _lastname: lastName, _avatar: avatar, _loginMethod: kEMAIL, _phoneNumber: "", _city: "", _country: "")
             
             
             saveUserLocally(fUser: fUser)
@@ -228,40 +228,40 @@ class FUser {
     
             let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationId, verificationCode: verificationCode)
     
-            Auth.auth().signIn(with: credential) { (firuser, error) in
-    
-                if error != nil {
-    
-                    completion(error!, false)
-                    return
-                }
-    
-                //check if user exist - login else register
-                fetchCurrentUserFromFirestore(userId: firuser!.uid, completion: { (user) in
-                    
-                    if user != nil && user!.firstname != "" {
-                        //we have user, login
-                        print("user is ....... \(user!)")
-                        saveUserLocally(fUser: user!)
-//                        saveUserInBackground(fUser: user!)
-                        saveUserToFirestore(fUser: user!)
-
-                        completion(error, true)
-                        
-                    } else {
-                        
-                        //    we have no user, register
-                        let fUser = FUser(_objectId: firuser!.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: "", _firstname: "", _lastname: "", _avatar: "", _loginMethod: kPHONE, _phoneNumber: firuser!.phoneNumber!, _city: "", _country: "")
-                        print("no user, saving new")
-                        saveUserLocally(fUser: fUser)
-//                        saveUserInBackground(fUser: fUser)
-                        saveUserToFirestore(fUser: fUser)
-                        completion(error, false)
-                        
-                    }
-
-                })
+        Auth.auth().signInAndRetrieveData(with: credential) { (firuser, error) in
+            
+            if error != nil {
+                
+                completion(error!, false)
+                return
             }
+
+            //check if user exist - login else register
+            fetchCurrentUserFromFirestore(userId: firuser!.user.uid, completion: { (user) in
+                
+                if user != nil && user!.firstname != "" {
+                    //we have user, login
+
+                    saveUserLocally(fUser: user!)
+                    saveUserToFirestore(fUser: user!)
+                    
+                    completion(error, true)
+                    
+                } else {
+                    
+                    //    we have no user, register
+                    let fUser = FUser(_objectId: firuser!.user.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: "", _firstname: "", _lastname: "", _avatar: "", _loginMethod: kPHONE, _phoneNumber: firuser!.user.phoneNumber!, _city: "", _country: "")
+
+                    saveUserLocally(fUser: fUser)
+                    saveUserToFirestore(fUser: fUser)
+                    completion(error, false)
+                    
+                }
+                
+            })
+            
+        }
+        
         }
     
     
@@ -311,7 +311,7 @@ class FUser {
 
 //NEW firestore
 func saveUserToFirestore(fUser: FUser) {
-    reference(collectionReference: .User).document(fUser.objectId).setData(userDictionaryFrom(user: fUser) as! [String : Any]) { (error) in
+    reference(.User).document(fUser.objectId).setData(userDictionaryFrom(user: fUser) as! [String : Any]) { (error) in
         
         print("error is \(error?.localizedDescription)")
     }
@@ -330,14 +330,14 @@ func saveUserLocally(fUser: FUser) {
 //New firestore
 func fetchCurrentUserFromFirestore(userId: String) {
 
-    reference(collectionReference: .User).document(userId).getDocument { (snapshot, error) in
+    reference(.User).document(userId).getDocument { (snapshot, error) in
 
         guard let snapshot = snapshot else {  return }
         
         if snapshot.exists {
             print("updated current users param")
             
-            UserDefaults.standard.setValue(snapshot.data() as NSDictionary, forKeyPath: kCURRENTUSER)
+            UserDefaults.standard.setValue(snapshot.data() as! NSDictionary, forKeyPath: kCURRENTUSER)
             UserDefaults.standard.synchronize()
 
         }
@@ -367,13 +367,13 @@ func fetchCurrentUserFromFirestore(userId: String) {
 //NEW firestore
 func fetchCurrentUserFromFirestore(userId: String, completion: @escaping (_ user: FUser?)->Void) {
     
-    reference(collectionReference: .User).document(userId).getDocument { (snapshot, error) in
+    reference(.User).document(userId).getDocument { (snapshot, error) in
         
         guard let snapshot = snapshot else {  return }
         
         if snapshot.exists {
 
-            let user = FUser(_dictionary: snapshot.data() as NSDictionary)
+            let user = FUser(_dictionary: snapshot.data()! as NSDictionary)
             completion(user)
         } else {
             completion(nil)
@@ -403,13 +403,13 @@ func getUsersFromFirestore(withIds: [String], completion: @escaping (_ usersArra
     //go through each user and download it from firestore
     for userId in withIds {
         
-        reference(collectionReference: .User).document(userId).getDocument { (snapshot, error) in
+        reference(.User).document(userId).getDocument { (snapshot, error) in
             
             guard let snapshot = snapshot else {  return }
             
             if snapshot.exists {
 
-                let user = FUser(_dictionary: snapshot.data() as NSDictionary)
+                let user = FUser(_dictionary: snapshot.data() as! NSDictionary)
                 count += 1
                 
                 //dont add if its current user
@@ -448,7 +448,7 @@ func updateCurrentUserInFirestore(withValues : [String : Any], completion: @esca
         
         userObject.setValuesForKeys(tempWithValues)
         
-        reference(collectionReference: .User).document(currentUserId).updateData(withValues) { (error) in
+        reference(.User).document(currentUserId).updateData(withValues) { (error) in
             
             if error != nil {
                 
@@ -502,7 +502,10 @@ func updateCurrentUserOneSignalId(newId: String) {
     }
 }
 
+//MARK: Chack User blocked status
 
-
+func checkBlockedStatus(withUser: FUser) -> Bool {
+    return withUser.blockedUsers.contains(FUser.currentId())
+}
 
 

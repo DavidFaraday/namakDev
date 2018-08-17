@@ -85,7 +85,7 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         self.navigationController?.navigationBar.tintAdjustmentMode = .automatic
         //end of bug fix
         
-        loadUsers()
+        getContactsOfCurrentUser()
     }
 
     
@@ -198,18 +198,24 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         
         if !isGroup {
 
-            let chatVC = ChatViewController()
-            
-            chatVC.titleName = userToChat.firstname
-            
-            chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
-            chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
-            chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
-            
-            chatVC.isGroup = false
-            chatVC.hidesBottomBarWhenPushed = true
-            
-            self.navigationController?.pushViewController(chatVC, animated: true)
+            if !checkBlockedStatus(withUser: userToChat) {
+                let chatVC = ChatViewController()
+                
+                chatVC.titleName = userToChat.firstname
+                
+                chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
+                chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
+                chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
+                
+                chatVC.isGroup = false
+                chatVC.hidesBottomBarWhenPushed = true
+                
+                self.navigationController?.pushViewController(chatVC, animated: true)
+
+            } else {
+                //user has blocked us
+                ProgressHUD.showError("This user is not available for chat")
+            }
         } else {
             
             //checkmarks
@@ -282,40 +288,45 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
     }
 
     
-
-    
-    
     //MARK: LoadUsers
-    func loadUsers() {
+    
+    func getContactsOfCurrentUser() {
         
-        ProgressHUD.show()
+        getUsersFromFirestore(withIds: FUser.currentUser()!.contacts) { (currentContacts) in
+
+            self.matchedUsers = currentContacts
+            self.splitDataInToSection()
+            self.lookForNewUsersInBackground()
+        }
+    }
+    
+    
+    
+    func lookForNewUsersInBackground() {
         
-        //to limit the load of users, need to get only the users from my country (update the code later)
-        reference(collectionReference: .User).order(by: kFIRSTNAME, descending: false).getDocuments { (snapshot, error) in
+        //to limit the load of users, need to get only the users from my country (update the code later), better to compare current users phone numbers to server and download users that match and not download all and compare the current user contacts
+        reference(.User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country).getDocuments { (snapshot, error) in
             
-            guard let snapshot = snapshot else { return }
+            guard let snapshot = snapshot else {
+                return
+            }
             
             if !snapshot.isEmpty {
                 
-                self.matchedUsers = []
                 self.users.removeAll()
-
+                
                 for userDictionary in snapshot.documents {
                     
                     let userDictionary = userDictionary.data() as NSDictionary
                     let fUser = FUser(_dictionary: userDictionary)
                     
-                    if fUser.objectId != FUser.currentId() {
-                        
+                    if fUser.objectId != FUser.currentId() && !FUser.currentUser()!.contacts.contains(fUser.objectId) {
+
                         self.users.append(fUser)
                     }
                 }
-                
-                ProgressHUD.dismiss()
-                self.tableView.reloadData()
             }
             
-            ProgressHUD.dismiss()
             self.compareUsers()
         }
         
@@ -323,23 +334,30 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
 
     func compareUsers() {
         
+        var usersContacts = FUser.currentUser()!.contacts
+        
         for user in users {
-            
+
             if user.phoneNumber != "" {
                 
                 let contact = searchForContactUsingPhoneNumber(phoneNumber: user.phoneNumber)
 
                 //if we have a match, we add to our array to display them
                 if contact.count > 0 {
+                    //add to contacts array
                     matchedUsers.append(user)
+                    usersContacts.append(user.objectId)
                 }
-                
-                self.tableView.reloadData()
-
             }
         }
-        updateInformationLabel()
+        
+        //save in background
+        updateCurrentUserInFirestore(withValues: [kCONTACT : usersContacts]) { (error) in
+            print("updated contacts")
+        }
 
+        
+        updateInformationLabel()
         self.splitDataInToSection()
     }
 
@@ -366,6 +384,7 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
                     let phoneNumber = fulMobNumVar.value(forKey: "digits") as? String
                     
                     let contactNumber = removeCountryCode(countryCodeLetters: countryCode!, fullPhoneNumber: phoneNumber!)
+                    
                     
                     //compare phoneNumber of contact with given user's phone number
                     if contactNumber == phoneNumberToCompareAgainst {
@@ -466,6 +485,9 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
     
     fileprivate func splitDataInToSection() {
         
+        //sort array
+        matchedUsers = matchedUsers.sorted(by: { $0.firstname < $1.firstname })
+
         // set section title "" at initial
         var sectionTitle: String = ""
         
@@ -491,7 +513,9 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
                 self.allUsersGrouped[sectionTitle] = []
                 
                 // append title within section title list
-                self.sectionTitleList.append(sectionTitle)
+                if !sectionTitleList.contains(sectionTitle) {
+                    self.sectionTitleList.append(sectionTitle)
+                }
             }
             
             // add record to the section

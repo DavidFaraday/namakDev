@@ -89,17 +89,31 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         } else {
             call = allCalls[indexPath.row]
         }
-
-        call.saveCallInBackground()
         
-        //call user again
-        let newCall = call!
-        
-        newCall.objectId = UUID().uuidString
-        newCall.callDate = Date()
+        var newCall: CallN!
+        let currentUser = FUser.currentUser()!
+        var userIdToCall = ""
+        var userNameToCall = ""
 
+        if call.callerId == FUser.currentId() {
+            print("call again to user : \(call.withUserFullName)")
+            //outgoing
+            newCall = call
+            newCall.objectId = UUID().uuidString
+            newCall.callDate = Date()
+            
+            userIdToCall = newCall.withUserId
+            userNameToCall = newCall.withUserFullName
+        } else {
+            //incoming
+            newCall = CallN(_callerId: currentUser.objectId, _withUserId: call.callerId, _callerFullName: currentUser.fullname, _withUserFullName: call.callerFullName, _callerAvatar: "", _withUserAvatar: "")
+            
+            userIdToCall = call.callerId
+            userNameToCall = call.callerFullName
+        }
+        
         newCall.saveCallInBackground()
-        callUser(withId: call.withUserId, withName: call.withUserFullName)
+        callUser(withId: userIdToCall, withName: userNameToCall)
     }
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -107,7 +121,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         return true
     }
 
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if editingStyle == .delete {
 
@@ -132,7 +146,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     func loadCalls() {
         
-        callListener = reference(collectionReference: .Call).document(FUser.currentId()).collection(FUser.currentId()).order(by: kDATE, descending: true).limit(to: 20).addSnapshotListener({ (snapshot, error) in
+        callListener = reference(.Call).document(FUser.currentId()).collection(FUser.currentId()).order(by: kDATE, descending: true).limit(to: 15).addSnapshotListener({ (snapshot, error) in
             
             self.allCalls = []
 
@@ -183,14 +197,13 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     func callUser(withId: String, withName: String) {
 
-        let call = callClient().callUser(withId: withId, headers: [kFULLNAME : withName])
+        let call = callClient().callUser(withId: withId, headers: [kNAME : FUser.currentUser()!.fullname])
         
         let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
         
         callVC._call = call
         
         self.present(callVC, animated: true, completion: nil)
-        
     }
 
     func callClient() -> SINCallClient {

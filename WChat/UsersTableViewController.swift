@@ -14,6 +14,7 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
 
     @IBOutlet weak var headerView: UIView!
     
+    @IBOutlet weak var filterSegmentedControll: UISegmentedControl!
     
     var allUsers: [FUser] = []
     var filteredUsers: [FUser] = []
@@ -23,6 +24,7 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
     let searchController = UISearchController(searchResultsController: nil)
 
     override func viewWillAppear(_ animated: Bool) {
+        filterSegmentedControll.selectedSegmentIndex = 0
         loadUsers(filter: kCITY)
     }
     
@@ -163,19 +165,24 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
             userToChat = users![indexPath.row]
         }
 
-        
-        let chatVC = ChatViewController()
-        
-        chatVC.titleName = userToChat.firstname
-        
-        chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
-        chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
-        chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
-        
-        chatVC.isGroup = false
-        chatVC.hidesBottomBarWhenPushed = true
-        
-        self.navigationController?.pushViewController(chatVC, animated: true)
+        if !checkBlockedStatus(withUser: userToChat) {
+            let chatVC = ChatViewController()
+            
+            chatVC.titleName = userToChat.firstname
+            
+            chatVC.membersToPush = [FUser.currentId(), userToChat.objectId]
+            chatVC.memberIds = [FUser.currentId(), userToChat.objectId]
+            chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: userToChat)
+            
+            chatVC.isGroup = false
+            chatVC.hidesBottomBarWhenPushed = true
+            
+            self.navigationController?.pushViewController(chatVC, animated: true)
+
+        } else {
+            //user has blocked us
+            ProgressHUD.showError("This user is not available for chat")
+        }
 
     }
 
@@ -211,7 +218,9 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
                 self.allUsersGrouped[sectionTitle] = []
                 
                 // append title within section title list
-                self.sectionTitleList.append(sectionTitle)
+                if !sectionTitleList.contains(sectionTitle) {
+                    self.sectionTitleList.append(sectionTitle)
+                }
             }
             
             // add record to the section
@@ -231,30 +240,31 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
         
         switch filter {
         case kCITY:
-            query = reference(collectionReference: .User).whereField(kCITY, isEqualTo: FUser.currentUser()!.city).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).whereField(kCITY, isEqualTo: FUser.currentUser()!.city)
         case kCOUNTRY:
-            query = reference(collectionReference: .User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country)
         default:
-            query = reference(collectionReference: .User).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).order(by: kFIRSTNAME, descending: false)
         }
 
             
         query.getDocuments { (snapshot, error) in
-                
+            
+            self.allUsers = []
+            self.sectionTitleList = []
+            self.allUsersGrouped = [:]
+
             if error != nil {
                 print(error?.localizedDescription)
                 ProgressHUD.dismiss()
+                self.tableView.reloadData()
                 return
             }
-
                 
             guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
             
             if !snapshot.isEmpty {
                 
-                self.allUsers = []
-                self.sectionTitleList = []
-                self.allUsersGrouped = [:]
 
                 for userDictionary in snapshot.documents {
                     
@@ -276,7 +286,8 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
             ProgressHUD.dismiss()
                 
         }
- 
+        self.tableView.reloadData()
+
     }
     
     //MARK: search controler functions

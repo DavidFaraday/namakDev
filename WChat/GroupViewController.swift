@@ -48,7 +48,8 @@ class GroupViewController: UIViewController, ImagePickerDelegate {
             return
         }
         
-        let avatarData = UIImageJPEGRepresentation(cameraButtonOutlet.image!, 0.7)!
+        let avatarData = cameraButtonOutlet.image!.jpegData(compressionQuality: 0.5)!
+
         let avatarString = avatarData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
         
         withValues = [kNAME : groupNameTextField.text!, kAVATAR : avatarString]
@@ -185,6 +186,15 @@ class GroupViewController: UIViewController, ImagePickerDelegate {
         self.dismiss(animated: true, completion: nil)
     }
 
+//    var configuration = Configuration()
+//    configuration.doneButtonTitle = "Finish"
+//    configuration.noImagesTitle = "Sorry! There are no images here!"
+//    configuration.recordLocation = false
+//    configuration.allowVideoSelection = true
+//    
+//    let imagePicker = ImagePickerController(configuration: configuration)
+//    imagePicker.delegate = self
+//    imagePicker.imageLimit = 1
 
 
 }

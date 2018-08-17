@@ -65,7 +65,7 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
         return "Unblock"
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         var tempBlockedUsers = FUser.currentUser()!.blockedUsers
         let userIdToUnblock = blockedUsersArray[indexPath.row].objectId
@@ -90,11 +90,6 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
 
     
 
-    //MARK: IBActions
-    
-    @IBAction func backButtonPressed(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
-    }
     
     //MARK: Load Users
     
@@ -125,7 +120,7 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
         
         profileVC.user = blockedUsersArray[indexPath.row]
         
-        self.present(profileVC, animated: true, completion: nil)
+        self.navigationController?.pushViewController(profileVC, animated: true)
 
     }
 

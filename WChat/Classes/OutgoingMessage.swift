@@ -57,11 +57,11 @@ class OutgoingMessage {
         messageDictionary[kMESSAGEID] = messageId
         
         for memberId in memberIds {
-        reference(collectionReference: .Message).document(memberId).collection(chatRoomID).document(messageId).setData(messageDictionary as! [String : Any])
+            reference(.Message).document(memberId).collection(chatRoomID).document(messageId).setData(messageDictionary as! [String : Any])
 
         }
         
-        updateRecents(chatRoomId: chatRoomID, memberIds: memberIds, lastMessage: messageDictionary[kMESSAGE] as! String)
+        updateRecents(chatRoomId: chatRoomID, lastMessage: messageDictionary[kMESSAGE] as! String)
 
         //send push
         let pushText = "[\(messageDictionary[kTYPE] as! String) message]"
@@ -73,9 +73,7 @@ class OutgoingMessage {
     //MARK: DeleteMessage
     
     class func deleteMessage(withId: String, chatRoomId: String) {
-        
-        let values = [kDELETED : true]
-        reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).document(withId).updateData(values)
+        reference(.Message).document(FUser.currentId()).collection(chatRoomId).document(withId).delete()
     }
 
     class func updateMessage(withId: String, chatRoomId: String, memberIds: [String]) {
@@ -84,7 +82,17 @@ class OutgoingMessage {
         let values = [kSTATUS : kREAD, kREADDATE : readDate]
         
         for userId in memberIds {
-            reference(collectionReference: .Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
+           
+            reference(.Message).document(userId).collection(chatRoomId).document(withId).getDocument { (snapshot, error) in
+                
+                guard let snapshot = snapshot else { return }
+                
+                if snapshot.exists {
+                    //update read status
+                    reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
+                    
+                }
+            }
         }
     }
     

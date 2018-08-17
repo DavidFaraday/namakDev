@@ -30,9 +30,11 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
     
     let storageRef = storage.reference(forURL: kFILEREFERENCE).child(videoFileName)
     
-    let imageDate = UIImageJPEGRepresentation(image, 0.7)
+    let imageDate = image.jpegData(compressionQuality: 0.5)
     
     var task : StorageUploadTask!
+    
+
     
     task = storageRef.putData(imageDate!, metadata: nil, completion: {
         metadata, error in
@@ -48,9 +50,15 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
             return
         }
         
-        
-        let link = metadata!.downloadURL()
-        completion(link?.absoluteString)
+        storageRef.downloadURL(completion: { (url, error) in
+            
+            guard let downloadUrl = url else {
+                completion(nil)
+                return
+            }
+            completion(downloadUrl.absoluteString)
+        })
+
     })
     
     task.observe(StorageTaskStatus.progress, handler: {
@@ -139,9 +147,15 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
             return
         }
         
-        
-        let link = metadata!.downloadURL()
-        completion(link?.absoluteString)
+        storageRef.downloadURL(completion: { (url, error) in
+            
+            guard let downloadUrl = url else {
+                completion(nil)
+                return
+            }
+            completion(downloadUrl.absoluteString)
+        })
+
     })
     
     task.observe(StorageTaskStatus.progress, handler: {
@@ -200,8 +214,8 @@ func videoThumbnail(video: NSURL) -> UIImage {
     let imageGenerator = AVAssetImageGenerator(asset: asset)
     imageGenerator.appliesPreferredTrackTransform = true
     
-    let time = CMTimeMakeWithSeconds(0.5, 1000)
-    var actualTime = kCMTimeZero
+    let time = CMTimeMakeWithSeconds(0.5, preferredTimescale: 1000)
+    var actualTime = CMTime.zero
     
     var image: CGImage?
     
@@ -247,8 +261,14 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
             return
         }
         
-        let link = metadata!.downloadURL()
-        completion(link?.absoluteString)
+        storageRef.downloadURL(completion: { (url, error) in
+            
+            guard let downloadUrl = url else {
+                completion(nil)
+                return
+            }
+            completion(downloadUrl.absoluteString)
+        })
         
     })
     

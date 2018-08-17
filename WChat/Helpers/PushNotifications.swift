@@ -45,7 +45,7 @@ func getMembersToPush(members: [String], completion: @escaping (_ usersArray: [S
     var count = 0
 
     for memberId in members {
-        reference(collectionReference: .User).document(memberId).getDocument { (snapshot, error) in
+        reference(.User).document(memberId).getDocument { (snapshot, error) in
             
             guard let snapshot = snapshot else { completion(pushIds); return }
             

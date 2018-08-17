@@ -39,29 +39,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         cleanTextFields()
         dismissKeyboard()
         
-        //delete locally
-        UserDefaults.standard.removeObject(forKey: kPUSHID)
-        UserDefaults.standard.removeObject(forKey: kCURRENTUSER)
-        UserDefaults.standard.synchronize()
-        
-        //delete user object
-       
-   reference(collectionReference: .User).document(FUser.currentId()).delete()
-        
-        FUser.deleteUser { (error) in
-            
-            if error != nil {
-                
-                DispatchQueue.main.async {
-                    ProgressHUD.showError("Couldnt Quit")
-                }
-                
-                return
-            }
-            
-            self.dismiss(animated: true, completion: nil)
-        }
-        
+        self.dismiss(animated: true, completion: nil)
     }
     
     
@@ -128,7 +106,8 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
             //create UIImage from Initials
             imageFromInitials(firstName: nameTextField.text!, lastName: surnameTextField.text!, withBlock: { (avatarInitials) in
                 
-                let avatarInitials = UIImageJPEGRepresentation(avatarInitials, 0.7)!
+                let avatarInitials = avatarInitials.jpegData(compressionQuality: 0.5)!
+
                 let avatar = avatarInitials.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
                 
                 tempDictionary[kAVATAR] = avatar
@@ -140,7 +119,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
             
         } else {
             
-            let avatarData = UIImageJPEGRepresentation(avatarImage!, 0.7)!
+            let avatarData = avatarImage!.jpegData(compressionQuality: 0.5)!
             let avatar = avatarData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
             
             tempDictionary[kAVATAR] = avatar

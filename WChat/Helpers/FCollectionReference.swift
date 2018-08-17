@@ -20,28 +20,28 @@ enum FCollectionReference: String {
 }
 
 
-func reference(collectionReference: FCollectionReference) -> CollectionReference{
+func reference(_ collectionReference: FCollectionReference) -> CollectionReference{
     return Firestore.firestore().collection(collectionReference.rawValue)
 }
 
-extension DocumentChange {
-    
-    func description() -> String {
-        var changeType = ""
-        
-        switch (self.type) {
-        case .added:
-        changeType = "Add"
-        break;
-        case .removed:
-        changeType = "Delete"
-        break;
-        case .modified:
-        changeType = "Change"
-        break;
-        }
-        
-        return changeType
-    }
-
-}
+//extension DocumentChange {
+//    
+//    func description() -> String {
+//        var changeType = ""
+//        
+//        switch (self.type) {
+//        case .added:
+//        changeType = "Add"
+//        break;
+//        case .removed:
+//        changeType = "Delete"
+//        break;
+//        case .modified:
+//        changeType = "Change"
+//        break;
+//        }
+//        
+//        return changeType
+//    }
+//
+//}

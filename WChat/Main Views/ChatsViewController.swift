@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Firebase
+import FirebaseFirestore
 
 class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, RecentChatsTableViewCellDelegate, UISearchResultsUpdating {
 
@@ -18,7 +18,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var recentChats: [NSDictionary] = []
     var filteredChats: [NSDictionary] = []
-    
     
     override func viewWillAppear(_ animated: Bool) {
         loadRecentChats()
@@ -107,7 +106,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             mute = true
         }
         
-        let muteRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: muteTitle, handler:{action, indexpath in
+        let muteRowAction = UITableViewRowAction(style: UITableViewRowAction.Style.default, title: muteTitle, handler:{action, indexpath in
             
             self.updatePushMembers(recent: tempRecent, mute: mute)
         })
@@ -115,14 +114,13 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         muteRowAction.backgroundColor = .blue
         
-        let deleteRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: "Delete", handler:{action, indexpath in
+        let deleteRowAction = UITableViewRowAction(style: UITableViewRowAction.Style.default, title: "Delete", handler:{action, indexpath in
 
             self.recentChats.remove(at: indexPath.row)
             
             deleteRecentChat(recentDictionary: tempRecent)
             
-            tableView.reloadData()
-
+            tableView.deleteRows(at: [indexPath], with: .automatic)
         })
         
         return [deleteRowAction, muteRowAction];
@@ -172,12 +170,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func loadRecentChats() {
         
-        //to be updated when changes accure
-        let options = QueryListenOptions()
-//        options.includeDocumentMetadataChanges(true) // in case recent changes
-        options.includeQueryMetadataChanges(true) // in case recent gets deleted
-        
-        recentListener = reference(collectionReference: .Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener(options: options, listener: { (snapshot, error) in
+        recentListener = reference(.Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener(includeMetadataChanges: true, listener: { (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
             
@@ -193,6 +186,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //                }
 //            }
             self.recentChats = []
+
             
             if !snapshot.isEmpty {
                 
@@ -216,6 +210,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             }
             
             self.tableView.reloadData()
+
         })
         
     }
@@ -226,16 +221,22 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func didTapAvatarImage(indexPath: IndexPath) {
         
         //get user and show in profile view
-        let recentChat = recentChats[indexPath.row]
-
+        var recentChat: NSDictionary!
+        
+        if searchController.isActive && searchController.searchBar.text != "" {
+            recentChat = filteredChats[indexPath.row]
+        } else {
+            recentChat = recentChats[indexPath.row]
+        }
+        
         if recentChat[kTYPE] as! String == kPRIVATE {
 
-            reference(collectionReference: .User).document(recentChat[kWITHUSERUSERID] as! String).getDocument { (snapshot, error) in
+            reference(.User).document(recentChat[kWITHUSERUSERID] as! String).getDocument { (snapshot, error) in
                 
                 guard let snapshot = snapshot else { return }
 
                 if snapshot.exists {
-                    let userDictionary = snapshot.data() as NSDictionary
+                    let userDictionary = snapshot.data()! as NSDictionary
                     
                     let tempUser = FUser(_dictionary: userDictionary)
                     
@@ -327,7 +328,4 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         filteredContentForSearchText(searchText: searchController.searchBar.text!)
     }
-    
-
-
 }

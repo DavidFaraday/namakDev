@@ -34,8 +34,8 @@ class PhoneNumberLoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.swipeGestureLeft.direction = UISwipeGestureRecognizerDirection.left
-        self.swipeGestureRight.direction = UISwipeGestureRecognizerDirection.right
+        self.swipeGestureLeft.direction = UISwipeGestureRecognizer.Direction.left
+        self.swipeGestureRight.direction = UISwipeGestureRecognizer.Direction.right
         
         self.swipeGestureLeft.addTarget(self, action: #selector(self.handleSwipeLeft(_:)))
         self.swipeGestureRight.addTarget(self, action: #selector(self.handleSwipeRight(_:)))

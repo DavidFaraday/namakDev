@@ -150,12 +150,7 @@ class SettingsTableViewController: UITableViewController {
     
     @IBAction func showAvatarSwitchValueChanged(_ sender: UISwitch) {
 
-        if sender.isOn {
-            avatarSwitchStatus = true
-        } else {
-            avatarSwitchStatus = false
-        }
-        
+        avatarSwitchStatus = sender.isOn
         saveUserDefaults()
     }
     
@@ -242,7 +237,7 @@ class SettingsTableViewController: UITableViewController {
         userDefaults.synchronize()
         
         //delete user object in firebase database
-       reference(collectionReference: .User).document(FUser.currentId()).delete()
+        reference(.User).document(FUser.currentId()).delete()
         
         FUser.deleteUser { (error) in
             

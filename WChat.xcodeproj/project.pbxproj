@@ -25,10 +25,8 @@
 		634553A52094830F00BB2D17 /* CallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634553A42094830F00BB2D17 /* CallViewController.swift */; };
 		634553A92094971700BB2D17 /* ringback.wav in Resources */ = {isa = PBXBuildFile; fileRef = 634553A82094971700BB2D17 /* ringback.wav */; };
 		6345654520A5D54B001F420F /* incoming.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6345654420A5D54A001F420F /* incoming.wav */; };
-		6345654720A5D557001F420F /* ringback.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6345654620A5D557001F420F /* ringback.wav */; };
 		6347221020753E3400F9C17C /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6347220F20753E3400F9C17C /* MapViewController.swift */; };
 		6349A880208F8A1700706246 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6349A87F208F8A1700706246 /* Encryption.swift */; };
-		6349A882208F8A6700706246 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6349A881208F8A6700706246 /* RNCryptor.framework */; };
 		635D8E4D20552D2A00297A0F /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4C20552D2A00297A0F /* UserTableViewCell.swift */; };
 		635D8E4F2055679100297A0F /* ChatsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4E2055679100297A0F /* ChatsViewController.swift */; };
 		635D8E5120557A2800297A0F /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E5020557A2800297A0F /* ProfileViewController.swift */; };
@@ -43,20 +41,26 @@
 		6389AA73205EE6B5006EF77A /* NewGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6389AA72205EE6B5006EF77A /* NewGroupViewController.swift */; };
 		638B44C820B039AF00E11BE8 /* PicturesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638B44C720B039AF00E11BE8 /* PicturesCollectionViewCell.swift */; };
 		638B44CA20B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638B44C920B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift */; };
+		638D60E420B72C92004950D4 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 638D60E320B72C92004950D4 /* AVFoundation.framework */; };
+		638D60E620B72CB0004950D4 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 638D60E520B72CB0004950D4 /* QuartzCore.framework */; };
+		638F3A7421021C8100DCCC07 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 638F3A7321021C8100DCCC07 /* Localizable.strings */; };
 		639344812078BC66002BDF8A /* InviteUserTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639344802078BC66002BDF8A /* InviteUserTableViewController.swift */; };
-		639D06DF2098469300879C3C /* ProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06DE2098469300879C3C /* ProviderDelegate.swift */; };
 		639D06E1209851E100879C3C /* SINCallKitProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06E0209851E100879C3C /* SINCallKitProvider.swift */; };
 		639D06E3209853DE00879C3C /* AudioControllDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06E2209853DE00879C3C /* AudioControllDelegate.swift */; };
 		63A51202206034A200F3EF31 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A51201206034A200F3EF31 /* Group.swift */; };
 		63B68E3320667EA00017B6B7 /* BlockedUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B68E3220667EA00017B6B7 /* BlockedUsersViewController.swift */; };
+		63B6E6AC20FF8FB300FE6D2A /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B6E6AB20FF8FB300FE6D2A /* RNCryptor.framework */; };
 		63C343532051BBF500C6985B /* FUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343522051BBF500C6985B /* FUser.swift */; };
 		63C343552051BC5500C6985B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343542051BC5500C6985B /* Constants.swift */; };
 		63C343572051BC7E00C6985B /* HelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343562051BC7E00C6985B /* HelperFunctions.swift */; };
+		63D44F2A20B1B03900C5B397 /* PushKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63D44F2920B1B03900C5B397 /* PushKit.framework */; };
+		63D44F2C20B1B04300C5B397 /* CallKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63D44F2B20B1B04300C5B397 /* CallKit.framework */; };
 		63D492F420675FB6007C19CA /* UsersTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D492F320675FB6007C19CA /* UsersTableViewController.swift */; };
 		63D492F720679945007C19CA /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D492F620679945007C19CA /* ChatViewController.swift */; };
 		63D492F920696CDE007C19CA /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D492F820696CDE007C19CA /* Camera.swift */; };
 		63D492FB206AAC7E007C19CA /* OutgoingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D492FA206AAC7E007C19CA /* OutgoingMessage.swift */; };
 		63D492FD206AB13C007C19CA /* IncomingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D492FC206AB13C007C19CA /* IncomingMessage.swift */; };
+		63E3F27120B1E10600E6E569 /* PhotoMediaItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63E3F27020B1E10600E6E569 /* PhotoMediaItem.swift */; };
 		63F7D8A0209CD0F8004CB6BD /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F7D89F209CD0F7004CB6BD /* Badges.swift */; };
 		63F7D8A2209CE077004CB6BD /* PhoneNumberLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F7D8A1209CE077004CB6BD /* PhoneNumberLoginViewController.swift */; };
 		63FC55B0209F2F2E00A43237 /* FCollectionReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FC55AF209F2F2E00A43237 /* FCollectionReference.swift */; };
@@ -87,7 +91,6 @@
 		634553A6209484AB00BB2D17 /* WChat-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WChat-Bridging-Header.h"; sourceTree = "<group>"; };
 		634553A82094971700BB2D17 /* ringback.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ringback.wav; sourceTree = "<group>"; };
 		6345654420A5D54A001F420F /* incoming.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = incoming.wav; sourceTree = "<group>"; };
-		6345654620A5D557001F420F /* ringback.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = ringback.wav; path = ../../myQC3swift4/QuickChat2.0/ringback.wav; sourceTree = "<group>"; };
 		6347220F20753E3400F9C17C /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		6349A87F208F8A1700706246 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		6349A881208F8A6700706246 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -105,20 +108,26 @@
 		6389AA72205EE6B5006EF77A /* NewGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGroupViewController.swift; sourceTree = "<group>"; };
 		638B44C720B039AF00E11BE8 /* PicturesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicturesCollectionViewCell.swift; sourceTree = "<group>"; };
 		638B44C920B03A6D00E11BE8 /* PictureMediaCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureMediaCollectionViewController.swift; sourceTree = "<group>"; };
+		638D60E320B72C92004950D4 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		638D60E520B72CB0004950D4 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		638F3A7321021C8100DCCC07 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		639344802078BC66002BDF8A /* InviteUserTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteUserTableViewController.swift; sourceTree = "<group>"; };
-		639D06DE2098469300879C3C /* ProviderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderDelegate.swift; sourceTree = "<group>"; };
 		639D06E0209851E100879C3C /* SINCallKitProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SINCallKitProvider.swift; sourceTree = "<group>"; };
 		639D06E2209853DE00879C3C /* AudioControllDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllDelegate.swift; sourceTree = "<group>"; };
 		63A51201206034A200F3EF31 /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
 		63B68E3220667EA00017B6B7 /* BlockedUsersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedUsersViewController.swift; sourceTree = "<group>"; };
+		63B6E6AB20FF8FB300FE6D2A /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		63C343522051BBF500C6985B /* FUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FUser.swift; sourceTree = "<group>"; };
 		63C343542051BC5500C6985B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		63C343562051BC7E00C6985B /* HelperFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperFunctions.swift; sourceTree = "<group>"; };
+		63D44F2920B1B03900C5B397 /* PushKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PushKit.framework; path = System/Library/Frameworks/PushKit.framework; sourceTree = SDKROOT; };
+		63D44F2B20B1B04300C5B397 /* CallKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CallKit.framework; path = System/Library/Frameworks/CallKit.framework; sourceTree = SDKROOT; };
 		63D492F320675FB6007C19CA /* UsersTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersTableViewController.swift; sourceTree = "<group>"; };
 		63D492F620679945007C19CA /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		63D492F820696CDE007C19CA /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		63D492FA206AAC7E007C19CA /* OutgoingMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingMessage.swift; sourceTree = "<group>"; };
 		63D492FC206AB13C007C19CA /* IncomingMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingMessage.swift; sourceTree = "<group>"; };
+		63E3F27020B1E10600E6E569 /* PhotoMediaItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoMediaItem.swift; sourceTree = "<group>"; };
 		63F7D89F209CD0F7004CB6BD /* Badges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 		63F7D8A1209CE077004CB6BD /* PhoneNumberLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberLoginViewController.swift; sourceTree = "<group>"; };
 		63FC55AF209F2F2E00A43237 /* FCollectionReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCollectionReference.swift; sourceTree = "<group>"; };
@@ -133,7 +142,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6349A882208F8A6700706246 /* RNCryptor.framework in Frameworks */,
+				63B6E6AC20FF8FB300FE6D2A /* RNCryptor.framework in Frameworks */,
+				638D60E620B72CB0004950D4 /* QuartzCore.framework in Frameworks */,
+				638D60E420B72C92004950D4 /* AVFoundation.framework in Frameworks */,
+				63D44F2C20B1B04300C5B397 /* CallKit.framework in Frameworks */,
+				63D44F2A20B1B03900C5B397 /* PushKit.framework in Frameworks */,
 				86AAD777BDB76A8FAD6B71C1 /* Pods_WChat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -144,6 +157,11 @@
 		324459C63FC74F05115807BB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				63B6E6AB20FF8FB300FE6D2A /* RNCryptor.framework */,
+				638D60E520B72CB0004950D4 /* QuartzCore.framework */,
+				638D60E320B72C92004950D4 /* AVFoundation.framework */,
+				63D44F2B20B1B04300C5B397 /* CallKit.framework */,
+				63D44F2920B1B03900C5B397 /* PushKit.framework */,
 				6349A881208F8A6700706246 /* RNCryptor.framework */,
 				B4893B57284A37EEC51CCE32 /* Pods_WChat.framework */,
 			);
@@ -186,9 +204,7 @@
 			children = (
 				633CA5C1207BB88600C80C4B /* WChat.entitlements */,
 				632BE1EF2051BA5800131EB6 /* AppDelegate.swift */,
-				639D06DE2098469300879C3C /* ProviderDelegate.swift */,
-				639D06E0209851E100879C3C /* SINCallKitProvider.swift */,
-				639D06E2209853DE00879C3C /* AudioControllDelegate.swift */,
+				638E617821243EE10068C2ED /* CallKit */,
 				63353B2B208A244B00A3DAF4 /* Main Views */,
 				63D492F5206797D9007C19CA /* Secondary Views */,
 				6344EE2320545D30009415FB /* Welcome */,
@@ -200,7 +216,6 @@
 				632BE1F62051BA5800131EB6 /* Assets.xcassets */,
 				632BE1F82051BA5800131EB6 /* LaunchScreen.storyboard */,
 				6345654420A5D54A001F420F /* incoming.wav */,
-				6345654620A5D557001F420F /* ringback.wav */,
 				632BE1FB2051BA5800131EB6 /* Info.plist */,
 				6344EE1B20541FC5009415FB /* GoogleService-Info.plist */,
 				634553A6209484AB00BB2D17 /* WChat-Bridging-Header.h */,
@@ -231,6 +246,7 @@
 				63798BEE207A0C95005A0061 /* CountryCode.swift */,
 				6349A87F208F8A1700706246 /* Encryption.swift */,
 				63F7D89F209CD0F7004CB6BD /* Badges.swift */,
+				638F3A7321021C8100DCCC07 /* Localizable.strings */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -246,6 +262,7 @@
 				6389AA6E20585A06006EF77A /* Recent.swift */,
 				63A51201206034A200F3EF31 /* Group.swift */,
 				63353B2C208A248600A3DAF4 /* CallClass.swift */,
+				63E3F27020B1E10600E6E569 /* PhotoMediaItem.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -258,6 +275,15 @@
 				63F7D8A1209CE077004CB6BD /* PhoneNumberLoginViewController.swift */,
 			);
 			path = Welcome;
+			sourceTree = "<group>";
+		};
+		638E617821243EE10068C2ED /* CallKit */ = {
+			isa = PBXGroup;
+			children = (
+				639D06E0209851E100879C3C /* SINCallKitProvider.swift */,
+				639D06E2209853DE00879C3C /* AudioControllDelegate.swift */,
+			);
+			path = CallKit;
 			sourceTree = "<group>";
 		};
 		63B68E3420667EE40017B6B7 /* Settings */ = {
@@ -308,7 +334,6 @@
 				632BE1E92051BA5800131EB6 /* Frameworks */,
 				632BE1EA2051BA5800131EB6 /* Resources */,
 				A429AF8842BFA6F32ACF1BD9 /* [CP] Embed Pods Frameworks */,
-				B4F26880B915909773A1C567 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -364,10 +389,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6345654720A5D557001F420F /* ringback.wav in Resources */,
 				632BE1FA2051BA5800131EB6 /* LaunchScreen.storyboard in Resources */,
 				6344EE1C20541FC6009415FB /* GoogleService-Info.plist in Resources */,
 				634553A92094971700BB2D17 /* ringback.wav in Resources */,
+				638F3A7421021C8100DCCC07 /* Localizable.strings in Resources */,
 				632BE1F72051BA5800131EB6 /* Assets.xcassets in Resources */,
 				6345654520A5D54B001F420F /* incoming.wav in Resources */,
 				632BE1F52051BA5800131EB6 /* Main.storyboard in Resources */,
@@ -437,21 +462,6 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-WChat/Pods-WChat-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B4F26880B915909773A1C567 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-WChat/Pods-WChat-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		D4300F289FD97D096F710B23 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -483,7 +493,6 @@
 				63FC55B0209F2F2E00A43237 /* FCollectionReference.swift in Sources */,
 				630D254A20700A21003FAB62 /* VideoMessage.swift in Sources */,
 				634553A52094830F00BB2D17 /* CallViewController.swift in Sources */,
-				639D06DF2098469300879C3C /* ProviderDelegate.swift in Sources */,
 				636C36DB208666E500D12839 /* BackgroundsCollectionViewController.swift in Sources */,
 				6344EE2220544E5C009415FB /* FinishRegistrationViewController.swift in Sources */,
 				6389AA71205EE699006EF77A /* GroupMemberCollectionViewCell.swift in Sources */,
@@ -503,6 +512,7 @@
 				63D492F720679945007C19CA /* ChatViewController.swift in Sources */,
 				633CA5C3207BBE8F00C80C4B /* PushNotifications.swift in Sources */,
 				63C343532051BBF500C6985B /* FUser.swift in Sources */,
+				63E3F27120B1E10600E6E569 /* PhotoMediaItem.swift in Sources */,
 				639D06E1209851E100879C3C /* SINCallKitProvider.swift in Sources */,
 				63D492FD206AB13C007C19CA /* IncomingMessage.swift in Sources */,
 				63843550208B748E003AA0AC /* CallTableViewController.swift in Sources */,
@@ -665,13 +675,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7P6AJEE272;
 				INFOPLIST_FILE = WChat/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosdevschool.WChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "WChat/WChat-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -686,12 +696,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7P6AJEE272;
 				INFOPLIST_FILE = WChat/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosdevschool.WChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "WChat/WChat-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

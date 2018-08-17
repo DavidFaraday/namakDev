@@ -63,11 +63,11 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     //MARK: Custom Hedears
     
     //custom header vars
-    let rightBarButtonView: UIView = {
-        
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 44))
-        return view
-    }()
+//    let rightBarButtonView: UIView = {
+//
+//        let view = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 44))
+//        return view
+//    }()
     let leftBarButtonView: UIView = {
         
         let view = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
@@ -105,6 +105,13 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     override func viewWillDisappear(_ animated: Bool) {
         clearRecentCounter(chatRoomId: chatRoomId)
     }
+    
+//    override func viewDidLayoutSubviews() {
+//        //to fix ios 12 iphone x toolbar issue
+//        perform(Selector(("jsq_updateCollectionViewInsets")))
+//        // end of to fix ios 12 iphone x toolbar issue
+//    }
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -125,6 +132,16 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         self.senderId = FUser.currentUser()!.objectId
         self.senderDisplayName = FUser.currentUser()!.firstname
 
+//        //to fix ios 12 iphone x toolbar issue
+//        let constraint = perform(Selector(("toolbarBottomLayoutGuide"))).takeUnretainedValue() as! NSLayoutConstraint
+//        constraint.priority = UILayoutPriority(rawValue: 1000)
+//
+//        self.inputToolbar.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+//        // end of to fix ios 12 iphone x toolbar issue
+
+        
+        
+        
         if isGroup! {
             getCurrentGroup(withId: chatRoomId)
         }
@@ -141,6 +158,11 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         //change the func in toggleSendButtonEnabled of JSQ to
         //BOOL hasText = TRUE; // [self.contentView.textView hasText];
 
+        //image message aspect fix
+        //JSQMessagesViewController/Model/JSQPhotoMediaItem.m
+//        imageView.contentMode = UIViewContentModeScaleAspectFill;
+//        imageView.frame = CGRectMake(0.0f, 0.0f, size.width, size.height);
+        
 
     }
     
@@ -210,7 +232,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         let status: NSAttributedString!
         
-        let attributedStringColor = [NSAttributedStringKey.foregroundColor : UIColor.blue]
+        let attributedStringColor = [NSAttributedString.Key.foregroundColor : UIColor.darkGray]
 
         switch message[kSTATUS] as! String {
         case kDELIVERED:
@@ -402,16 +424,17 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             let mediaItem = message.media as! VideoMessage
             
             let player = AVPlayer(url: mediaItem.fileURL! as URL)
-            let moviePlayer = AVPlayerViewController()
+            let moviewPlayer = AVPlayerViewController()
             
             let session = AVAudioSession.sharedInstance()
-            try! session.setCategory(AVAudioSessionCategoryPlayAndRecord, with: AVAudioSessionCategoryOptions.defaultToSpeaker)
             
-            moviePlayer.player = player
+            try! session.setCategory(.playAndRecord, mode: .default, options: .defaultToSpeaker)
             
-            self.present(moviePlayer, animated: true, completion: {
-                moviePlayer.player!.play()
-            })
+            moviewPlayer.player = player
+            
+            self.present(moviewPlayer, animated: true) {
+                moviewPlayer.player!.play()
+            }
 
         default:
             print("unknown message taped")
@@ -460,7 +483,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     func loadMessegas() {
         
         //to update message status
-        updatedChatListener = reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener { (snapshot, error) in
+        updatedChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener { (snapshot, error) in
 
             guard let snapshot = snapshot else { return }
 
@@ -475,7 +498,8 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             }
         }
 
-        reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 11).getDocuments(completion: { (snapshot, error) in
+       //get last 11 messages
+        reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 11).getDocuments(completion: { (snapshot, error) in
             
             guard let snapshot = snapshot else {
                 //we have no available chats
@@ -488,12 +512,14 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
             //remove bad messages
             self.loadedMessages = self.removeBadMessages(allMessages: sorted)
+
+            
             self.insertMessages()
             self.finishReceivingMessage(animated: false)
             self.initialLoadComplete = true
 
             self.getPictureMessages()
-            
+
             self.getOldChatsInBackground()
             self.listenForNewChats()
 
@@ -534,7 +560,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         }
         
         
-        newChatListener = reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener { (snapshot, error) in
+        newChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener { (snapshot, error) in
 
             guard let snapshot = snapshot else { return }
 
@@ -600,7 +626,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
             let lastMessageDate = loadedMessages.first![kDATE] as! String
             
-            reference(collectionReference: .Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isLessThan: lastMessageDate).getDocuments { (snapshot, error) in
+            reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isLessThan: lastMessageDate).getDocuments { (snapshot, error) in
                 
                 guard let snapshot = snapshot else { return }
 
@@ -663,14 +689,16 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             uploadImage(image: pic, chatRoomId: chatRoomId, view: self.navigationController!.view) { (imageLink) in
                 
-                let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kPICTURE)]")
-                
-                outgoingMessage = OutgoingMessage(message: encryptedText, pictureLink: imageLink!, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kPICTURE)
-                
-                JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                self.finishSendingMessage()
-                
-                outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
+                if imageLink != nil {
+                    let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kPICTURE)]")
+                    
+                    outgoingMessage = OutgoingMessage(message: encryptedText, pictureLink: imageLink!, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kPICTURE)
+                    
+                    JSQSystemSoundPlayer.jsq_playMessageSentSound()
+                    self.finishSendingMessage()
+                    
+                    outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
+                }
             }
             return
         }
@@ -682,19 +710,22 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             let thumbNail = videoThumbnail(video: video)
 
-            let dataThumbnail = UIImageJPEGRepresentation(thumbNail, 0.3)
+            let dataThumbnail = thumbNail.jpegData(compressionQuality: 0.3)
+
             
             uploadVideo(video: videoData!, chatRoomId: chatRoomId, view: self.navigationController!.view, completion: { (videoLink) in
                 
-                let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kVIDEO)]")
-                
-                outgoingMessage = OutgoingMessage(message: encryptedText, video: videoLink!, thumbnail: dataThumbnail! as NSData, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kVIDEO)
-                
-                
-                JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                self.finishSendingMessage()
-                
-                outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
+                if videoLink != nil {
+                    let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kVIDEO)]")
+                    
+                    outgoingMessage = OutgoingMessage(message: encryptedText, video: videoLink!, thumbnail: dataThumbnail! as NSData, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kVIDEO)
+                    
+                    
+                    JSQSystemSoundPlayer.jsq_playMessageSentSound()
+                    self.finishSendingMessage()
+                    
+                    outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
+                }
             })
             
             return
@@ -706,15 +737,16 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             uploadAudio(audioPath: audioPath, chatRoomId: chatRoomId, view: (self.navigationController?.view)!, completion: { (audioLink) in
                 
-                let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kAUDIO)]")
-                
-                outgoingMessage = OutgoingMessage(message: encryptedText, audio: audioLink!, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kAUDIO)
-                
-                JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                self.finishSendingMessage()
-                
-                outgoingMessage!.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
-                
+                if audioLink != nil {
+                    let encryptedText = Encryption.encryptText(chatRoomId: self.chatRoomId, message: "[\(kAUDIO)]")
+                    
+                    outgoingMessage = OutgoingMessage(message: encryptedText, audio: audioLink!, senderId: currentUser.objectId, senderName: currentUser.firstname, date: date, status: kDELIVERED, type: kAUDIO)
+                    
+                    JSQSystemSoundPlayer.jsq_playMessageSentSound()
+                    self.finishSendingMessage()
+                    
+                    outgoingMessage!.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush)
+                }
             })
             return
         }
@@ -757,7 +789,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             insertInitialLoadMessages(messageDictionary: messageDictionary)
             loadedMessagesCount += 1
         }
-        
+
         self.showLoadEarlierMessagesHeader = (loadedMessagesCount != loadedMessages.count)
     }
     
@@ -807,18 +839,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         }
     }
 
-    //not needed
-    func updateChatStatus(chatDictionary: NSDictionary, chatRoomId: String) {
-
-        let readDate = dateFormatter().string(from: Date())
-        let values = [kSTATUS : kREAD, kREADDATE : readDate]
-        
-        for userId in memberIds {
-            reference(collectionReference: .Message).document(userId).collection(chatRoomId).document(chatDictionary[kMESSAGEID] as! String).updateData(values)
-
-        }
-    }
-
 
 
     //MARK: LoadMoreMessages
@@ -865,16 +885,14 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     //MARK: UIImagepickerController delegate function
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
-        let video = info[UIImagePickerControllerMediaURL] as? NSURL
-        let picture = info[UIImagePickerControllerOriginalImage] as? UIImage
-
+        let video = info[UIImagePickerController.InfoKey.mediaURL] as? NSURL
+        let picture = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+        
         sendMessage(text: nil, date: Date(), picture: picture, location: nil, video: video, audio: nil)
-
-        picker.dismiss(animated: true, completion: nil)
-
         
+        picker.dismiss(animated: true, completion: nil)
     }
 
     //MARK: IQAudioRecorder delegate
@@ -901,7 +919,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         leftBarButtonView.addSubview(subTitleLabel)
         
         
-        let infoButton = UIBarButtonItem(image: UIImage(named: "info"), style: UIBarButtonItemStyle.plain, target: self, action: #selector (self.infoButtonPressed))
+        let infoButton = UIBarButtonItem(image: UIImage(named: "info"), style: UIBarButtonItem.Style.plain, target: self, action: #selector (self.infoButtonPressed))
         
         self.navigationItem.rightBarButtonItem = infoButton
 
@@ -993,13 +1011,13 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     func createTypingObservers() {
 
-        typingListener = reference(collectionReference: .Typing).document(chatRoomId).addSnapshotListener { (snapshot, error) in
+        typingListener = reference(.Typing).document(chatRoomId).addSnapshotListener { (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
             
             if snapshot.exists {
                 
-                for data in snapshot.data() {
+                for data in snapshot.data()! {
                     if data.key != FUser.currentId() {
                         
                         let typing = data.value as! Bool
@@ -1013,7 +1031,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 
             } else {
                 //create typing othervise it will crash on updated
-                reference(collectionReference: .Typing).document(self.chatRoomId).setData([FUser.currentId() : false])
+                reference(.Typing).document(self.chatRoomId).setData([FUser.currentId() : false])
             }
             
         }
@@ -1039,7 +1057,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
     
     func typingIndicatorSave(typing: Bool) {
-        reference(collectionReference: .Typing).document(chatRoomId).updateData([FUser.currentId() : typing])
+        reference(.Typing).document(chatRoomId).updateData([FUser.currentId() : typing])
     }
 
     //MARK: UITextViewDelegate
@@ -1054,8 +1072,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     //MARK: Helpers
     func addNewPictureMessageLink(link: String) {
         allPictureMessages.append(link)
-        print(allPictureMessages.count)
-
     }
     
     func getPictureMessages() {
@@ -1068,7 +1084,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 allPictureMessages.append(message[kPICTURE] as! String)
             }
         }
-        print("picMes = \(allPictureMessages.count)")
     }
     
     func removeListners() {
@@ -1085,13 +1100,13 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     
     func getCurrentGroup(withId: String) {
-    reference(collectionReference: .Group).document(withId).getDocument { (snapshot, error) in
+        reference(.Group).document(withId).getDocument { (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
         
         
             if snapshot.exists {
-                self.group = snapshot.data() as NSDictionary
+                self.group = snapshot.data() as! NSDictionary
                 self.setUIforGroupChat()
             }
         }
@@ -1130,9 +1145,9 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         for message in tempMessages {
 
             if message[kTYPE] != nil  {
-                if !self.legitTypes.contains(message[kTYPE] as! String) || message[kDELETED] as! Bool {
-                    message[kDELETED]
-                    //remove the message from array if its deleted or bad message
+                if !self.legitTypes.contains(message[kTYPE] as! String) {
+
+                    //remove the message from array if its bad message
                     tempMessages.remove(at: tempMessages.index(of: message)!)
                 }
             } else {
@@ -1185,7 +1200,8 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
             imageView.image = UIImage(named: userDefaults.object(forKey: kBACKGROUBNDIMAGE) as! String)!
-            
+            imageView.contentMode = .scaleAspectFill
+
             self.view.insertSubview(imageView, at: 0)
         }
     }

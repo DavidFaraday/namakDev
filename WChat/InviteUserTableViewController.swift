@@ -173,11 +173,11 @@ class InviteUserTableViewController: UITableViewController, UserTableViewCellDel
         
         switch filter {
         case kCITY:
-            query = reference(collectionReference: .User).whereField(kCITY, isEqualTo: FUser.currentUser()!.city).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).whereField(kCITY, isEqualTo: FUser.currentUser()!.city).order(by: kFIRSTNAME, descending: false)
         case kCOUNTRY:
-            query = reference(collectionReference: .User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country).order(by: kFIRSTNAME, descending: false)
         default:
-            query = reference(collectionReference: .User).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).order(by: kFIRSTNAME, descending: false)
         }
         
         
@@ -247,7 +247,7 @@ class InviteUserTableViewController: UITableViewController, UserTableViewCellDel
         //update recents
         updateExistingRicentsWithNewValues(chatRoomId: group[kGROUPID] as! String, members: tempMembers, withValues: withValues)
         
-        goToGroupChat(membersToPush: tempMembers, members: tempMembers)
+        goToGroupChat(membersToPush: tempMembersToPush, members: tempMembers)
     }
     
     func goToGroupChat(membersToPush: [String], members: [String]) {
@@ -294,7 +294,9 @@ class InviteUserTableViewController: UITableViewController, UserTableViewCellDel
                 self.allUsersGrouped[sectionTitle] = []
                 
                 // append title within section title list
-                self.sectionTitleList.append(sectionTitle)
+                if !sectionTitleList.contains(sectionTitle) {
+                    self.sectionTitleList.append(sectionTitle)
+                }
             }
             
             // add record to the section

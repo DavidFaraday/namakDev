@@ -48,22 +48,26 @@ class CountryCode {
             
             let countryCodeName = carrier?.isoCountryCode?.uppercased()
             
-            //need to check in both dictionaries
-            let countryCodeShort = codeDictionaryShort[countryCodeName!]
-            let countryCode = codeDictionary[countryCodeName!]
-            
-            if  countryCodeShort != "" {
+            if countryCodeName != nil {
+                //need to check in both dictionaries
+                let countryCodeShort = codeDictionaryShort[countryCodeName!]
+                let countryCode = codeDictionary[countryCodeName!]
                 
-                return countryCodeShort!
-                
-            } else if countryCode != ""{
-                
-                return countryCode!
-                
-            }else {
-                print("no code......")
+                if  countryCodeShort != "" {
+                    
+                    return countryCodeShort!
+                    
+                } else if countryCode != ""{
+                    
+                    return countryCode!
+                    
+                }else {
+                    print("no code......")
+                    return ""
+                    
+                }
+            } else {
                 return ""
-                
             }
             
         } else {

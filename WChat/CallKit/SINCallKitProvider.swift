@@ -16,8 +16,7 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
     var _acDelegate: AudioContollerDelegate!
     var _calls: [UUID : SINCall]
     var _muted: Bool
-
-
+    var remoteDisplayName: String?
     
     init(withClient: SINClient) {
         
@@ -27,7 +26,7 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
         _client.audioController().delegate = _acDelegate
         _calls = [:]
         
-        let config = CXProviderConfiguration(localizedName: "Wchat")
+        let config = CXProviderConfiguration(localizedName: "WChat")
         config.maximumCallGroups = 1
         config.maximumCallsPerCallGroup = 1
         
@@ -38,13 +37,12 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
         _provider.setDelegate(self, queue: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(callDidEnd), name: NSNotification.Name(rawValue: "SINCallDidEndNotification"), object: nil)
-        
     }
     
     func reportNewIncomingCall (call: SINCall) {
-        var caller = "yo"
-        if let call = call.headers[kFULLNAME] {
-            caller = call as! String
+        var caller = "Unknow Caller"
+        if remoteDisplayName != nil {
+            caller = remoteDisplayName!
         }
         
         let update = CXCallUpdate()
@@ -124,8 +122,7 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
     //MARK: CXProvider delegate
     func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
         print("Did activate")
-//        _client.call
-        
+        _client.call()?.provider(provider, didActivate: audioSession)
     }
     
     func callForAction(action: CXCallAction) -> SINCall? {

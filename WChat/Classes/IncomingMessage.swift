@@ -96,8 +96,7 @@ class IncomingMessage {
             date = Date()
         }
         
-        let mediaItem = JSQPhotoMediaItem(image: nil)
-        
+        let mediaItem = PhotoMediaItem(image: nil)
         mediaItem?.appliesMediaViewMaskAsOutgoing = returnOutgoingStatusFromUser(senderId: userId!)
         
         //update the colletion view when image is set

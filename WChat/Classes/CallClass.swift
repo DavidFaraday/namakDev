@@ -109,21 +109,21 @@ class CallN {
     
     //MARK: Save funcs
     func saveCallInBackground() {
-        reference(collectionReference: .Call).document(callerId).collection(callerId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
-        reference(collectionReference: .Call).document(withUserId).collection(withUserId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
+        reference(.Call).document(callerId).collection(callerId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
+        reference(.Call).document(withUserId).collection(withUserId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
     }
 
     //MARK: Update funcs
 
-    func updateCall(withValues: [String : Any]) {
-        reference(collectionReference: .Call).document(callerId).collection(callerId).document(objectId).updateData(dictionaryFromCall() as! [String : Any])
-        reference(collectionReference: .Call).document(withUserId).collection(withUserId).document(objectId).updateData(dictionaryFromCall() as! [String : Any])
-    }
+//    func updateCall(withValues: [String : Any]) {
+//        reference(.Call).document(callerId).collection(callerId).document(objectId).updateData(dictionaryFromCall() as! [String : Any])
+//        reference(.Call).document(withUserId).collection(withUserId).document(objectId).updateData(dictionaryFromCall() as! [String : Any])
+//    }
     
     //MARK: Delet funcs
     
     func deleteCall() {
-        reference(collectionReference: .Call).document(FUser.currentId()).collection(FUser.currentId()).document(objectId).delete()
+        reference(.Call).document(FUser.currentId()).collection(FUser.currentId()).document(objectId).delete()
     }
 
     

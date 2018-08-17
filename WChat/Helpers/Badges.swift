@@ -12,7 +12,7 @@ import FirebaseFirestore
 func recentBadgeCount(withBlock: @escaping (_ badgeNumber: Int) -> Void) {
     
     
-    recentBadgeHandler = reference(collectionReference: .Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener({ (snapshot, error) in
+    recentBadgeHandler = reference(.Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener({ (snapshot, error) in
         
         var badge = 0
         var counter = 0

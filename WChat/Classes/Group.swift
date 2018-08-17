@@ -18,15 +18,15 @@ class Group {
         groupDictionary = NSMutableDictionary(objects: [groupId, subject, ownerId, members, members, avatar], forKeys: [kGROUPID as NSCopying, kNAME as NSCopying, kOWNERID as NSCopying, kMEMBERS as NSCopying, kMEMBERSTOPUSH as NSCopying, kAVATAR as NSCopying])
     }
 
-    func saveGroup(group: NSMutableDictionary) {
+    func saveGroup() {
         
         let date = dateFormatter().string(from: Date())
         groupDictionary[kDATE] = date
-        reference(collectionReference: .Group).document(groupDictionary[kGROUPID] as! String).setData(groupDictionary as! [String : Any])
+        reference(.Group).document(groupDictionary[kGROUPID] as! String).setData(groupDictionary as! [String : Any])
     }
     
     class func updateGroup(groupId: String ,withValues: [String : Any]) {
-        reference(collectionReference: .Group).document(groupId).updateData(withValues)
+        reference(.Group).document(groupId).updateData(withValues)
 
     }
 
