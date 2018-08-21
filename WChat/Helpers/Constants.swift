@@ -62,6 +62,7 @@ public let kBLOCKEDUSERID = "blockedUserId"
 //
 public let kBACKGROUBNDIMAGE = "backgroundImage"
 public let kSHOWAVATAR = "showAvatar"
+public let kSHOWMESSAGENOTIFICATION = "showMessageInPush"
 public let kPASSWORDPROTECT = "passwordProtect"
 public let kFIRSTRUN = "firstRun"
 public let kNUMBEROFMESSAGES = 10

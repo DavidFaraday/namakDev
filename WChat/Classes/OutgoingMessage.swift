@@ -64,7 +64,12 @@ class OutgoingMessage {
         updateRecents(chatRoomId: chatRoomID, lastMessage: messageDictionary[kMESSAGE] as! String)
 
         //send push
-        let pushText = "[\(messageDictionary[kTYPE] as! String) message]"
+        var pushText = "[\(messageDictionary[kTYPE] as! String) message]"
+
+        //check if we should show text of push
+        if (messageDictionary[kTYPE] as! String) == kTEXT && userDefaults.bool(forKey: kSHOWMESSAGENOTIFICATION) {
+            pushText = Encryption.decryptText(chatRoomId: chatRoomID, encryptedMessage: messageDictionary[kMESSAGE] as! String)
+        }
         
         sendPushNotification(membersToPush: membersToPush, message: pushText)
     }

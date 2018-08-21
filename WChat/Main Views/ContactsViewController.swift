@@ -85,7 +85,6 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         self.navigationController?.navigationBar.tintAdjustmentMode = .automatic
         //end of bug fix
         
-        getContactsOfCurrentUser()
     }
 
     
@@ -100,6 +99,7 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
         
+        getContactsOfCurrentUser()
         setupButtons()
     }
 
@@ -129,7 +129,6 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
             // return count for users
             return users!.count
         }
-        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -291,11 +290,15 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
     //MARK: LoadUsers
     
     func getContactsOfCurrentUser() {
-        
-        getUsersFromFirestore(withIds: FUser.currentUser()!.contacts) { (currentContacts) in
 
-            self.matchedUsers = currentContacts
-            self.splitDataInToSection()
+        if FUser.currentUser()!.contacts.count > 0 {
+            getUsersFromFirestore(withIds: FUser.currentUser()!.contacts) { (currentContacts) in
+                
+                self.matchedUsers = currentContacts
+                self.splitDataInToSection()
+                self.lookForNewUsersInBackground()
+            }
+        } else {
             self.lookForNewUsersInBackground()
         }
     }
@@ -305,6 +308,7 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
     func lookForNewUsersInBackground() {
         
         //to limit the load of users, need to get only the users from my country (update the code later), better to compare current users phone numbers to server and download users that match and not download all and compare the current user contacts
+        print("search in \(FUser.currentUser()?.country)")
         reference(.User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country).getDocuments { (snapshot, error) in
             
             guard let snapshot = snapshot else {
@@ -316,10 +320,9 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
                 self.users.removeAll()
                 
                 for userDictionary in snapshot.documents {
-                    
                     let userDictionary = userDictionary.data() as NSDictionary
                     let fUser = FUser(_dictionary: userDictionary)
-                    
+
                     if fUser.objectId != FUser.currentId() && !FUser.currentUser()!.contacts.contains(fUser.objectId) {
 
                         self.users.append(fUser)
@@ -345,6 +348,7 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
                 //if we have a match, we add to our array to display them
                 if contact.count > 0 {
                     //add to contacts array
+
                     matchedUsers.append(user)
                     usersContacts.append(user.objectId)
                 }

@@ -34,14 +34,17 @@ class PhoneNumberLoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        //hide page controll
+        pageControl.isHidden = true
+        
         self.swipeGestureLeft.direction = UISwipeGestureRecognizer.Direction.left
         self.swipeGestureRight.direction = UISwipeGestureRecognizer.Direction.right
         
-        self.swipeGestureLeft.addTarget(self, action: #selector(self.handleSwipeLeft(_:)))
-        self.swipeGestureRight.addTarget(self, action: #selector(self.handleSwipeRight(_:)))
+//        self.swipeGestureLeft.addTarget(self, action: #selector(self.handleSwipeLeft(_:)))
+//        self.swipeGestureRight.addTarget(self, action: #selector(self.handleSwipeRight(_:)))
         
-        self.view.addGestureRecognizer(self.swipeGestureLeft)
-        self.view.addGestureRecognizer(self.swipeGestureRight)
+//        self.view.addGestureRecognizer(self.swipeGestureLeft)
+//        self.view.addGestureRecognizer(self.swipeGestureRight)
 
         countryCodeTextField.text = CountryCode().currentCode
     }
@@ -159,21 +162,33 @@ class PhoneNumberLoginViewController: UIViewController {
         switch pageControl.currentPage {
         case 0:
             viewOne.isHidden = false
-            viewTwo.isHidden = true
-            loginView.isHidden = true
+//            viewTwo.isHidden = true
+//            loginView.isHidden = true
         case 1:
             viewOne.isHidden = true
-            viewTwo.isHidden = false
-            loginView.isHidden = true
+//            viewTwo.isHidden = false
+//            loginView.isHidden = true
         case 2:
             viewOne.isHidden = true
-            viewTwo.isHidden = true
-            loginView.isHidden = false
+//            viewTwo.isHidden = true
+//            loginView.isHidden = false
             
         default:
             print("unknow page")
         }
         
     }
+    
+    
+    //MARK: Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "welcomeToFinishReg" {
+            let vc = segue.destination as! FinishRegistrationViewController
+            vc.countryCode = countryCodeTextField.text
+        }
+    }
+
 
 }

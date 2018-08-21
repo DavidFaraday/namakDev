@@ -19,6 +19,9 @@ class SettingsTableViewController: UITableViewController {
     
     @IBOutlet weak var cleanCacheButtonOutlet: UIButton!
     @IBOutlet weak var showAvatarSwitchOutlet: UISwitch!
+    @IBOutlet weak var showPushSwitchOutlet: UISwitch!
+    
+    var showMessageInPush = false
     var avatarSwitchStatus = false
     var firstLoad: Bool?
     
@@ -60,7 +63,7 @@ class SettingsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if section == 1 { return 5}
+        if section == 1 { return 6}
         return 2
     }
     
@@ -146,6 +149,11 @@ class SettingsTableViewController: UITableViewController {
 //        }
 
         
+    }
+    @IBAction func showMessageNotificationValueChanged(_ sender: UISwitch) {
+        
+        showMessageInPush = sender.isOn
+        saveUserDefaults()
     }
     
     @IBAction func showAvatarSwitchValueChanged(_ sender: UISwitch) {
@@ -264,9 +272,10 @@ class SettingsTableViewController: UITableViewController {
     }
 
     func saveUserDefaults() {
-        
+        userDefaults.set(showMessageInPush, forKey: kSHOWMESSAGENOTIFICATION)
         userDefaults.set(avatarSwitchStatus, forKey: kSHOWAVATAR)
         userDefaults.synchronize()
+
     }
 
     
@@ -277,12 +286,14 @@ class SettingsTableViewController: UITableViewController {
         if !firstLoad! {
             userDefaults.set(true, forKey: kFIRSTRUN)
             userDefaults.set(avatarSwitchStatus, forKey: kSHOWAVATAR)
+            userDefaults.set(showMessageInPush, forKey: kSHOWMESSAGENOTIFICATION)
             userDefaults.synchronize()
-            
         }
-        
+
+        showMessageInPush = userDefaults.bool(forKey: kSHOWMESSAGENOTIFICATION)
         avatarSwitchStatus = userDefaults.bool(forKey: kSHOWAVATAR)
         showAvatarSwitchOutlet.isOn = avatarSwitchStatus
+        showPushSwitchOutlet.isOn = showMessageInPush
     }
     
     func cleanCache() {

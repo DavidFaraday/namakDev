@@ -21,6 +21,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
     var avatarImage: UIImage?
     var email: String!
     var password: String!
+    var countryCode: String?
     
     @IBOutlet weak var avatarImageView: UIImageView!
 
@@ -51,21 +52,21 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         if nameTextField.text != "" && surnameTextField.text != "" && cityTextField.text != "" && countryTextField.text != "" && phoneTextField.text != "" {
             
             //for email registration
-            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!, completion: { (error) in
-
-                if error != nil {
-
-                    ProgressHUD.dismiss()
-                    ProgressHUD.showError(error!.localizedDescription)
-                    return
-                }
-
-                self.registerUser()
-
-            })
+//            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!, completion: { (error) in
+//
+//                if error != nil {
+//
+//                    ProgressHUD.dismiss()
+//                    ProgressHUD.showError(error!.localizedDescription)
+//                    return
+//                }
+//
+//                self.registerUser()
+//
+//            })
             
             //for phone reg
-            //registerUser()
+            registerUser()
             
         } else {
             ProgressHUD.showError("All fields are required")
@@ -97,7 +98,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         
         let fullName = nameTextField.text! + " " + surnameTextField.text!
 
-        var tempDictionary: Dictionary = [kFIRSTNAME : nameTextField.text!, kLASTNAME: surnameTextField.text!, kFULLNAME : fullName, kCOUNTRY : countryTextField.text!, kCITY : cityTextField.text!, kPHONE : phoneTextField.text!] as [String : Any]
+        var tempDictionary: Dictionary = [kFIRSTNAME : nameTextField.text!, kLASTNAME: surnameTextField.text!, kFULLNAME : fullName, kCOUNTRY : countryTextField.text!, kCITY : cityTextField.text!, kPHONE : phoneTextField.text!, kCOUNTRYCODE : countryCode] as [String : Any]
         
         
         //add avatar if available
@@ -144,7 +145,6 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
             
             //enter the application
             self.goToApp()
-
         }
 
     }
