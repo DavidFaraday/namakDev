@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Firebase
 
 func startPrivateChat(user1: FUser, user2: FUser) -> String {
     
@@ -76,7 +77,7 @@ func creatRecentItem(userId: String, chatRoomId: String, members: [String], with
 
     let recentId = refernce.documentID
 
-    let date = dateFormatter().string(from: Date())
+    let date = Timestamp(date: Date())
 
     var recent: [String : Any]!
     
@@ -158,8 +159,8 @@ func updateRecents(chatRoomId: String, lastMessage: String) {
 func updateRecentItem(recent: NSDictionary, lastMessage: String) {
 
     
-    let date = dateFormatter().string(from: Date())
-    
+    let date = Timestamp(date: Date())
+
     var counter = recent[kCOUNTER] as! Int
     
     if recent[kUSERID] as? String != FUser.currentUser()!.objectId {

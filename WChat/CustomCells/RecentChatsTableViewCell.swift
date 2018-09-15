@@ -88,22 +88,13 @@ class RecentChatsTableViewCell: UITableViewCell {
             
         }
         
-        var date: Date!
+        var date = Date()
         
         if let created = recentChat[kDATE] {
-            if (created as! String).count != 14 {
-                date = Date()
-            } else {
-                date = dateFormatter().date(from: created as! String)!
-            }
-        } else {
-            date = Date()
+            date = created as! Date
         }
         
-        
-        dateLabel.text = timeElapsed(date: date!)
-
-        
+        dateLabel.text = timeElapsed(date: date)
     }
 
     

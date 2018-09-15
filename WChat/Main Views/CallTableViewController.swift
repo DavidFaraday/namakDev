@@ -96,7 +96,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         var userNameToCall = ""
 
         if call.callerId == FUser.currentId() {
-            print("call again to user : \(call.withUserFullName)")
+
             //outgoing
             newCall = call
             newCall.objectId = UUID().uuidString

@@ -290,7 +290,7 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
 
     }
     
-    //MARK: search controler functions
+    //MARK: Search controler functions
     
     func filteredContentForSearchText(searchText: String, scope: String = "All") {
         

@@ -58,7 +58,6 @@ class FUser {
         countryCode = ""
         blockedUsers = []
         contacts = []
-
     }
     
     
@@ -69,23 +68,37 @@ class FUser {
         pushId = _dictionary[kPUSHID] as? String
         
         if let created = _dictionary[kCREATEDAT] {
-            if (created as! String).count != 14 {
-                createdAt = Date()
+            //check if its a string
+            if let createdStr = created as? String {
+                if createdStr.count != 14 {
+                    createdAt = Date()
+                } else {
+                    createdAt = dateFormatter().date(from: created as! String)!
+                }
             } else {
-                createdAt = dateFormatter().date(from: created as! String)!
+                //its a date in firestor
+                createdAt = created as! Date
             }
         } else {
             createdAt = Date()
         }
+        
         if let updateded = _dictionary[kUPDATEDAT] {
-            if (updateded as! String).count != 14 {
-                updatedAt = Date()
+            //check if its a string
+            if let updatededStr = updateded as? String {
+                if updatededStr.count != 14 {
+                    updatedAt = Date()
+                } else {
+                    updatedAt = dateFormatter().date(from: updatededStr)!
+                }
             } else {
-                updatedAt = dateFormatter().date(from: updateded as! String)!
+                //its a date in firestor
+                updatedAt = updateded as! Date
             }
         } else {
             updatedAt = Date()
         }
+        
         
         if let mail = _dictionary[kEMAIL] {
             email = mail as! String
@@ -216,7 +229,6 @@ class FUser {
             saveUserLocally(fUser: fUser)
             saveUserToFirestore(fUser: fUser)
             completion(error)
-            
         })
         
     }
@@ -225,43 +237,38 @@ class FUser {
     
     class func registerUserWith(phoneNumber: String, verificationCode: String, verificationId: String!, completion: @escaping (_ error: Error?, _ shouldLogin: Bool) -> Void) {
     
-    
             let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationId, verificationCode: verificationCode)
     
-        Auth.auth().signInAndRetrieveData(with: credential) { (firuser, error) in
-            
-            if error != nil {
+            Auth.auth().signInAndRetrieveData(with: credential) { (firuser, error) in
                 
-                completion(error!, false)
-                return
-            }
-
-            //check if user exist - login else register
-            fetchCurrentUserFromFirestore(userId: firuser!.user.uid, completion: { (user) in
-                
-                if user != nil && user!.firstname != "" {
-                    //we have user, login
-
-                    saveUserLocally(fUser: user!)
-                    saveUserToFirestore(fUser: user!)
+                if error != nil {
                     
-                    completion(error, true)
-                    
-                } else {
-                    
-                    //    we have no user, register
-                    let fUser = FUser(_objectId: firuser!.user.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: "", _firstname: "", _lastname: "", _avatar: "", _loginMethod: kPHONE, _phoneNumber: firuser!.user.phoneNumber!, _city: "", _country: "")
-
-                    saveUserLocally(fUser: fUser)
-                    saveUserToFirestore(fUser: fUser)
-                    completion(error, false)
-                    
+                    completion(error!, false)
+                    return
                 }
-                
-            })
-            
-        }
-        
+
+                //check if user exist - login else register
+                fetchCurrentUserFromFirestore(userId: firuser!.user.uid, completion: { (user) in
+                    
+                    if user != nil && user!.firstname != "" {
+                        //we have user, login
+
+                        saveUserLocally(fUser: user!)
+                        saveUserToFirestore(fUser: user!)
+                        
+                        completion(error, true)
+                        
+                    } else {
+                        
+                        //    we have no user, register
+                        let fUser = FUser(_objectId: firuser!.user.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: "", _firstname: "", _lastname: "", _avatar: "", _loginMethod: kPHONE, _phoneNumber: firuser!.user.phoneNumber!, _city: "", _country: "")
+
+                        saveUserLocally(fUser: fUser)
+                        saveUserToFirestore(fUser: fUser)
+                        completion(error, false)
+                    }
+                })
+            }
         }
     
     
@@ -283,10 +290,7 @@ class FUser {
             } catch let error as NSError {
                 completion(false)
                 print(error.localizedDescription)
-    
             }
-    
-    
         }
     
     //MARK: Delete user
@@ -387,10 +391,10 @@ func fetchCurrentUserFromFirestore(userId: String, completion: @escaping (_ user
 
 func userDictionaryFrom(user: FUser) -> NSDictionary {
     
-    let createdAt = dateFormatter().string(from: user.createdAt)
-    let updatedAt = dateFormatter().string(from: user.updatedAt)
+//    let createdAt = dateFormatter().string(from: user.createdAt)
+//    let updatedAt = dateFormatter().string(from: user.updatedAt)
     
-    return NSDictionary(objects: [user.objectId,  createdAt, updatedAt, user.email, user.loginMethod, user.pushId!, user.firstname, user.lastname, user.fullname, user.avatar, user.contacts, user.blockedUsers, user.isOnline, user.phoneNumber, user.countryCode, user.city, user.country], forKeys: [kOBJECTID as NSCopying, kCREATEDAT as NSCopying, kUPDATEDAT as NSCopying, kEMAIL as NSCopying, kLOGINMETHOD as NSCopying, kPUSHID as NSCopying, kFIRSTNAME as NSCopying, kLASTNAME as NSCopying, kFULLNAME as NSCopying, kAVATAR as NSCopying, kCONTACT as NSCopying, kBLOCKEDUSERID as NSCopying, kISONLINE as NSCopying, kPHONE as NSCopying, kCOUNTRYCODE as NSCopying, kCITY as NSCopying, kCOUNTRY as NSCopying])
+    return NSDictionary(objects: [user.objectId,  user.createdAt, user.updatedAt, user.email, user.loginMethod, user.pushId!, user.firstname, user.lastname, user.fullname, user.avatar, user.contacts, user.blockedUsers, user.isOnline, user.phoneNumber, user.countryCode, user.city, user.country], forKeys: [kOBJECTID as NSCopying, kCREATEDAT as NSCopying, kUPDATEDAT as NSCopying, kEMAIL as NSCopying, kLOGINMETHOD as NSCopying, kPUSHID as NSCopying, kFIRSTNAME as NSCopying, kLASTNAME as NSCopying, kFULLNAME as NSCopying, kAVATAR as NSCopying, kCONTACT as NSCopying, kBLOCKEDUSERID as NSCopying, kISONLINE as NSCopying, kPHONE as NSCopying, kCOUNTRYCODE as NSCopying, kCITY as NSCopying, kCOUNTRY as NSCopying])
     
 }
 

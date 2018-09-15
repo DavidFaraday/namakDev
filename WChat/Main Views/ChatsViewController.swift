@@ -21,10 +21,10 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     override func viewWillAppear(_ animated: Bool) {
         loadRecentChats()
-
-        //to remove empty cell lines
-        tableView.tableFooterView = UIView()
-
+    }
+    
+    override func viewDidLayoutSubviews() {
+        setTableViewHeader()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -35,6 +35,9 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //to remove empty cell lines
+        tableView.tableFooterView = UIView()
+
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
@@ -270,7 +273,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         buttonView.addSubview(groupButton)
         headerView.addSubview(buttonView)
         headerView.addSubview(lineView)
-        
         
         tableView.tableHeaderView = headerView
     }

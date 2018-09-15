@@ -47,13 +47,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         self.push.delegate = self
         self.push.setDesiredPushTypeAutomatically()
 
-        func userDidLogin(userId: String) {
-            
-            self.push.registerUserNotificationSettings()
-            self.initSinchWithUserId(userId: userId)
-            self.startOneSignal()
-        }
-
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, queue: nil, using: {
             note in
             
@@ -61,8 +54,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             UserDefaults.standard.set(userId, forKey: kUSERID)
             UserDefaults.standard.synchronize()
             
-            userDidLogin(userId: userId)
+            self.userDidLogin(userId: userId)
         })
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: USER_DID_LOGOUT_NOTIFICATION), object: nil, queue: nil, using: {
+            note in
+            
+            self.userDidLogout()
+        })
+
         
         
         //OneSignal
@@ -273,8 +273,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     func handleRemoteNotification(userInfo: NSDictionary) {
         
         if _client == nil {
-            let userId = UserDefaults.standard.object(forKey: kUSERID)
-            if userId != nil {
+            if let userId = UserDefaults.standard.object(forKey: kUSERID) {
                 self.initSinchWithUserId(userId: userId as! String)
             }
         }
@@ -282,7 +281,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         let result = self._client.relayRemotePushNotification(userInfo as? [AnyHashable : Any])
 
         
-        print("......", result!.call()?.headers)
         if result!.isCall() && result!.call().isCallCanceled {
             self.presentMissedCallNotificationWithRemoteUserId(remoteUserId: result!.call()?.headers[kNAME] as? String ?? "Unknown")
         }
@@ -299,7 +297,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             //create the content for the notification
             let content = UNMutableNotificationContent()
             content.title = "Missed call"
-            content.body = "From \(remoteUserId)"
+//            content.body = "From \(remoteUserId)"
             content.sound = UNNotificationSound.default
             
             //notification trigger can be based on time, calendar or location
@@ -322,12 +320,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     //MARK: SinchCallClientDelegates
     
     func client(_ client: SINCallClient!, willReceiveIncomingCall call: SINCall!) {
-        print("will receive")
+
         callKitProvider.reportNewIncomingCall(call: call)
     }
     
     func client(_ client: SINCallClient!, didReceiveIncomingCall call: SINCall!) {
-        print("did receive")
+
         var top = self.window?.rootViewController
 
         while (top?.presentedViewController != nil) {
@@ -352,6 +350,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     func clientDidFail(_ client: SINClient!, error: Error!) {
         print("client did fail")
     }
+    
+    //MARK: LOGIN LOGOUT helpers
+    
+    private func userDidLogin(userId: String) {
+        self.push.registerUserNotificationSettings()
+        self.initSinchWithUserId(userId: userId)
+        self.startOneSignal()
+    }
+
+    private func userDidLogout() {
+        print("did log out")
+        _client.stopListeningOnActiveConnection()
+        _client.unregisterPushNotificationData()
+        _client.terminate()
+        _client = nil
+    }
+
+    
+
 
 }
 

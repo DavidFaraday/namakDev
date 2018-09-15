@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Firebase
 
 class OutgoingMessage {
     
@@ -16,34 +17,44 @@ class OutgoingMessage {
     //text message
     init (message: String, senderId: String, senderName: String, date: Date, status: String, type: String) {
         
-        messageDictionary = NSMutableDictionary(objects: [message, senderId, senderName, dateFormatter().string(from: date), status, type, false], forKeys: [kMESSAGE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
+        let date = Timestamp(date: date)
+        
+        messageDictionary = NSMutableDictionary(objects: [message, senderId, senderName, date, status, type, false], forKeys: [kMESSAGE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
     }
 
     //picture
     init(message: String, pictureLink: String, senderId: String, senderName: String, date: Date, status: String, type: String) {
         
-        messageDictionary = NSMutableDictionary(objects: [message, pictureLink, senderId, senderName, dateFormatter().string(from: date), status, type, false], forKeys: [kMESSAGE as NSCopying, kPICTURE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
+        let date = Timestamp(date: date)
+
+        messageDictionary = NSMutableDictionary(objects: [message, pictureLink, senderId, senderName, date, status, type, false], forKeys: [kMESSAGE as NSCopying, kPICTURE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
     }
 
 
     //audio
     init(message: String, audio: String, senderId: String, senderName: String, date: Date, status: String, type: String) {
         
-        messageDictionary = NSMutableDictionary(objects: [message, audio, senderId, senderName, dateFormatter().string(from: date), status, type, false], forKeys: [kMESSAGE as NSCopying, kAUDIO as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
+        let date = Timestamp(date: date)
+
+        messageDictionary = NSMutableDictionary(objects: [message, audio, senderId, senderName, date, status, type, false], forKeys: [kMESSAGE as NSCopying, kAUDIO as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
     }
 
     //video
     init(message: String, video: String, thumbnail: NSData, senderId: String, senderName: String, date: Date, status: String, type: String) {
         
+        let date = Timestamp(date: date)
+
         let picThumb = thumbnail.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
         
-        messageDictionary = NSMutableDictionary(objects: [message, video, picThumb, senderId, senderName, dateFormatter().string(from: date), status, type, false], forKeys: [kMESSAGE as NSCopying, kVIDEO as NSCopying, kPICTURE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
+        messageDictionary = NSMutableDictionary(objects: [message, video, picThumb, senderId, senderName, date, status, type, false], forKeys: [kMESSAGE as NSCopying, kVIDEO as NSCopying, kPICTURE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
     }
 
     //location
     init(message: String, latitude: NSNumber, longitude: NSNumber, senderId: String, senderName: String, date: Date, status: String, type: String) {
         
-        messageDictionary = NSMutableDictionary(objects: [message, latitude, longitude, senderId, senderName, dateFormatter().string(from: date), status, type, false], forKeys: [kMESSAGE as NSCopying, kLATITUDE as NSCopying, kLONGITUDE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
+        let date = Timestamp(date: date)
+
+        messageDictionary = NSMutableDictionary(objects: [message, latitude, longitude, senderId, senderName, date, status, type, false], forKeys: [kMESSAGE as NSCopying, kLATITUDE as NSCopying, kLONGITUDE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying, kDELETED as NSCopying])
     }
 
     
@@ -66,8 +77,8 @@ class OutgoingMessage {
         //send push
         var pushText = "[\(messageDictionary[kTYPE] as! String) message]"
 
-        //check if we should show text of push
-        if (messageDictionary[kTYPE] as! String) == kTEXT && userDefaults.bool(forKey: kSHOWMESSAGENOTIFICATION) {
+        //check if its a text message to show the text
+        if (messageDictionary[kTYPE] as! String) == kTEXT {
             pushText = Encryption.decryptText(chatRoomId: chatRoomID, encryptedMessage: messageDictionary[kMESSAGE] as! String)
         }
         
@@ -83,8 +94,8 @@ class OutgoingMessage {
 
     class func updateMessage(withId: String, chatRoomId: String, memberIds: [String]) {
         
-        let readDate = dateFormatter().string(from: Date())
-        let values = [kSTATUS : kREAD, kREADDATE : readDate]
+        let readDate = Date() //dateFormatter().string(from: Date())
+        let values = [kSTATUS : kREAD, kREADDATE : readDate] as [String : Any]
         
         for userId in memberIds {
            

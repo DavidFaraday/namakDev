@@ -96,19 +96,6 @@ class PhoneNumberLoginViewController: UIViewController {
         
     }
     
-    func goToApp() {
-        
-        ProgressHUD.dismiss()
-        
-        //post user did login notification
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo: [kUSERID : FUser.currentId()])
-        
-        
-        let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "mainApplication") as! UITabBarController
-        
-        self.present(mainView, animated: true, completion: nil)
-    }
-
     
     func registerUser() {
         if codeTextField.text != "" && verificationId != nil {
@@ -122,9 +109,11 @@ class PhoneNumberLoginViewController: UIViewController {
                 
                 if shouldLogin {
                     
+                    ProgressHUD.dismiss()
+
                     //go to app
-                    self.goToApp()
-                    
+                    goToApp(fromView: self, to: "mainApplication")
+
                 } else {
                     self.performSegue(withIdentifier: "welcomeToFinishReg", sender: self)
 

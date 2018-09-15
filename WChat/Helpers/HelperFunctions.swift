@@ -192,3 +192,31 @@ func imageFromInitials(firstName: String?, lastName: String?, withBlock: @escapi
     withBlock(img!)
 }
 
+func goToApp(fromView: UIViewController, to: String) {
+    
+    var identifier = "mainApp"
+    var appView: UIViewController!
+    
+    switch to {
+    case "welcome":
+        //logout notification
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGOUT_NOTIFICATION), object: nil, userInfo: [:])
+
+        identifier = "welcome"
+        appView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: identifier)
+
+    case "mainApplication":
+        //post user did login notification
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo: [kUSERID : FUser.currentId()])
+
+        identifier = "mainApplication"
+        appView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: identifier) as! UITabBarController
+
+    default:
+        return
+    }
+    
+    DispatchQueue.main.async {
+        fromView.present(appView, animated: true, completion: nil)
+    }
+}

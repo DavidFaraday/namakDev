@@ -88,7 +88,15 @@ class WelcomeViewController: UIViewController {
                 return
             }
             
-            self.goToApp()
+            ProgressHUD.dismiss()
+            
+            self.cleanTextFields()
+            self.dismissKeyboard()
+            
+            //post user did login notification
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo: [kUSERID : FUser.currentId()])
+
+            goToApp(fromView: self, to: "mainApplication")
         }
     }
     
@@ -97,26 +105,6 @@ class WelcomeViewController: UIViewController {
         self.performSegue(withIdentifier: "welcomeToFinishReg", sender: self)
         self.cleanTextFields()
         self.dismissKeyboard()
-    }
-    
-    
-    
-    
-    func goToApp() {
-        
-        print("welcome go to app")
-        ProgressHUD.dismiss()
-        
-        cleanTextFields()
-        dismissKeyboard()
-        
-        //post user did login notification
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo: [kUSERID : FUser.currentId()])
-        
-        
-        let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "mainApplication") as! UITabBarController
-        
-        self.present(mainView, animated: true, completion: nil)
     }
 
     

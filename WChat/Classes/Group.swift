@@ -20,7 +20,7 @@ class Group {
 
     func saveGroup() {
         
-        let date = dateFormatter().string(from: Date())
+        let date = Timestamp(date: Date())
         groupDictionary[kDATE] = date
         reference(.Group).document(groupDictionary[kGROUPID] as! String).setData(groupDictionary as! [String : Any])
     }

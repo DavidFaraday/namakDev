@@ -92,7 +92,7 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         super.viewDidLoad()
         
         title = "Contacts"
-        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.searchController = searchController
 
         searchController.searchResultsUpdater = self
@@ -388,7 +388,6 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
                     let phoneNumber = fulMobNumVar.value(forKey: "digits") as? String
                     
                     let contactNumber = removeCountryCode(countryCodeLetters: countryCode!, fullPhoneNumber: phoneNumber!)
-                    
                     
                     //compare phoneNumber of contact with given user's phone number
                     if contactNumber == phoneNumberToCompareAgainst {

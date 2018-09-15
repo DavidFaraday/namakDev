@@ -63,13 +63,9 @@ class IncomingMessage {
         
         var date: Date!
         
-        //check if the date is formatted properly
+        //check if we have a date
         if let created = messageDictionary[kDATE] {
-            if (created as! String).count != 14 {
-                date = Date()
-            } else {
-                date = dateFormatter().date(from: created as! String)!
-            }
+            date = created as? Date
         } else {
             date = Date()
         }
@@ -86,16 +82,13 @@ class IncomingMessage {
         
         var date: Date!
         
+        //check if we have a date
         if let created = messageDictionary[kDATE] {
-            if (created as! String).count != 14 {
-                date = Date()
-            } else {
-                date = dateFormatter().date(from: created as! String)!
-            }
+            date = created as? Date
         } else {
             date = Date()
         }
-        
+
         let mediaItem = PhotoMediaItem(image: nil)
         mediaItem?.appliesMediaViewMaskAsOutgoing = returnOutgoingStatusFromUser(senderId: userId!)
         
@@ -183,8 +176,15 @@ class IncomingMessage {
         let name = messageDictionary[kSENDERNAME] as? String
         let userId = messageDictionary[kSENDERID] as? String
         
-        let date = dateFormatter().date(from: (messageDictionary[kDATE] as? String)!)
-        
+        var date: Date!
+
+        //check if we have a date
+        if let created = messageDictionary[kDATE] {
+            date = created as? Date
+        } else {
+            date = Date()
+        }
+
         let latitude = messageDictionary[kLATITUDE] as? Double
         let longitude = messageDictionary[kLONGITUDE] as? Double
         
@@ -208,14 +208,6 @@ class IncomingMessage {
     //MARK: HelperFunctions
     
     func returnOutgoingStatusFromUser(senderId: String) -> Bool {
-        //or
-//        if senderId == FUser.currentId() {
-//            //outgoing
-//            return true
-//        } else {
-//            //incoming
-//            return false
-//        }
         return senderId == FUser.currentId()
     }
 

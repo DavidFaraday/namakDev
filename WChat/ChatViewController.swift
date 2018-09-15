@@ -22,6 +22,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     var typingListener: ListenerRegistration?
     var updatedChatListener: ListenerRegistration?
     var newChatListener: ListenerRegistration?
+    var withUserUpdateListener: ListenerRegistration?
 
     let legitTypes = [kAUDIO, kVIDEO, kTEXT, kLOCATION, kPICTURE]
 
@@ -132,14 +133,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         self.senderId = FUser.currentUser()!.objectId
         self.senderDisplayName = FUser.currentUser()!.firstname
 
-//        //to fix ios 12 iphone x toolbar issue
-//        let constraint = perform(Selector(("toolbarBottomLayoutGuide"))).takeUnretainedValue() as! NSLayoutConstraint
-//        constraint.priority = UILayoutPriority(rawValue: 1000)
-//
-//        self.inputToolbar.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-//        // end of to fix ios 12 iphone x toolbar issue
+        //to fix ios 12 iphone x toolbar issue
+        let constraint = perform(Selector(("toolbarBottomLayoutGuide"))).takeUnretainedValue() as! NSLayoutConstraint
+        constraint.priority = UILayoutPriority(rawValue: 1000)
 
-        
+        self.inputToolbar.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        // end of to fix ios 12 iphone x toolbar issue
         
         
         if isGroup! {
@@ -239,7 +238,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             status = NSAttributedString(string: kDELIVERED)
         case kREAD:
             
-            let statusString = "Read" + " " + readTimeFrom(dateString: message[kREADDATE] as! String)
+            let statusString = "Read" + " " + readTimeFrom(date: message[kREADDATE] as! Date)
             status = NSAttributedString(string: statusString, attributes: attributedStringColor)
         default:
             status = NSAttributedString(string: "✔︎")
@@ -400,11 +399,14 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             
             let mediaItem = message.media as! JSQPhotoMediaItem
             
-            let photos = IDMPhoto.photos(withImages: [mediaItem.image])
-            
-            let browser = IDMPhotoBrowser(photos: photos)
-            
-            self.present(browser!, animated: true, completion: nil)
+            //check if media is available
+            if mediaItem.image != nil {
+                let photos = IDMPhoto.photos(withImages: [mediaItem.image])
+                
+                let browser = IDMPhotoBrowser(photos: photos)
+                
+                self.present(browser!, animated: true, completion: nil)
+            }
 
         case kLOCATION:
 
@@ -513,11 +515,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             //remove bad messages
             self.loadedMessages = self.removeBadMessages(allMessages: sorted)
 
-            
             self.insertMessages()
-            self.finishReceivingMessage(animated: false)
+            self.finishReceivingMessage(animated: true)
             self.initialLoadComplete = true
-
+            
             self.getPictureMessages()
 
             self.getOldChatsInBackground()
@@ -553,12 +554,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     func listenForNewChats() {
         
-        var lastMessageDate = "0"
+        var lastMessageDate = Date()
         
         if loadedMessages.count > 0 {
-            lastMessageDate = loadedMessages.last![kDATE] as! String
+            //add 1 sec to last chats date
+            lastMessageDate = Calendar.current.date(byAdding: .second, value: 1, to: loadedMessages.last![kDATE] as! Date)!
         }
-        
         
         newChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener { (snapshot, error) in
 
@@ -569,9 +570,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 for diff in snapshot.documentChanges {
 
                     if (diff.type == .added) {
-
                         let item = diff.document.data() as NSDictionary
-
                         if let type = item[kTYPE] as? String {
 
                             if self.legitTypes.contains(type) && !(item[kDELETED] as! Bool)  {
@@ -624,7 +623,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         if loadedMessages.count > 10 {
 
-            let lastMessageDate = loadedMessages.first![kDATE] as! String
+            let lastMessageDate = loadedMessages.first![kDATE] as! Date
             
             reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isLessThan: lastMessageDate).getDocuments { (snapshot, error) in
                 
@@ -799,7 +798,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         let incomingMessage = IncomingMessage(collectionView_: self.collectionView!)
         
         if (messageDictionary[kSENDERID] as! String) != FUser.currentId() {
-            
+
             OutgoingMessage.updateMessage(withId: messageDictionary[kMESSAGEID] as! String, chatRoomId: chatRoomId, memberIds: memberIds)
         }
         
@@ -940,14 +939,13 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             self.withUsers = withUsers
             self.getAvatarImages()
             if !self.isGroup! {
-                self.setUIforSingleChat()
+                self.setUIforSingleChat(withUser: withUsers.first!)
+                self.updateUserOnlineStatus()
             }
         }
     }
 
-    func setUIforSingleChat() {
-        
-        let withUser = withUsers.first!
+    func setUIforSingleChat(withUser: FUser) {
         
         imageFromData(pictureData: withUser.avatar) { (image) in
             
@@ -1096,6 +1094,9 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         if updatedChatListener != nil {
             updatedChatListener!.remove()
         }
+        if withUserUpdateListener != nil {
+            withUserUpdateListener!.remove()
+        }
     }
     
     
@@ -1167,14 +1168,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         }
     }
 
-    func readTimeFrom(dateString: String) -> String {
-        
-        let date = dateFormatter().date(from: dateString)
+    func readTimeFrom(date: Date) -> String {
         
         let currentDateFormater = dateFormatter()
         currentDateFormater.dateFormat = "HH:mm"
         
-        return currentDateFormater.string(from: date!)
+        return currentDateFormater.string(from: date)
     }
     
     func loadUserDefaults() {
@@ -1295,6 +1294,46 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
 
 
+    //MARK: UpdateUserOnlineStatus
+    
+    func updateUserOnlineStatus() {
+        
+        if !isGroup! {
+            let withUser = withUsers.first!
 
+            withUserUpdateListener = reference(.User).document(withUser.objectId).addSnapshotListener { (snapshot, error) in
+                
+                guard let snapshot = snapshot else {  return }
+                
+                if snapshot.exists {
+                    
+                    let withUser = FUser(_dictionary: snapshot.data() as! NSDictionary)
+                    self.setUIforSingleChat(withUser: withUser)
+                }
+            }
 
+        }
+    }
 }
+
+extension JSQMessagesInputToolbar {
+    
+    override open func didMoveToWindow() {
+        
+        super.didMoveToWindow()
+        
+        guard let window = window else { return }
+        
+        if #available(iOS 11.0, *) {
+            
+            let anchor = window.safeAreaLayoutGuide.bottomAnchor
+            
+            bottomAnchor.constraint(lessThanOrEqualToSystemSpacingBelow: anchor, multiplier: 1.0).isActive = true
+            
+        }
+        
+    }
+    
+}
+
+

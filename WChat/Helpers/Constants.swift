@@ -15,6 +15,7 @@ let userDefaults = UserDefaults.standard
 
 //NOTIFICATIONS
 public let USER_DID_LOGIN_NOTIFICATION = "UserDidLoginNotification"
+public let USER_DID_LOGOUT_NOTIFICATION = "UserDidLogoutNotification"
 public let APP_STARTED_NOTIFICATION = "AppStartedNotification"
 
 
