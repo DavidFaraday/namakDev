@@ -52,21 +52,21 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         if nameTextField.text != "" && surnameTextField.text != "" && cityTextField.text != "" && countryTextField.text != "" && phoneTextField.text != "" {
             
             //for email registration
-            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!, completion: { (error) in
-
-                if error != nil {
-
-                    ProgressHUD.dismiss()
-                    ProgressHUD.showError(error!.localizedDescription)
-                    return
-                }
-
-                self.registerUser()
-
-            })
+//            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!, completion: { (error) in
+//
+//                if error != nil {
+//
+//                    ProgressHUD.dismiss()
+//                    ProgressHUD.showError(error!.localizedDescription)
+//                    return
+//                }
+//
+//                self.registerUser()
+//
+//            })
             
             //for phone reg
-            //registerUser()
+            registerUser()
             
         } else {
             ProgressHUD.showError("All fields are required")

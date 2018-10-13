@@ -12,7 +12,7 @@ import Firebase
 import MBProgressHUD
 import AVFoundation
 import ProgressHUD
-
+import Photos
 
 let storage = Storage.storage()
 
@@ -74,7 +74,7 @@ func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -
     
     let imageFileName = (imageUrl.components(separatedBy: "%").last!).components(separatedBy: "?").first!
     
-    
+    //
     if fileExistsAtPath(path: imageFileName) {
         
         if let contentsOfFile = UIImage(contentsOfFile: fileInDocumentsDirectory(filename: imageFileName)) {
@@ -101,7 +101,7 @@ func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -
                 data!.write(to: docURL, atomically: true)
                 
                 let imageToReturn = UIImage(data: data! as Data)
-                
+               
                 DispatchQueue.main.async {
                     completion(imageToReturn!)
                 }
@@ -347,6 +347,28 @@ func fileExistsAtPath(path: String) -> Bool {
     
     return doesExist
 }
+
+
+//photo library funcs
+
+func addImage(image: UIImage, toAlbum album: PHAssetCollection, completion: ((_ status: Bool, _ identifier: String?) -> Void)?) {
+    
+    var localIdentifier: String?
+    
+    PHPhotoLibrary.shared().performChanges({
+        let assetRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
+        let assetPlaceholder = assetRequest.placeholderForCreatedAsset
+        let albumChangeRequest = PHAssetCollectionChangeRequest(for: album)
+        albumChangeRequest?.addAssets([assetPlaceholder] as NSFastEnumeration)
+
+        localIdentifier = assetPlaceholder?.localIdentifier
+
+    }) { (status, error) in
+        completion?(status, localIdentifier)
+    }
+    
+}
+
 
 
 

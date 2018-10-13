@@ -45,6 +45,7 @@
 		638D60E620B72CB0004950D4 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 638D60E520B72CB0004950D4 /* QuartzCore.framework */; };
 		638F3A7421021C8100DCCC07 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 638F3A7321021C8100DCCC07 /* Localizable.strings */; };
 		639344812078BC66002BDF8A /* InviteUserTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639344802078BC66002BDF8A /* InviteUserTableViewController.swift */; };
+		6398B175214E3FD80073DDE2 /* PhotoAlbum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6398B174214E3FD80073DDE2 /* PhotoAlbum.swift */; };
 		639D06E1209851E100879C3C /* SINCallKitProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06E0209851E100879C3C /* SINCallKitProvider.swift */; };
 		639D06E3209853DE00879C3C /* AudioControllDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06E2209853DE00879C3C /* AudioControllDelegate.swift */; };
 		63A51202206034A200F3EF31 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A51201206034A200F3EF31 /* Group.swift */; };
@@ -112,6 +113,7 @@
 		638D60E520B72CB0004950D4 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		638F3A7321021C8100DCCC07 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		639344802078BC66002BDF8A /* InviteUserTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteUserTableViewController.swift; sourceTree = "<group>"; };
+		6398B174214E3FD80073DDE2 /* PhotoAlbum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbum.swift; sourceTree = "<group>"; };
 		639D06E0209851E100879C3C /* SINCallKitProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SINCallKitProvider.swift; sourceTree = "<group>"; };
 		639D06E2209853DE00879C3C /* AudioControllDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllDelegate.swift; sourceTree = "<group>"; };
 		63A51201206034A200F3EF31 /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
@@ -263,6 +265,7 @@
 				63A51201206034A200F3EF31 /* Group.swift */,
 				63353B2C208A248600A3DAF4 /* CallClass.swift */,
 				63E3F27020B1E10600E6E569 /* PhotoMediaItem.swift */,
+				6398B174214E3FD80073DDE2 /* PhotoAlbum.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -525,6 +528,7 @@
 				6347221020753E3400F9C17C /* MapViewController.swift in Sources */,
 				63798BEF207A0C95005A0061 /* CountryCode.swift in Sources */,
 				6349A880208F8A1700706246 /* Encryption.swift in Sources */,
+				6398B175214E3FD80073DDE2 /* PhotoAlbum.swift in Sources */,
 				63D492F920696CDE007C19CA /* Camera.swift in Sources */,
 				6384354E208B0EA1003AA0AC /* CallTableViewCell.swift in Sources */,
 				632BE1F02051BA5800131EB6 /* AppDelegate.swift in Sources */,
