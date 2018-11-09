@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import CoreLocation
 import OneSignal
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate, SINClientDelegate, SINCallClientDelegate, SINManagedPushDelegate {
@@ -28,8 +29,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
+
+//        //MARK: Realm Migrations
+//        Realm.Configuration.defaultConfiguration = Realm.Configuration(
+//            // bump the schema version to 1
+//            schemaVersion: 1,
+//            migrationBlock: { migration, oldSchemaVersion in
+//                migration.enumerateObjects(ofType: DBMessage.className(), { (oldObject, newObject) in
+//                    
+//                    // make sure to check the version accordingly
+//                    if (oldSchemaVersion < 1) {
+//                        // the magic happens here: `id` is the property you specified
+//                        // as your primary key on your Model
+//                        newObject!["messageId"] = "id"
+//                    }
+//
+//                })
+//            }
+//        )
+//
         FirebaseApp.configure()
-        FirestoreSettings().isPersistenceEnabled = true
+        FirestoreSettings().isPersistenceEnabled = false
 
         //AutoLogin
         authListener = Auth.auth().addStateDidChangeListener { auth, user in

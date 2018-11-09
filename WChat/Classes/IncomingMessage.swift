@@ -111,16 +111,12 @@ class IncomingMessage {
         
         var date: Date!
         
+        //check if we have a date
         if let created = messageDictionary[kDATE] {
-            if (created as! String).count != 14 {
-                date = Date()
-            } else {
-                date = dateFormatter().date(from: created as! String)!
-            }
+            date = created as? Date
         } else {
             date = Date()
         }
-        
         
         
         let videoURL = NSURL(fileURLWithPath: messageDictionary[kVIDEO] as! String)

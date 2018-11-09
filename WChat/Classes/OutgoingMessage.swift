@@ -67,6 +67,10 @@ class OutgoingMessage {
         let messageId = UUID().uuidString //unique number
         messageDictionary[kMESSAGEID] = messageId
         
+        //save Message Locally in DB
+        createMessage(messageDictionary: messageDictionary, chatRoomId: chatRoomID)
+        
+        //save message in FB
         for memberId in memberIds {
             reference(.Message).document(memberId).collection(chatRoomID).document(messageId).setData(messageDictionary as! [String : Any])
 
@@ -90,7 +94,9 @@ class OutgoingMessage {
     
     class func deleteMessage(withId: String, chatRoomId: String) {
         reference(.Message).document(FUser.currentId()).collection(chatRoomId).document(withId).delete()
+        
     }
+    
 
     class func updateMessage(withId: String, chatRoomId: String, memberIds: [String]) {
         

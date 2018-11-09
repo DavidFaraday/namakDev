@@ -26,17 +26,17 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
     
     let dateString = dateFormatter().string(from: Date())
     
-    let videoFileName = "PictureMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".jpg"
+    var fileName = "PictureMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".jpg"
     
-    let storageRef = storage.reference(forURL: kFILEREFERENCE).child(videoFileName)
+    let storageRef = storage.reference(forURL: kFILEREFERENCE).child(fileName)
     
-    let imageDate = image.jpegData(compressionQuality: 0.5)
+    let imageData = image.jpegData(compressionQuality: 0.5)
     
     var task : StorageUploadTask!
     
 
     
-    task = storageRef.putData(imageDate!, metadata: nil, completion: {
+    task = storageRef.putData(imageData!, metadata: nil, completion: {
         metadata, error in
         
         task.removeAllObservers()
@@ -66,6 +66,17 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
         progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float( (snapshot.progress?.totalUnitCount)!)
         
     })
+    
+    //save image locally
+    if imageData != nil {
+        
+        fileName = dateString + ".jpg"
+        var docURL = getDocumentsURL()
+        
+        docURL = docURL.appendingPathComponent(fileName, isDirectory: false)
+        let data = NSData(data: imageData!)
+        data.write(to: docURL, atomically: true)
+    }
 }
 
 func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -> Void) {
@@ -126,9 +137,9 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
     
     let dateString = dateFormatter().string(from: Date())
     
-    let videoFileName = "VideoMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".mov"
+    var fileName = "VideoMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".mov"
     
-    let storageRef = storage.reference(forURL: kFILEREFERENCE).child(videoFileName)
+    let storageRef = storage.reference(forURL: kFILEREFERENCE).child(fileName)
     
     
     var task : StorageUploadTask!
@@ -163,6 +174,14 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
         progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float( (snapshot.progress?.totalUnitCount)!)
         
     })
+    
+    //save locally
+    fileName = dateString + ".mov"
+    var docURL = getDocumentsURL()
+    
+    docURL = docURL.appendingPathComponent(fileName, isDirectory: false)
+    video.write(to: docURL, atomically: true)
+
 }
 
 func downloadVideo(videoUrl: String, completion: @escaping (_ isReadyToPlay: Bool, _ videoFileName: String) -> Void) {
@@ -243,9 +262,9 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
     
     let audio = NSData(contentsOfFile: audioPath)
 
-    let audioFileName = "AudioMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".m4a"
+    var fileName = "AudioMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".m4a"
 
-    let storageRef = storage.reference(forURL: kFILEREFERENCE).child(audioFileName)
+    let storageRef = storage.reference(forURL: kFILEREFERENCE).child(fileName)
     
     
     var task : StorageUploadTask!
@@ -277,6 +296,16 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
         progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float( (snapshot.progress?.totalUnitCount)!)
         
     })
+    
+    
+    //save locally
+    if audio != nil {
+        fileName = dateString + ".m4a"
+        var docURL = getDocumentsURL()
+        docURL = docURL.appendingPathComponent(fileName, isDirectory: false)
+        audio!.write(to: docURL, atomically: true)
+    }
+
 }
 
 func downloadAudio(audioUrl: String, completion: @escaping (_ audioFileName: String) -> Void) {

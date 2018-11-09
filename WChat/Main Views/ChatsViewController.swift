@@ -133,7 +133,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         tableView.deselectRow(at: indexPath, animated: true)
-        
+
         var recent: NSDictionary!
         
         if searchController.isActive && searchController.searchBar.text != "" {

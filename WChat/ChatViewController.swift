@@ -14,6 +14,7 @@ import IDMPhotoBrowser
 import AVFoundation
 import AVKit
 import FirebaseFirestore
+import RealmSwift
 
 class ChatViewController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, IQAudioRecorderViewControllerDelegate {
 
@@ -28,7 +29,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
     var maxMessageNumber = 0
     var minMessageNumber = 0
-    var loadOld = false //for loading older messages
+
     var loadedMessagesCount = 0
 
     var typingCounter = 0
@@ -43,9 +44,15 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     var group: NSDictionary?
 
     var messages: [JSQMessage] = []
+    
+    let realm = try! Realm()
+    var allDBMessages: Results<DBMessage>!
+    var notificationToken: NotificationToken?
+
     var objectMessages: [NSDictionary] = []
     var loadedMessages: [NSDictionary] = []
     var allPictureMessages: [String] = []
+    
     
     var initialLoadComplete = false
 
@@ -98,7 +105,11 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         return title
     }()
 
-
+    override func viewDidLayoutSubviews() {
+        super .viewDidLayoutSubviews()
+        
+        self.scrollToBottom(animated: true)
+    }
     override func viewWillAppear(_ animated: Bool) {
         clearRecentCounter(chatRoomId: chatRoomId)
     }
@@ -360,7 +371,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, header headerView: JSQMessagesLoadEarlierHeaderView!, didTapLoadEarlierMessagesButton sender: UIButton!) {
         
-        loadMoreMessages(maxNumber: maxMessageNumber, minNumber: minMessageNumber)
+        loadMoreMessages()
         self.collectionView!.reloadData()
     }
 
@@ -477,6 +488,9 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         messages.remove(at: indexPath.row)
         
         OutgoingMessage.deleteMessage(withId: messageId, chatRoomId: chatRoomId)
+        
+        //delete from local DB
+        deleteMessageFromLocalDB(dbMessage: allDBMessages[indexPath.row])
     }
 
 
@@ -500,56 +514,68 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             }
         }
 
-       //get last 11 messages
-        reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 11).getDocuments(completion: { (snapshot, error) in
+        // get all messages from DB
+        
+        let predicate = NSPredicate(format: "chatRoomId = %@", chatRoomId)
+
+        allDBMessages = realm.objects(DBMessage.self).filter(predicate).sorted(byKeyPath: kDATE, ascending: true)
+        
+        notificationToken = allDBMessages.observe({ (changes: RealmCollectionChange) in
             
-            guard let snapshot = snapshot else {
-                //we have no available chats
-                self.initialLoadComplete = true
-                self.listenForNewChats()
+            //updated message
+            switch changes {
+            case .update(_, let deletions, let insertions, let modifications):
+                
+//                for index in deletions {
+//                    print("deleted object at index: \(index)")
+//                }
+                
+                for index in insertions {
+                    let insertedMessage = self.allDBMessages[index]
+                    let item = DBMessage.dictionaryFrom(dbMessage: insertedMessage)
+                    
+                    //for adding link to pictures
+                    if item[kTYPE] as! String == kPICTURE {
+                        self.addNewPictureMessageLink(link: item[kPICTURE] as! String)
+                    }
+                    
+                    if self.insertInitialLoadMessages(messageDictionary: item, shouldSaveInDB: false) {
+                        JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
+                    }
+
+                    self.finishReceivingMessage(animated: true)
+                }
+                
+//                for index in modifications {
+////                    print("modified object at index: \(index)")
+//                }
+                
+            case .error(let error):
+                print("Error on new insertion", error.localizedDescription)
+            default:
                 return
             }
 
-            let sorted = ((dictionaryFromSnapshots(snapshots: snapshot.documents)) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
-
-            //remove bad messages
-            self.loadedMessages = self.removeBadMessages(allMessages: sorted)
-
-            self.insertMessages()
-            self.finishReceivingMessage(animated: true)
-            self.initialLoadComplete = true
-            
-            self.getPictureMessages()
-
-            self.getOldChatsInBackground()
-            self.listenForNewChats()
-
         })
+
         
-//        chatRef.child(FUser.currentId()).child(chatRoomId).queryLimited(toLast: 11).observeSingleEvent(of: .value, with: {
-//            snapshot in
-//
-//            if snapshot.exists() {
-//
-//                let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
-//
-//                //remove bad messages
-//                self.loadedMessages = self.removeBadMessages(allMessages: sorted)
-//                self.insertMessages()
-//                self.finishReceivingMessage(animated: false)
-//                self.initialLoadComplete = true
-//
-//                self.getOldChatsInBackground()
-//                self.listenForNewChats()
-//
-//            } else {
-//                //we have no available chats
-//                self.initialLoadComplete = true
-//                self.listenForNewChats()
-//
-//            }
-//
-//        })
+        //convert array of DBMessages to Array of dictionaries
+        var messageDictionaries: [NSMutableDictionary] = [[:]]
+        
+        for mess in allDBMessages {
+            messageDictionaries.append(DBMessage.dictionaryFrom(dbMessage: mess))
+        }
+
+        //remove bad messages
+        self.loadedMessages = self.removeBadMessages(allMessages: messageDictionaries)
+
+        self.insertMessages()
+        self.finishReceivingMessage(animated: true)
+        self.initialLoadComplete = true
+
+        self.getPictureMessages()
+        self.getAllMessagesAndSaveToDB()
+        self.listenForNewChats()
     }
     
     func listenForNewChats() {
@@ -571,95 +597,45 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
                     if (diff.type == .added) {
                         let item = diff.document.data() as NSDictionary
-                        if let type = item[kTYPE] as? String {
-
-                            if self.legitTypes.contains(type) && !(item[kDELETED] as! Bool)  {
-                                //for adding link to pictures
-                                if item[kTYPE] as! String == kPICTURE {
-                                    self.addNewPictureMessageLink(link: item[kPICTURE] as! String)
-                                }
+                        
+                        //check if we have a sender Id
+                        if let senderId = item[kSENDERID] as? String {
+                            //check if its an incoming message
+                            if senderId != FUser.currentId() {
                                 
-                                if self.insertInitialLoadMessages(messageDictionary: item) {
-
-                                    JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
+                                if let type = item[kTYPE] as? String {
+                                    if self.legitTypes.contains(type)  {
+                                        //for adding link to pictures
+                                        if item[kTYPE] as! String == kPICTURE {
+                                            self.addNewPictureMessageLink(link: item[kPICTURE] as! String)
+                                        }
+                                        
+                                        createMessage(messageDictionary: item, chatRoomId: self.chatRoomId)
+                                    }
                                 }
-
-                                self.finishReceivingMessage()
                             }
-
                         }
                     }
                 }
             }
         }
-        
-//        chatRef.child(FUser.currentId()).child(chatRoomId).queryOrdered(byChild: kDATE).queryStarting(atValue: lastMessageDate).observe(.childAdded, with: {
-//            snapshot in
-//
-//            if snapshot.exists() {
-//
-//                let item = (snapshot.value as? NSDictionary)!
-//
-//                if let type = item[kTYPE] as? String {
-//
-//                    if self.legitTypes.contains(type) && !(item[kDELETED] as! Bool)  {
-//
-//                        if self.insertInitialLoadMessages(messageDictionary: item) {
-//
-//                            JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
-//                        }
-//
-//                        self.finishReceivingMessage()
-//                    }
-//
-//                }
-//            }
-//        })
     }
 
-    func getOldChatsInBackground() {
+    //shouldt be needed
+    func getAllMessagesAndSaveToDB() {
         
-        //check if we have any old messages to load, we always get last 11 messages at first
-        
-        if loadedMessages.count > 10 {
-
-            let lastMessageDate = loadedMessages.first![kDATE] as! Date
-            
-            reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isLessThan: lastMessageDate).getDocuments { (snapshot, error) in
+        //check if we have no messages in db, get all availale from FB and save locally
+        if allDBMessages.count == 0 {
+            reference(.Message).document(FUser.currentId()).collection(chatRoomId).getDocuments { (snapshot, error) in
                 
                 guard let snapshot = snapshot else { return }
 
                 let sorted = ((dictionaryFromSnapshots(snapshots: snapshot.documents)) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
 
-                //take new objects and add to the beginning of the array
-                self.loadedMessages = self.removeBadMessages(allMessages: sorted) + self.loadedMessages
-
-                self.getPictureMessages()
-                
-                //update new min/max values
-                self.maxMessageNumber = self.loadedMessages.count - self.loadedMessagesCount - 1
-                self.minMessageNumber = self.maxMessageNumber - kNUMBEROFMESSAGES
-
+                for messageDictionary in sorted {
+                    createMessage(messageDictionary: messageDictionary, chatRoomId: self.chatRoomId)
+                }
             }
-            
-            
-//            chatRef.child(FUser.currentId()).child(chatRoomId).queryOrdered(byChild: kDATE).queryEnding(atValue: lastMessageDate).observeSingleEvent(of: .value, with: {
-//                snapshot in
-//
-//                if snapshot.exists() {
-//
-//                    let sorted = ((snapshot.value as! NSDictionary).allValues as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
-//
-//                    //take new objects and add to the beginning of the array
-//                    self.loadedMessages = self.removeBadMessages(allMessages: sorted) + self.loadedMessages
-//
-//                }
-//
-//                //update new min/max values
-//                self.maxMessageNumber = self.loadedMessages.count - self.loadedMessagesCount - 1
-//                self.minMessageNumber = self.maxMessageNumber - kNUMBEROFMESSAGES
-//
-//            })
             
         }
         
@@ -774,7 +750,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     //MARK: InsertMessages
     
     func insertMessages() {
-        
+
         maxMessageNumber = loadedMessages.count - loadedMessagesCount
         minMessageNumber = maxMessageNumber - kNUMBEROFMESSAGES
         
@@ -785,18 +761,18 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         for i in minMessageNumber ..< maxMessageNumber {
             let messageDictionary = loadedMessages[i]
 
-            insertInitialLoadMessages(messageDictionary: messageDictionary)
+            insertInitialLoadMessages(messageDictionary: messageDictionary, shouldSaveInDB: false)
             loadedMessagesCount += 1
         }
-
+        
         self.showLoadEarlierMessagesHeader = (loadedMessagesCount != loadedMessages.count)
     }
     
     
-    func insertInitialLoadMessages(messageDictionary: NSDictionary) -> Bool {
+    func insertInitialLoadMessages(messageDictionary: NSDictionary, shouldSaveInDB: Bool) -> Bool {
 
         let incomingMessage = IncomingMessage(collectionView_: self.collectionView!)
-        
+
         if (messageDictionary[kSENDERID] as! String) != FUser.currentId() {
 
             OutgoingMessage.updateMessage(withId: messageDictionary[kMESSAGEID] as! String, chatRoomId: chatRoomId, memberIds: memberIds)
@@ -807,8 +783,14 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         if message != nil {
             objectMessages.append(messageDictionary)
             messages.append(message!)
+            
+            if shouldSaveInDB {
+                //save the message to realm
+//                createMessage(messageDictionary: messageDictionary, chatRoomId: chatRoomId)
+
+            }
         }
-        
+
         return isIncoming(messageDictionary: messageDictionary)
     }
 
@@ -841,17 +823,15 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
 
 
     //MARK: LoadMoreMessages
-    func loadMoreMessages(maxNumber: Int, minNumber: Int) {
+    func loadMoreMessages() {
         
-        if loadOld {
-            maxMessageNumber = minNumber - 1
-            minMessageNumber = maxMessageNumber - kNUMBEROFMESSAGES
-        }
+        maxMessageNumber = minMessageNumber - 1
+        minMessageNumber = maxMessageNumber - kNUMBEROFMESSAGES
 
         if minMessageNumber < 0 {
             minMessageNumber = 0
         }
-
+        
         for i in (minMessageNumber ... maxMessageNumber).reversed() {
 
             let messageDictionary = loadedMessages[i]
@@ -859,7 +839,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             loadedMessagesCount += 1
         }
         
-        loadOld = true
         self.showLoadEarlierMessagesHeader = (loadedMessagesCount != loadedMessages.count)
     }
 
@@ -868,6 +847,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     @objc func backAction() {
         clearRecentCounter(chatRoomId: chatRoomId)
         removeListners()
+        notificationToken?.invalidate()
         self.navigationController?.popToRootViewController(animated: true)
     }
     
@@ -1077,9 +1057,12 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         allPictureMessages = []
         
         for message in loadedMessages {
-            if message[kTYPE] as! String == kPICTURE {
-                //add to array
-                allPictureMessages.append(message[kPICTURE] as! String)
+
+            if let type = message[kTYPE] as? String  {
+                if type == kPICTURE {
+                    //add to array
+                    allPictureMessages.append(message[kPICTURE] as! String)
+                }
             }
         }
     }
