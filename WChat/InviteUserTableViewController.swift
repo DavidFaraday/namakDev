@@ -259,7 +259,7 @@ class InviteUserTableViewController: UITableViewController, UserTableViewCellDel
         chatVC.memberIds = members
         chatVC.membersToPush = membersToPush
 
-        chatVC.chatRoomId = group[kGROUPID] as! String
+        chatVC.chatRoomId = group[kGROUPID] as? String
         
         chatVC.isGroup = true
         chatVC.hidesBottomBarWhenPushed = true

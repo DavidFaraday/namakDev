@@ -85,7 +85,7 @@ func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -
     
     let imageFileName = (imageUrl.components(separatedBy: "%").last!).components(separatedBy: "?").first!
     
-    //
+
     if fileExistsAtPath(path: imageFileName) {
         
         if let contentsOfFile = UIImage(contentsOfFile: fileInDocumentsDirectory(filename: imageFileName)) {
@@ -112,7 +112,11 @@ func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -
                 data!.write(to: docURL, atomically: true)
                 
                 let imageToReturn = UIImage(data: data! as Data)
-               
+                
+                //save image to Library
+                let photoLibrary = PhotoLibrary()
+                photoLibrary.savePhotoToPhotoLibrary(image: imageToReturn!)
+                
                 DispatchQueue.main.async {
                     completion(imageToReturn!)
                 }
@@ -211,8 +215,11 @@ func downloadVideo(videoUrl: String, completion: @escaping (_ isReadyToPlay: Boo
                 
                 data!.write(to: docURL, atomically: true)
                 
+                //save video to Library
+                let photoLibrary = PhotoLibrary()
+                photoLibrary.saveVideoToPhotoLibrary(videoURL: docURL)
+
                 DispatchQueue.main.async {
-                    
                     completion(true, videoFileName)
                 }
                 
@@ -357,7 +364,7 @@ func fileInDocumentsDirectory(filename: String) -> String {
 func getDocumentsURL() -> URL {
     
     let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last
-    
+
     return documentURL!
 }
 
@@ -376,28 +383,6 @@ func fileExistsAtPath(path: String) -> Bool {
     
     return doesExist
 }
-
-
-//photo library funcs
-
-func addImage(image: UIImage, toAlbum album: PHAssetCollection, completion: ((_ status: Bool, _ identifier: String?) -> Void)?) {
-    
-    var localIdentifier: String?
-    
-    PHPhotoLibrary.shared().performChanges({
-        let assetRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
-        let assetPlaceholder = assetRequest.placeholderForCreatedAsset
-        let albumChangeRequest = PHAssetCollectionChangeRequest(for: album)
-        albumChangeRequest?.addAssets([assetPlaceholder] as NSFastEnumeration)
-
-        localIdentifier = assetPlaceholder?.localIdentifier
-
-    }) { (status, error) in
-        completion?(status, localIdentifier)
-    }
-    
-}
-
 
 
 

@@ -9,79 +9,32 @@
 import Foundation
 import Photos
 
+class PhotoLibrary: NSObject {
+    
+    func savePhotoToPhotoLibrary(image: UIImage) {
+        
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(PhotoLibrary.image(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            print("error saving image: ", error.localizedDescription)
+        } else {
+            print("Saved!, Your image has been saved to your photos.")
+        }
+    }
 
-class CustomPhotoAlbum: NSObject {
-    static let albumName = "WChat Album"
-    static let sharedInstance = CustomPhotoAlbum()
-    
-    var assetCollection: PHAssetCollection!
-    
-    override init() {
-        super.init()
-        
-        if let assetCollection = fetchAssetCollectionForAlbum() {
-            self.assetCollection = assetCollection
-            return
-        }
-        
-        if PHPhotoLibrary.authorizationStatus() != PHAuthorizationStatus.authorized {
-            PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
-                ()
-            })
-        }
-        
-        if PHPhotoLibrary.authorizationStatus() == PHAuthorizationStatus.authorized {
-            self.createAlbum()
-        } else {
-            PHPhotoLibrary.requestAuthorization(requestAuthorizationHandler)
-        }
-    }
-    
-    func requestAuthorizationHandler(status: PHAuthorizationStatus) {
-        if PHPhotoLibrary.authorizationStatus() == PHAuthorizationStatus.authorized {
-            // ideally this ensures the creation of the photo album even if authorization wasn't prompted till after init was done
-            print("trying again to create the album")
-            self.createAlbum()
-        } else {
-            print("should really prompt the user to let them know it's failed")
-        }
-    }
-    
-    func createAlbum() {
+    func saveVideoToPhotoLibrary(videoURL: URL) {
+        print(videoURL)
         PHPhotoLibrary.shared().performChanges({
-            PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: CustomPhotoAlbum.albumName)   // create an asset collection with the album name
-        }) { success, error in
-            if success {
-                self.assetCollection = self.fetchAssetCollectionForAlbum()
+            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
+        }) { saved, error in
+            if saved {
+                print("video saved successfuly")
             } else {
-                print("error \(error)")
+                print("error saving video", error?.localizedDescription)
             }
         }
     }
-    
-    func fetchAssetCollectionForAlbum() -> PHAssetCollection? {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "title = %@", CustomPhotoAlbum.albumName)
-        let collection = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
-        
-        if let _: AnyObject = collection.firstObject {
-            return collection.firstObject
-        }
-        return nil
-    }
-    
-    func save(image: UIImage) {
-        if assetCollection == nil {
-            return                          // if there was an error upstream, skip the save
-        }
-        
-        PHPhotoLibrary.shared().performChanges({
-            let assetChangeRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
-            let assetPlaceHolder = assetChangeRequest.placeholderForCreatedAsset
-            let albumChangeRequest = PHAssetCollectionChangeRequest(for: self.assetCollection)
-            let enumeration: NSArray = [assetPlaceHolder!]
-            albumChangeRequest!.addAssets(enumeration)
-            
-        }, completionHandler: nil)
-    }
+
 }

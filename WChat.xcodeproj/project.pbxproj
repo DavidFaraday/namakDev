@@ -19,12 +19,10 @@
 		63353B2D208A248600A3DAF4 /* CallClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63353B2C208A248600A3DAF4 /* CallClass.swift */; };
 		633CA5C3207BBE8F00C80C4B /* PushNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633CA5C2207BBE8F00C80C4B /* PushNotifications.swift */; };
 		6344EE1C20541FC6009415FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6344EE1B20541FC5009415FB /* GoogleService-Info.plist */; };
-		6344EE202054222D009415FB /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE1F2054222D009415FB /* WelcomeViewController.swift */; };
 		6344EE2220544E5C009415FB /* FinishRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */; };
 		6344EE2520545D42009415FB /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6344EE2420545D42009415FB /* SettingsViewController.swift */; };
 		634553A52094830F00BB2D17 /* CallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634553A42094830F00BB2D17 /* CallViewController.swift */; };
 		634553A92094971700BB2D17 /* ringback.wav in Resources */ = {isa = PBXBuildFile; fileRef = 634553A82094971700BB2D17 /* ringback.wav */; };
-		6345654520A5D54B001F420F /* incoming.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6345654420A5D54A001F420F /* incoming.wav */; };
 		6347221020753E3400F9C17C /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6347220F20753E3400F9C17C /* MapViewController.swift */; };
 		6349A880208F8A1700706246 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6349A87F208F8A1700706246 /* Encryption.swift */; };
 		635D8E4D20552D2A00297A0F /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D8E4C20552D2A00297A0F /* UserTableViewCell.swift */; };
@@ -50,8 +48,10 @@
 		639D06E1209851E100879C3C /* SINCallKitProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06E0209851E100879C3C /* SINCallKitProvider.swift */; };
 		639D06E3209853DE00879C3C /* AudioControllDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639D06E2209853DE00879C3C /* AudioControllDelegate.swift */; };
 		63A51202206034A200F3EF31 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A51201206034A200F3EF31 /* Group.swift */; };
+		63B3A0DD2196CE5F00EC2E6E /* AnimationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B3A0DC2196CE5F00EC2E6E /* AnimationManager.swift */; };
 		63B68E3320667EA00017B6B7 /* BlockedUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B68E3220667EA00017B6B7 /* BlockedUsersViewController.swift */; };
 		63B6E6AC20FF8FB300FE6D2A /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B6E6AB20FF8FB300FE6D2A /* RNCryptor.framework */; };
+		63BC16FF21976AE2008AA31C /* incoming.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63BC16FE21976AE2008AA31C /* incoming.wav */; };
 		63C343532051BBF500C6985B /* FUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343522051BBF500C6985B /* FUser.swift */; };
 		63C343552051BC5500C6985B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343542051BC5500C6985B /* Constants.swift */; };
 		63C343572051BC7E00C6985B /* HelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C343562051BC7E00C6985B /* HelperFunctions.swift */; };
@@ -86,13 +86,11 @@
 		633CA5C1207BB88600C80C4B /* WChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WChat.entitlements; sourceTree = "<group>"; };
 		633CA5C2207BBE8F00C80C4B /* PushNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotifications.swift; sourceTree = "<group>"; };
 		6344EE1B20541FC5009415FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		6344EE1F2054222D009415FB /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishRegistrationViewController.swift; sourceTree = "<group>"; };
 		6344EE2420545D42009415FB /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		634553A42094830F00BB2D17 /* CallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallViewController.swift; sourceTree = "<group>"; };
 		634553A6209484AB00BB2D17 /* WChat-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WChat-Bridging-Header.h"; sourceTree = "<group>"; };
 		634553A82094971700BB2D17 /* ringback.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ringback.wav; sourceTree = "<group>"; };
-		6345654420A5D54A001F420F /* incoming.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = incoming.wav; sourceTree = "<group>"; };
 		6347220F20753E3400F9C17C /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		6349A87F208F8A1700706246 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		6349A881208F8A6700706246 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,8 +117,10 @@
 		639D06E0209851E100879C3C /* SINCallKitProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SINCallKitProvider.swift; sourceTree = "<group>"; };
 		639D06E2209853DE00879C3C /* AudioControllDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioControllDelegate.swift; sourceTree = "<group>"; };
 		63A51201206034A200F3EF31 /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		63B3A0DC2196CE5F00EC2E6E /* AnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationManager.swift; sourceTree = "<group>"; };
 		63B68E3220667EA00017B6B7 /* BlockedUsersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedUsersViewController.swift; sourceTree = "<group>"; };
 		63B6E6AB20FF8FB300FE6D2A /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		63BC16FE21976AE2008AA31C /* incoming.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = incoming.wav; sourceTree = "<group>"; };
 		63C343522051BBF500C6985B /* FUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FUser.swift; sourceTree = "<group>"; };
 		63C343542051BC5500C6985B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		63C343562051BC7E00C6985B /* HelperFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperFunctions.swift; sourceTree = "<group>"; };
@@ -217,14 +217,13 @@
 				6322EE9E2055ABB300C74A5C /* CustomCells */,
 				6344EE1E2054221B009415FB /* Classes */,
 				6344EE1D20542211009415FB /* Helpers */,
-				632BE1F32051BA5800131EB6 /* Main.storyboard */,
+				63BC16FD21971D6B008AA31C /* StoryBoards */,
 				632BE1F62051BA5800131EB6 /* Assets.xcassets */,
-				632BE1F82051BA5800131EB6 /* LaunchScreen.storyboard */,
-				6345654420A5D54A001F420F /* incoming.wav */,
+				63BC16FE21976AE2008AA31C /* incoming.wav */,
+				634553A82094971700BB2D17 /* ringback.wav */,
 				632BE1FB2051BA5800131EB6 /* Info.plist */,
 				6344EE1B20541FC5009415FB /* GoogleService-Info.plist */,
 				634553A6209484AB00BB2D17 /* WChat-Bridging-Header.h */,
-				634553A82094971700BB2D17 /* ringback.wav */,
 			);
 			path = WChat;
 			sourceTree = "<group>";
@@ -269,6 +268,7 @@
 				63353B2C208A248600A3DAF4 /* CallClass.swift */,
 				63E3F27020B1E10600E6E569 /* PhotoMediaItem.swift */,
 				6398B174214E3FD80073DDE2 /* PhotoAlbum.swift */,
+				63B3A0DC2196CE5F00EC2E6E /* AnimationManager.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -276,7 +276,6 @@
 		6344EE2320545D30009415FB /* Welcome */ = {
 			isa = PBXGroup;
 			children = (
-				6344EE1F2054222D009415FB /* WelcomeViewController.swift */,
 				6344EE2120544E5C009415FB /* FinishRegistrationViewController.swift */,
 				63F7D8A1209CE077004CB6BD /* PhoneNumberLoginViewController.swift */,
 			);
@@ -310,6 +309,15 @@
 				636C36DA208666E500D12839 /* BackgroundsCollectionViewController.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		63BC16FD21971D6B008AA31C /* StoryBoards */ = {
+			isa = PBXGroup;
+			children = (
+				632BE1F32051BA5800131EB6 /* Main.storyboard */,
+				632BE1F82051BA5800131EB6 /* LaunchScreen.storyboard */,
+			);
+			path = StoryBoards;
 			sourceTree = "<group>";
 		};
 		63D492F5206797D9007C19CA /* Secondary Views */ = {
@@ -406,10 +414,10 @@
 			files = (
 				632BE1FA2051BA5800131EB6 /* LaunchScreen.storyboard in Resources */,
 				6344EE1C20541FC6009415FB /* GoogleService-Info.plist in Resources */,
+				63BC16FF21976AE2008AA31C /* incoming.wav in Resources */,
 				634553A92094971700BB2D17 /* ringback.wav in Resources */,
 				638F3A7421021C8100DCCC07 /* Localizable.strings in Resources */,
 				632BE1F72051BA5800131EB6 /* Assets.xcassets in Resources */,
-				6345654520A5D54B001F420F /* incoming.wav in Resources */,
 				632BE1F52051BA5800131EB6 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -526,7 +534,6 @@
 				63F7D8A2209CE077004CB6BD /* PhoneNumberLoginViewController.swift in Sources */,
 				638B44C820B039AF00E11BE8 /* PicturesCollectionViewCell.swift in Sources */,
 				6344EE2520545D42009415FB /* SettingsViewController.swift in Sources */,
-				6344EE202054222D009415FB /* WelcomeViewController.swift in Sources */,
 				639344812078BC66002BDF8A /* InviteUserTableViewController.swift in Sources */,
 				635D8E5120557A2800297A0F /* ProfileViewController.swift in Sources */,
 				63D492F720679945007C19CA /* ChatViewController.swift in Sources */,
@@ -543,6 +550,7 @@
 				63FFDEF12088FE33005F9033 /* BackgroundImageCollectionViewCell.swift in Sources */,
 				6389AA6F20585A06006EF77A /* Recent.swift in Sources */,
 				6347221020753E3400F9C17C /* MapViewController.swift in Sources */,
+				63B3A0DD2196CE5F00EC2E6E /* AnimationManager.swift in Sources */,
 				63798BEF207A0C95005A0061 /* CountryCode.swift in Sources */,
 				6349A880208F8A1700706246 /* Encryption.swift in Sources */,
 				6398B175214E3FD80073DDE2 /* PhotoAlbum.swift in Sources */,

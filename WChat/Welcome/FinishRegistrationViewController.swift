@@ -51,22 +51,23 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         
         if nameTextField.text != "" && surnameTextField.text != "" && cityTextField.text != "" && countryTextField.text != "" && phoneTextField.text != "" {
             
-            //for email registration
-//            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!, completion: { (error) in
-//
-//                if error != nil {
-//
-//                    ProgressHUD.dismiss()
-//                    ProgressHUD.showError(error!.localizedDescription)
-//                    return
-//                }
-//
-//                self.registerUser()
-//
-//            })
-            
-            //for phone reg
-            registerUser()
+            if countryCode != nil {
+                // phone reg
+                registerUser()
+
+            } else {
+                // email registration
+                FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!, completion: { (error) in
+    
+                    if error != nil {
+    
+                        ProgressHUD.dismiss()
+                        ProgressHUD.showError(error!.localizedDescription)
+                        return
+                    }
+                    self.registerUser()
+                })
+            }
             
         } else {
             ProgressHUD.showError("All fields are required")
@@ -88,7 +89,6 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         present(imagePickerController, animated: true, completion: nil)
         
         dismissKeyboard()
-
     }
     
 
@@ -98,7 +98,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         
         let fullName = nameTextField.text! + " " + surnameTextField.text!
 
-        var tempDictionary: Dictionary = [kFIRSTNAME : nameTextField.text!, kLASTNAME: surnameTextField.text!, kFULLNAME : fullName, kCOUNTRY : countryTextField.text!, kCITY : cityTextField.text!, kPHONE : phoneTextField.text!, kCOUNTRYCODE : countryCode] as [String : Any]
+        var tempDictionary: Dictionary = [kFIRSTNAME : nameTextField.text!, kLASTNAME: surnameTextField.text!, kFULLNAME : fullName, kCOUNTRY : countryTextField.text!, kCITY : cityTextField.text!, kPHONE : phoneTextField.text!, kCOUNTRYCODE : countryCode ?? ""] as [String : Any]
         
         
         //add avatar if available
@@ -107,7 +107,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
             //create UIImage from Initials
             imageFromInitials(firstName: nameTextField.text!, lastName: surnameTextField.text!, withBlock: { (avatarInitials) in
                 
-                let avatarInitials = avatarInitials.jpegData(compressionQuality: 0.5)!
+                let avatarInitials = avatarInitials.jpegData(compressionQuality: 0.4)!
 
                 let avatar = avatarInitials.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
                 
@@ -120,7 +120,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
             
         } else {
             
-            let avatarData = avatarImage!.jpegData(compressionQuality: 0.5)!
+            let avatarData = avatarImage!.jpegData(compressionQuality: 0.3)!
             let avatar = avatarData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
             
             tempDictionary[kAVATAR] = avatar
@@ -134,12 +134,12 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
     func finishRegistration(withValues: [String : Any]) {
         
         updateCurrentUserInFirestore(withValues: withValues) { (error) in
+            
             if error != nil {
-                
                 DispatchQueue.main.async {
                     ProgressHUD.showError(error!.localizedDescription)
+                    self.deleteUser()
                 }
-                
                 return
             }
             
@@ -148,7 +148,6 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
             
             self.cleanTextFields()
             self.dismissKeyboard()
-            
             
             goToApp(fromView: self, to: "mainApplication")
         }
@@ -189,6 +188,25 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate {
         
         self.dismiss(animated: true, completion: nil)
     }
+
+    //MARK: Delete user in case of error
+    func deleteUser() {
+        
+        //delete local user
+        userDefaults.removeObject(forKey: kPUSHID)
+        userDefaults.removeObject(forKey: kCURRENTUSER)
+        userDefaults.synchronize()
+        
+        //delete user object in firebase database
+        reference(.User).document(FUser.currentId()).delete()
+        
+        FUser.deleteUser { (error) in
+            goToApp(fromView: self, to: "welcome")
+        }
+        
+    }
+
+    
 
 
 }

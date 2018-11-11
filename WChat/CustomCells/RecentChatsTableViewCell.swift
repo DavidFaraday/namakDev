@@ -32,11 +32,9 @@ class RecentChatsTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-
         
         //setup count label background to be round
         messageCountBackground.layer.cornerRadius = messageCountBackground.frame.width / 2
-        
         
         //avatar image tap
         tapGesture.addTarget(self, action: #selector(self.avatarTap))
@@ -47,7 +45,6 @@ class RecentChatsTableViewCell: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
 
     }
     

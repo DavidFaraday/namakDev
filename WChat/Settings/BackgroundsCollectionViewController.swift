@@ -62,7 +62,6 @@ class BackgroundsCollectionViewController: UICollectionViewController {
         ProgressHUD.showSuccess("Set!")
     }
 
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
     override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
         return true
     }

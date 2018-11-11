@@ -100,7 +100,7 @@ class OutgoingMessage {
 
     class func updateMessage(withId: String, chatRoomId: String, memberIds: [String]) {
         
-        let readDate = Date() //dateFormatter().string(from: Date())
+        let readDate = Date() 
         let values = [kSTATUS : kREAD, kREADDATE : readDate] as [String : Any]
         
         for userId in memberIds {

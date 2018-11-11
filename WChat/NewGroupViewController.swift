@@ -76,7 +76,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDelegate, UIColl
             //chage avatar if we have one
             if groupIcon != nil {
                 
-                let avatarData = groupIcon!.jpegData(compressionQuality: 0.5)!
+                let avatarData = groupIcon!.jpegData(compressionQuality: 0.4)!
 
                 avatar = avatarData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
             }

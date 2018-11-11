@@ -91,6 +91,7 @@ class SettingsTableViewController: UITableViewController {
         
         self.cleanCache()
 
+        //will add options to clean separate files later
 //        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 //
 //        let cleanPhotoes = UIAlertAction(title: NSLocalizedString("Clean Photoes", comment: ""), style: .default) { (alert: UIAlertAction!) in

@@ -10,7 +10,6 @@ import Foundation
 import OneSignal
 
 
-
 func sendPushNotification(membersToPush: [String], message: String) {
 
     let updatedMembers = removeCurrentUserFromMembersArray(members: membersToPush)
@@ -51,7 +50,7 @@ func getMembersToPush(members: [String], completion: @escaping (_ usersArray: [S
             
             if snapshot.exists {
                 
-                let userDictionary = snapshot.data() as! NSDictionary
+                let userDictionary = snapshot.data()! as NSDictionary
                 
                 let fUser = FUser.init(_dictionary: userDictionary)
                 

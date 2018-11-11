@@ -69,8 +69,6 @@ class CallViewController: UIViewController, SINCallDelegate {
             if (UIApplication.shared.delegate as! AppDelegate).callKitProvider.callExist(callId: _call.callId) {
                 
                 callAnswered = true
-//                if _call.state == SINCallState.established {
-//                }
             }
             
             showButtons()

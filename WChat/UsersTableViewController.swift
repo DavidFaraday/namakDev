@@ -54,7 +54,6 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
 
     //MARK: IBActions
     
-    
     @IBAction func filterSegmentChanged(_ sender: UISegmentedControl) {
         
         switch sender.selectedSegmentIndex {
@@ -114,7 +113,6 @@ class UsersTableViewController: UITableViewController, UserTableViewCellDelegate
             
             user = users![indexPath.row]
         }
-
         
         cell.generateCellWith(fUser: user, indexPath: indexPath)
         

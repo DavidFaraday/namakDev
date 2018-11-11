@@ -57,7 +57,7 @@ class GroupViewController: UIViewController, ImagePickerDelegate {
         Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: withValues)
         
         //need to update recents of the group
-        //chache with values because in recent the group name has different key
+        //change with values because in recent the group name has different key
         withValues = [kWITHUSERUSERNAME : groupNameTextField.text!, kAVATAR : avatarString]
 
         updateExistingRicentsWithNewValues(chatRoomId: group[kGROUPID] as! String, members: group[kMEMBERS] as! [String], withValues: withValues)
@@ -148,13 +148,11 @@ class GroupViewController: UIViewController, ImagePickerDelegate {
                 currentPopoverpresentioncontroller.sourceView = editButtonOutlet
                 currentPopoverpresentioncontroller.sourceRect = editButtonOutlet.bounds
                 
-                
                 currentPopoverpresentioncontroller.permittedArrowDirections = .up
                 self.present(optionMenu, animated: true, completion: nil)
             }
         } else{
             self.present(optionMenu, animated: true, completion: nil)
-            
         }
         
     }

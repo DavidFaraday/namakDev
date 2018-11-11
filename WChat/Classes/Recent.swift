@@ -220,7 +220,7 @@ func createRecentsForNewMembers(groupId: String, groupName: String,  membersToPu
     
     createRecent(members: membersToPush, chatRoomId: groupId, withUserUsername: groupName, type: kGROUP, users: nil, avatarOfGroup: avatar)
 }
-/////
+
 func updateExistingRicentsWithNewValues(chatRoomId: String, members: [String], withValues: [String : Any]) {
     
     reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { (snapshot, error) in

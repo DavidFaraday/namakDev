@@ -379,10 +379,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
     private func userDidLogout() {
         print("did log out")
-        _client.stopListeningOnActiveConnection()
-        _client.unregisterPushNotificationData()
-        _client.terminate()
-        _client = nil
+        if _client != nil {
+            _client.stopListeningOnActiveConnection()
+            _client.unregisterPushNotificationData()
+            _client.terminate()
+            _client = nil
+        }
     }
 
     

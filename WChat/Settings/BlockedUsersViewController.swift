@@ -123,7 +123,5 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
         self.navigationController?.pushViewController(profileVC, animated: true)
 
     }
-
-
     
 }

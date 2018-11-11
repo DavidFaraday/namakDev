@@ -50,8 +50,6 @@ class EditProfileTableViewController: UITableViewController, ImagePickerDelegate
 
     //MARK: IBActions
     
-    
-    
     @IBAction func saveButtonPressed(_ sender: Any) {
         
         if firstNameTextField.text != "" && lastNameTextField.text != "" && emailTextField.text != "" {

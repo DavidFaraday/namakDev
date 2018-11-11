@@ -177,17 +177,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             guard let snapshot = snapshot else { return }
             
-//            snapshot.documentChanges.forEach { diff in
-//                if (diff.type == .added) {
-//                    print("New city: \(diff.document.data()[kRECENTID])")
-//                }
-//                if (diff.type == .modified) {
-//                    print("Modified city: \(diff.document.data()[kRECENTID])")
-//                }
-//                if (diff.type == .removed) {
-//                    print("Removed city: \(diff.document.data()[kRECENTID])")
-//                }
-//            }
             self.recentChats = []
 
             
@@ -202,13 +191,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         
                         self.recentChats.append(recent)
                     }
-                    
-                    
-                    //required for offline working
-                    //                    reference(collectionReference: .Recent).whereField(kCHATROOMID, isEqualTo: currentRecent[kCHATROOMID] as! String).addSnapshotListener({ (snapshot, error) in
-                    //
-                    //                    })
-                    //end of offline requirement
                 }
             }
             

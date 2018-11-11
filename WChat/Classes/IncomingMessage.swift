@@ -42,7 +42,6 @@ class IncomingMessage {
             print("Unknown Message Type")
         }
         
-
         
         if message != nil {
             return message

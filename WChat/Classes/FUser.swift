@@ -284,7 +284,6 @@ class FUser {
     
             do {
                 try Auth.auth().signOut()
-    
                 completion(true)
     
             } catch let error as NSError {
@@ -313,7 +312,6 @@ class FUser {
 
 //MARK: Save user funcs
 
-//NEW firestore
 func saveUserToFirestore(fUser: FUser) {
     reference(.User).document(fUser.objectId).setData(userDictionaryFrom(user: fUser) as! [String : Any]) { (error) in
         
@@ -331,7 +329,6 @@ func saveUserLocally(fUser: FUser) {
 
 //MARK: Fetch User funcs
 
-//New firestore
 func fetchCurrentUserFromFirestore(userId: String) {
 
     reference(.User).document(userId).getDocument { (snapshot, error) in
@@ -350,25 +347,6 @@ func fetchCurrentUserFromFirestore(userId: String) {
     
 }
 
-//Old firebase
-//func fetchCurrentUser(userId: String) {
-//
-//    userRef.queryOrdered(byChild: kOBJECTID).queryEqual(toValue: userId).observe(.value, with: {
-//        snapshot in
-//
-//        if snapshot.exists() {
-//
-//            let user = ((snapshot.value as! NSDictionary).allValues as NSArray).firstObject! as! NSDictionary
-//
-//            UserDefaults.standard.setValue(user, forKeyPath: kCURRENTUSER)
-//            UserDefaults.standard.synchronize()
-//        }
-//
-//    })
-//
-//}
-
-//NEW firestore
 func fetchCurrentUserFromFirestore(userId: String, completion: @escaping (_ user: FUser?)->Void) {
     
     reference(.User).document(userId).getDocument { (snapshot, error) in
@@ -391,14 +369,10 @@ func fetchCurrentUserFromFirestore(userId: String, completion: @escaping (_ user
 
 func userDictionaryFrom(user: FUser) -> NSDictionary {
     
-//    let createdAt = dateFormatter().string(from: user.createdAt)
-//    let updatedAt = dateFormatter().string(from: user.updatedAt)
-    
     return NSDictionary(objects: [user.objectId,  user.createdAt, user.updatedAt, user.email, user.loginMethod, user.pushId!, user.firstname, user.lastname, user.fullname, user.avatar, user.contacts, user.blockedUsers, user.isOnline, user.phoneNumber, user.countryCode, user.city, user.country], forKeys: [kOBJECTID as NSCopying, kCREATEDAT as NSCopying, kUPDATEDAT as NSCopying, kEMAIL as NSCopying, kLOGINMETHOD as NSCopying, kPUSHID as NSCopying, kFIRSTNAME as NSCopying, kLASTNAME as NSCopying, kFULLNAME as NSCopying, kAVATAR as NSCopying, kCONTACT as NSCopying, kBLOCKEDUSERID as NSCopying, kISONLINE as NSCopying, kPHONE as NSCopying, kCOUNTRYCODE as NSCopying, kCITY as NSCopying, kCOUNTRY as NSCopying])
     
 }
 
-//NEW firestore
 func getUsersFromFirestore(withIds: [String], completion: @escaping (_ usersArray: [FUser]) -> Void) {
     
     var count = 0

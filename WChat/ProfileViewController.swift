@@ -124,9 +124,7 @@ class ProfileViewController: UITableViewController {
     }
     
     //MARK: CallFunctions
-    
     func callClient() -> SINCallClient {
-        
         return appDelegate._client.call()
     }
     

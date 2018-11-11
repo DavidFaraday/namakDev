@@ -11,6 +11,7 @@ import Contacts
 import FirebaseFirestore
 import ProgressHUD
 
+//need review the logic
 class ContactsViewController: UIViewController, UISearchResultsUpdating, UITableViewDataSource, UITableViewDelegate, UserTableViewCellDelegate {
     
     var users: [FUser] = []
@@ -551,7 +552,6 @@ class ContactsViewController: UIViewController, UISearchResultsUpdating, UITable
         
     }
 
-    
     
     
 }
